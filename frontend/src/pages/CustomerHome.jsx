@@ -53,9 +53,12 @@ function CustomerHome() {
     try {
       setLoading(true);
       const { data } = await axios.get('/api/products');
-      setAllProducts(data.products);
+      console.log('API Response:', data);
+      setAllProducts(data.products || []);
     } catch (error) {
       console.error('Error fetching products:', error);
+      console.error('Error details:', error.response?.data);
+      setAllProducts([]);
     } finally {
       setLoading(false);
     }
