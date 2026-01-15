@@ -1,0 +1,18 @@
+{
+  "name": "pdf-to-google-sheets",
+  "version": "1.0.0",
+  "description": "Extract products from PDF catalog and import to Google Sheets",
+  "type": "module",
+  "main": "importProducts.js",
+  "scripts": {
+    "import": "node importProducts.js"
+  },
+  "keywords": ["pdf", "google-sheets", "import"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "pdf-parse": "^1.1.1",
+    "googleapis": "^128.0.0",
+    "dotenv": "^16.4.5"
+  }
+}
