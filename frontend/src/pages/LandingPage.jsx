@@ -404,6 +404,18 @@ function LandingPage() {
     try {
       setSubmitting(true);
       
+      // حساب سعر التوصيل
+      const productTotal = (product.suggested_price || product.customerPrice) * formData.quantity;
+      const distance = calculateDistance(
+        STORE_LOCATION.lat,
+        STORE_LOCATION.lng,
+        locationCoords.lat,
+        locationCoords.lng
+      );
+      const deliveryFee = distance < NEARBY_RADIUS_KM 
+        ? getNearbyDeliveryFee(productTotal) 
+        : DELIVERY_FEE;
+      
       const orderData = {
         productId: product._id,
         customerName: formData.customerName,
@@ -416,7 +428,8 @@ function LandingPage() {
         },
         quantity: formData.quantity,
         notes: formData.notes,
-        affiliateCode: affiliateCode
+        affiliateCode: affiliateCode,
+        deliveryFee: deliveryFee
       };
 
       await api.post('/orders', orderData);

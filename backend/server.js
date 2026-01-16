@@ -21,16 +21,16 @@ const corsOptions = {
     // Allow requests with no origin
     if (!origin) return callback(null, true);
     
-    // Check allow list and Vercel domains
+    // Check allow list and Vercel/Netlify domains
     const allowed = [
       'http://localhost:3000',
       'http://192.168.1.8:3000',
       'https://prince-shop47.vercel.app',
-      'https://prince-shop-ghardaia-1nma4s0gz-nassim-coiffeurs-projects.vercel.app', // Explicitly added your preview URL
+      'https://prince-shop47.netlify.app', // Netlify Production
       process.env.FRONTEND_URL
     ];
 
-    if (allowed.includes(origin) || origin.endsWith('.onrender.com') || origin.endsWith('.vercel.app')) {
+    if (allowed.includes(origin) || origin.endsWith('.onrender.com') || origin.endsWith('.vercel.app') || origin.endsWith('.netlify.app')) {
       return callback(null, true);
     } else {
       console.log('⚠️ CORS blocked:', origin);
@@ -88,7 +88,7 @@ app.use('/api/admin', adminRoutes);
 // إنشاء طلب جديد
 app.post('/api/orders', async (req, res) => {
   try {
-    const { productId, customerName, customerPhone, deliveryLocation, deliveryCoordinates, quantity, notes, affiliateCode } = req.body;
+    const { productId, customerName, customerPhone, deliveryLocation, deliveryCoordinates, quantity, notes, affiliateCode, deliveryFee } = req.body;
     
     console.log('Received order data:', req.body);
     
@@ -111,8 +111,9 @@ app.post('/api/orders', async (req, res) => {
       return res.status(404).json({ error: 'المنتج غير موجود' });
     }
     
-    // حساب المبلغ الإجمالي
-    const totalAmount = product.suggested_price * (quantity || 1);
+    // حساب المبلغ الإجمالي (سعر المنتج + التوصيل)
+    const productTotal = product.suggested_price * (quantity || 1);
+    const totalAmount = productTotal + (deliveryFee || 0);
     
     // البحث عن المسوق إذا تم تقديم رمز المسوق
     let affiliateId = null;
@@ -137,6 +138,7 @@ app.post('/api/orders', async (req, res) => {
       productPrice: product.suggested_price,
       quantity: quantity || 1,
       totalAmount,
+      deliveryFee: deliveryFee || 0,
       notes,
       affiliate: affiliateId,
       affiliateProfit

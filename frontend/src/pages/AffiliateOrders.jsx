@@ -140,10 +140,18 @@ export default function AffiliateOrders() {
 
                   {/* Pricing */}
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-3 border-t gap-2">
-                    <div className="flex gap-4 sm:gap-6">
+                    <div className="flex flex-wrap gap-4 sm:gap-6">
                       <div>
                         <p className="text-xs text-gray-500 mb-1">سعر البيع</p>
                         <p className="font-semibold text-gray-900 text-sm sm:text-base">{order.pricing.sellingPrice} دج</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">التوصيل</p>
+                        <p className="font-semibold text-orange-600 text-sm sm:text-base">{order.deliveryFee || 0} دج</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">الإجمالي</p>
+                        <p className="font-semibold text-blue-600 text-sm sm:text-base">{(order.pricing.sellingPrice || 0) + (order.deliveryFee || 0)} دج</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-500 mb-1">ربحك</p>

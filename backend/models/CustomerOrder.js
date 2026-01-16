@@ -57,6 +57,12 @@ const customerOrderSchema = new mongoose.Schema({
     ref: 'User'
   },
   
+  // سعر التوصيل
+  deliveryFee: {
+    type: Number,
+    default: 0
+  },
+  
   // ربح المسوق من هذا الطلب
   affiliateProfit: {
     type: Number,
