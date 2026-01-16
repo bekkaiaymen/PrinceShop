@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, ShoppingCart, User, Menu, X, MapPin, Phone } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 
 function CustomerHome() {
@@ -52,7 +52,7 @@ function CustomerHome() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get('/api/products');
+      const { data } = await api.get('/products');
       console.log('API Response:', data);
       setAllProducts(data.products || []);
     } catch (error) {
@@ -348,7 +348,7 @@ function OrderModal({ product, affiliateCode, onClose }) {
         affiliateCode: affiliateCode || null
       });
       
-      const response = await axios.post('/api/orders', {
+      const response = await api.post('/orders', {
         productId: product._id,
         ...formData,
         affiliateCode: affiliateCode || null

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, TrendingUp, Package, DollarSign, Filter, Zap, Headphones, ChevronLeft } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api';
 import { Link } from 'react-router-dom';
 
 function HomePage() {
@@ -67,7 +67,7 @@ function HomePage() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get('/api/products');
+      const { data } = await api.get('/products');
       setAllProducts(data.products);
     } catch (error) {
       console.error('Error fetching products:', error);
