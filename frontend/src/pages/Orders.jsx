@@ -155,9 +155,23 @@ function OrderCard({ order, statusConfig, onStatusChange, onViewDetails }) {
                 {status.label}
               </div>
               <h3 className="font-bold text-gray-900 mb-1 line-clamp-2">{order.productName}</h3>
-              <div className="flex items-center gap-4 text-sm text-gray-600">
-                <span>الكمية: {order.quantity}</span>
-                <span className="text-xl font-bold text-blue-600">{order.totalAmount} دج</span>
+              <div className="flex flex-wrap items-center gap-3 text-sm">
+                <div className="text-gray-600">
+                  <span className="text-xs">سعر السلعة:</span>
+                  <span className="font-bold text-gray-900 mr-1">{order.productPrice} دج</span>
+                </div>
+                <div className="text-gray-600">
+                  <span className="text-xs">الكمية:</span>
+                  <span className="font-bold text-gray-900 mr-1">{order.quantity}</span>
+                </div>
+                <div className="text-gray-600">
+                  <span className="text-xs">التوصيل:</span>
+                  <span className="font-bold text-orange-600 mr-1">{order.deliveryFee || 0} دج</span>
+                </div>
+                <div className="text-blue-600">
+                  <span className="text-xs">المجموع:</span>
+                  <span className="font-bold text-xl mr-1">{order.totalAmount} دج</span>
+                </div>
               </div>
             </div>
           </div>
@@ -275,11 +289,24 @@ function OrderDetailsModal({ order, statusConfig, onClose, onStatusChange }) {
                 className="w-32 h-32 object-contain bg-white rounded-xl p-2"
               />
               <div className="flex-1">
-                <h4 className="font-bold text-gray-900 mb-2">{order.productName}</h4>
-                <div className="space-y-1 text-sm">
-                  <p><span className="text-gray-600">السعر:</span> <span className="font-bold">{order.productPrice} دج</span></p>
-                  <p><span className="text-gray-600">الكمية:</span> <span className="font-bold">{order.quantity}</span></p>
-                  <p className="text-xl font-bold text-blue-600 mt-2">المجموع: {order.totalAmount} دج</p>
+                <h4 className="font-bold text-gray-900 mb-3">{order.productName}</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between bg-white p-2 rounded-lg">
+                    <span className="text-gray-600">سعر السلعة:</span>
+                    <span className="font-bold text-gray-900">{order.productPrice} دج</span>
+                  </div>
+                  <div className="flex items-center justify-between bg-white p-2 rounded-lg">
+                    <span className="text-gray-600">الكمية:</span>
+                    <span className="font-bold text-gray-900">{order.quantity}</span>
+                  </div>
+                  <div className="flex items-center justify-between bg-white p-2 rounded-lg">
+                    <span className="text-gray-600">سعر التوصيل:</span>
+                    <span className="font-bold text-orange-600">{order.deliveryFee || 0} دج</span>
+                  </div>
+                  <div className="flex items-center justify-between bg-blue-50 p-3 rounded-lg border-2 border-blue-200">
+                    <span className="text-gray-900 font-bold">المجموع:</span>
+                    <span className="text-xl font-bold text-blue-600">{order.totalAmount} دج</span>
+                  </div>
                 </div>
               </div>
             </div>
