@@ -4,6 +4,7 @@ import api from '../services/api';
 import { Link } from 'react-router-dom';
 
 function HomePage() {
+  console.log('HomePage: Component Loaded (v3.0 - Robust)'); // Debug Log
   const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
