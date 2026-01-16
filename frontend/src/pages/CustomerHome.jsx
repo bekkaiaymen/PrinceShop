@@ -53,12 +53,16 @@ function CustomerHome() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const { data } = await api.get('/products');
-      console.log('API Response:', data);
+      console.log('Fetching products directly from Render...');
+      // DIRECT FETCH BYPASSING AXIOS TO PREVENT CONFIG ISSUES
+      const response = await fetch('https://princeshop-backend.onrender.com/api/products');
+      const data = await response.json();
+      
+      console.log('Direct Fetch Response:', data);
       setAllProducts(data.products || []);
     } catch (error) {
       console.error('Error fetching products:', error);
-      console.error('Error details:', error.response?.data);
+      // Fallback empty array to prevent crash
       setAllProducts([]);
     } finally {
       setLoading(false);
