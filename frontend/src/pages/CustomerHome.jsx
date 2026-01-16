@@ -15,6 +15,8 @@ function CustomerHome() {
   const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('الكل');
+  const [priceRange, setPriceRange] = useState('all');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [orderModalOpen, setOrderModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -128,11 +130,45 @@ function CustomerHome() {
     return categorized;
   };
 
-  const filteredProducts = searchTerm 
-    ? allProducts.filter(p => 
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.sku?.toLowerCase().includes(searchTerm.toLowerCase())
-      ).slice(0, 50) // تحديد 50 منتج كحد أقصى في البحث
+  const filteredProducts = searchTerm || selectedCategory !== 'الكل' || priceRange !== 'all'
+    ? allProducts.filter(p => {
+        // فلتر البحث
+        const matchSearch = !searchTerm || 
+          p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          p.sku?.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        // فلتر الفئة
+        let matchCategory = selectedCategory === 'الكل';
+        if (!matchCategory) {
+          const productName = p.name?.toUpperCase() || '';
+          const category = categoryOrder.find(cat => cat.name === selectedCategory);
+          if (category) {
+            matchCategory = category.keywords.some(keyword => productName.includes(keyword));
+          }
+        }
+        
+        // فلتر السعر
+        let matchPrice = priceRange === 'all';
+        if (!matchPrice) {
+          const price = p.customerPrice || p.suggested_price || 0;
+          switch(priceRange) {
+            case 'under1000':
+              matchPrice = price < 1000;
+              break;
+            case '1000-2000':
+              matchPrice = price >= 1000 && price <= 2000;
+              break;
+            case '2000-3000':
+              matchPrice = price >= 2000 && price <= 3000;
+              break;
+            case 'above3000':
+              matchPrice = price > 3000;
+              break;
+          }
+        }
+        
+        return matchSearch && matchCategory && matchPrice;
+      }).slice(0, 50)
     : null;
 
   const categorizedProducts = !searchTerm ? categorizeProducts() : null;
@@ -200,7 +236,7 @@ function CustomerHome() {
           </p>
           
           {/* Search Box */}
-          <div className="max-w-2xl mx-auto relative">
+          <div className="max-w-2xl mx-auto relative mb-6">
             <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
@@ -209,6 +245,34 @@ function CustomerHome() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pr-12 pl-4 py-4 sm:py-5 border-0 rounded-2xl focus:ring-4 focus:ring-white/30 text-base sm:text-lg shadow-2xl text-gray-800"
             />
+          </div>
+
+          {/* Filters */}
+          <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Category Filter */}
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="px-4 py-3 border-2 border-white/30 rounded-xl focus:ring-4 focus:ring-white/30 text-gray-800 bg-white/90 backdrop-blur font-medium shadow-lg"
+            >
+              <option value="الكل">🏷️ جميع الفئات</option>
+              {categoryOrder.filter(cat => cat.keywords.length > 0).map(cat => (
+                <option key={cat.name} value={cat.name}>{cat.icon} {cat.name}</option>
+              ))}
+            </select>
+
+            {/* Price Filter */}
+            <select
+              value={priceRange}
+              onChange={(e) => setPriceRange(e.target.value)}
+              className="px-4 py-3 border-2 border-white/30 rounded-xl focus:ring-4 focus:ring-white/30 text-gray-800 bg-white/90 backdrop-blur font-medium shadow-lg"
+            >
+              <option value="all">💰 جميع الأسعار</option>
+              <option value="under1000">أقل من 1000 دج</option>
+              <option value="1000-2000">1000 - 2000 دج</option>
+              <option value="2000-3000">2000 - 3000 دج</option>
+              <option value="above3000">أكثر من 3000 دج</option>
+            </select>
           </div>
         </div>
       </section>
@@ -219,12 +283,12 @@ function CustomerHome() {
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
           <p className="mt-6 text-blue-600 font-bold text-lg">جاري تحميل المنتجات...</p>
         </div>
-      ) : searchTerm ? (
-        /* نتائج البحث */
+      ) : (searchTerm || selectedCategory !== 'الكل' || priceRange !== 'all') ? (
+        /* نتائج البحث/الفلتر */
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
           <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 sm:p-6 rounded-2xl mb-6 shadow-lg">
             <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-              نتائج البحث 🔍
+              {searchTerm ? 'نتائج البحث 🔍' : 'نتائج الفلتر 🎯'}
             </h3>
             <p className="text-base sm:text-lg text-gray-600">
               وجدنا <span className="font-bold text-blue-600">{filteredProducts?.length || 0}</span> منتج

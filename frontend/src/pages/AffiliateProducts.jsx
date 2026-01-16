@@ -9,6 +9,9 @@ export default function AffiliateProducts() {
   const [copiedText, setCopiedText] = useState(null);
   const [copiedImage, setCopiedImage] = useState(null);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('الكل');
+  const [profitFilter, setProfitFilter] = useState('all');
 
   // الفئات بنفس الترتيب في صفحة الزبون
   const categoryOrder = [
@@ -41,14 +44,41 @@ export default function AffiliateProducts() {
     }
   };
 
-  // تصنيف المنتجات حسب الفئات
+  // تصنيف المنتجات حسب الفئات مع الفلتر
   const categorizeProducts = () => {
     const categorized = {};
     categoryOrder.forEach(cat => { categorized[cat.name] = []; });
 
     if (!Array.isArray(allProducts)) return categorized;
 
-    allProducts.forEach(product => {
+    // تطبيق الفلتر
+    let filtered = allProducts.filter(product => {
+      // فلتر البحث
+      const matchSearch = !searchTerm || 
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.sku?.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      // فلتر نسبة الربح
+      let matchProfit = profitFilter === 'all';
+      if (!matchProfit) {
+        const profitPercent = product.profit_percent || 0;
+        switch(profitFilter) {
+          case 'low':
+            matchProfit = profitPercent < 15;
+            break;
+          case 'medium':
+            matchProfit = profitPercent >= 15 && profitPercent < 25;
+            break;
+          case 'high':
+            matchProfit = profitPercent >= 25;
+            break;
+        }
+      }
+      
+      return matchSearch && matchProfit;
+    });
+
+    filtered.forEach(product => {
       let matched = false;
       const productName = product.name?.toUpperCase() || '';
       
@@ -183,6 +213,53 @@ export default function AffiliateProducts() {
         </div>
       </div>
 
+      {/* Filters */}
+      <div className="bg-white rounded-xl shadow-lg p-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Search */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">🔍 البحث</label>
+            <input
+              type="text"
+              placeholder="ابحث عن منتج..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          {/* Category Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">🏷️ الفئة</label>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="الكل">جميع الفئات</option>
+              {categoryOrder.filter(cat => cat.keywords.length > 0).map(cat => (
+                <option key={cat.name} value={cat.name}>{cat.icon} {cat.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Profit Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">💰 نسبة الربح</label>
+            <select
+              value={profitFilter}
+              onChange={(e) => setProfitFilter(e.target.value)}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="all">جميع النسب</option>
+              <option value="low">أقل من 15%</option>
+              <option value="medium">15% - 25%</option>
+              <option value="high">أكثر من 25%</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       {/* عرض المنتجات حسب الفئات */}
       {!loading && !error && (
         <div className="space-y-8">
@@ -190,6 +267,8 @@ export default function AffiliateProducts() {
             const categorizedProducts = categorizeProducts();
             const products = categorizedProducts[category.name] || [];
             
+            // فلتر الفئة المحددة
+            if (selectedCategory !== 'الكل' && category.name !== selectedCategory) return null;
             if (products.length === 0) return null;
             
             return (
