@@ -254,9 +254,14 @@ app.get('/api/products', async (req, res) => {
       customerPrice: calculateCustomerPrice(product.wholesale_price)
     }));
 
+    // BACKWARD COMPATIBILITY: Send both 'products' (for old frontend) and 'data' (for newer standard)
+    // This fixes the issue where cached frontend expects 'products' array but might receive something else
     res.json({
-      products: productsWithCustomerPrice,
+      success: true,
+      products: productsWithCustomerPrice, // Old Frontend property
+      data: productsWithCustomerPrice,     // New Standard property
       total,
+      count: productsWithCustomerPrice.length,
       page: Number(page),
       pages: Math.ceil(total / limit),
     });
