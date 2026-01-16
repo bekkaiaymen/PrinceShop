@@ -435,7 +435,7 @@ function CustomerHome() {
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
           <p className="mt-6 text-blue-600 font-bold text-lg">جاري تحميل المنتجات...</p>
         </div>
-      ) : (searchTerm || selectedCategory !== 'الكل' || priceRange !== 'all') ? (
+      ) : (searchTerm || selectedCategory !== 'الكل' || minPrice !== '' || maxPrice !== '' || exactPrice !== '') ? (
         /* نتائج البحث/الفلتر */
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
           <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 sm:p-6 rounded-2xl mb-6 shadow-lg">
