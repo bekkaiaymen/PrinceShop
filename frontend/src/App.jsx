@@ -16,6 +16,8 @@ import ImageVerification from './pages/ImageVerification';
 import Orders from './pages/Orders';
 import AdminDashboard from './pages/AdminDashboard';
 import LandingPage from './pages/LandingPage';
+import OwnerLogin from './pages/OwnerLogin';
+import OwnerDashboard from './pages/OwnerDashboard';
 
 function App() {
   return (
@@ -40,6 +42,10 @@ function App() {
             <Route path="profile" element={<AffiliateProfile />} />
             <Route path="customer-orders" element={<Orders />} />
           </Route>
+          
+          {/* Owner Routes - لصاحب الموقع */}
+          <Route path="/owner/login" element={<OwnerLogin />} />
+          <Route path="/owner/dashboard" element={<OwnerDashboard />} />
           
           {/* Admin Dashboard */}
           <Route path="/admin" element={<AdminDashboard />} />

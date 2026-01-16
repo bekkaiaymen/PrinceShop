@@ -57,6 +57,13 @@ const customerOrderSchema = new mongoose.Schema({
     ref: 'User'
   },
   
+  // مصدر الطلب (مباشر أو من مسوق)
+  orderSource: {
+    type: String,
+    enum: ['direct', 'affiliate'],
+    default: 'direct'
+  },
+  
   // سعر التوصيل
   deliveryFee: {
     type: Number,

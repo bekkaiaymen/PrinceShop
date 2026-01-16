@@ -6,9 +6,11 @@ import Product from './models/Product.js';
 import Order from './models/Order.js';
 import CustomerOrder from './models/CustomerOrder.js';
 import User from './models/User.js';
+import Owner from './models/Owner.js';
 import authRoutes from './routes/auth.js';
 import affiliateRoutes from './routes/affiliate.js';
 import adminRoutes from './routes/admin.js';
+import jwt from 'jsonwebtoken';
 
 dotenv.config();
 
@@ -118,11 +120,14 @@ app.post('/api/orders', async (req, res) => {
     // البحث عن المسوق إذا تم تقديم رمز المسوق
     let affiliateId = null;
     let affiliateProfit = 0;
+    let orderSource = 'direct'; // افتراضياً الطلب مباشر
+    
     if (affiliateCode) {
       const affiliate = await User.findOne({ affiliateCode, role: 'affiliate' });
       if (affiliate) {
         affiliateId = affiliate._id;
         affiliateProfit = product.affiliate_profit * (quantity || 1);
+        orderSource = 'affiliate'; // الطلب من مسوق
       }
     }
     
@@ -142,7 +147,8 @@ app.post('/api/orders', async (req, res) => {
       deliveryTime: deliveryTime || 'morning',
       notes,
       affiliate: affiliateId,
-      affiliateProfit
+      affiliateProfit,
+      orderSource // إضافة مصدر الطلب
     });
     
     await order.save();
@@ -351,6 +357,240 @@ app.get('/api/stats', async (req, res) => {
       avgProfit: avgProfit[0]?.avgProfit || 0,
     });
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============ OWNER ROUTES ============
+
+// تسجيل صاحب الموقع (للمرة الأولى فقط)
+app.post('/api/owner/register', async (req, res) => {
+  try {
+    const { username, password, email, phone } = req.body;
+    
+    // التحقق من عدم وجود مالك مسجل
+    const existingOwner = await Owner.findOne();
+    if (existingOwner) {
+      return res.status(400).json({ error: 'المالك مسجل مسبقاً' });
+    }
+    
+    const owner = new Owner({ username, password, email, phone });
+    await owner.save();
+    
+    const token = jwt.sign({ ownerId: owner._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    
+    res.status(201).json({
+      token,
+      owner: {
+        id: owner._id,
+        username: owner.username,
+        email: owner.email,
+        phone: owner.phone
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// تسجيل دخول صاحب الموقع
+app.post('/api/owner/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    
+    const owner = await Owner.findOne({ username });
+    if (!owner) {
+      return res.status(401).json({ error: 'اسم المستخدم أو كلمة المرور غير صحيحة' });
+    }
+    
+    const isMatch = await owner.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'اسم المستخدم أو كلمة المرور غير صحيحة' });
+    }
+    
+    const token = jwt.sign({ ownerId: owner._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    
+    res.json({
+      token,
+      owner: {
+        id: owner._id,
+        username: owner.username,
+        email: owner.email,
+        phone: owner.phone
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// جلب جميع الطلبات لصاحب الموقع
+app.get('/api/owner/orders', async (req, res) => {
+  try {
+    const { page = 1, limit = 50, status, orderSource, search, startDate, endDate } = req.query;
+    const skip = (page - 1) * limit;
+    
+    let query = {};
+    
+    // فلتر حسب الحالة
+    if (status && status !== 'all') {
+      query.status = status;
+    }
+    
+    // فلتر حسب المصدر (مباشر أو من مسوق)
+    if (orderSource && orderSource !== 'all') {
+      query.orderSource = orderSource;
+    }
+    
+    // بحث في اسم الزبون أو رقم الهاتف
+    if (search) {
+      query.$or = [
+        { customerName: { $regex: search, $options: 'i' } },
+        { customerPhone: { $regex: search, $options: 'i' } }
+      ];
+    }
+    
+    // فلتر حسب التاريخ
+    if (startDate || endDate) {
+      query.createdAt = {};
+      if (startDate) query.createdAt.$gte = new Date(startDate);
+      if (endDate) query.createdAt.$lte = new Date(endDate);
+    }
+    
+    const [orders, total] = await Promise.all([
+      CustomerOrder.find(query)
+        .populate('product', 'name image sku price wholesalePrice')
+        .populate('affiliate', 'name email phone')
+        .sort({ createdAt: -1 })
+        .limit(Number(limit))
+        .skip(skip),
+      CustomerOrder.countDocuments(query)
+    ]);
+    
+    res.json({
+      orders,
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / limit)
+    });
+  } catch (error) {
+    console.error('Error fetching owner orders:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// جلب إحصائيات صاحب الموقع
+app.get('/api/owner/statistics', async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    
+    let dateQuery = {};
+    if (startDate || endDate) {
+      dateQuery.createdAt = {};
+      if (startDate) dateQuery.createdAt.$gte = new Date(startDate);
+      if (endDate) dateQuery.createdAt.$lte = new Date(endDate);
+    }
+    
+    // إجمالي الطلبات
+    const totalOrders = await CustomerOrder.countDocuments(dateQuery);
+    
+    // الطلبات المباشرة
+    const directOrders = await CustomerOrder.countDocuments({ ...dateQuery, orderSource: 'direct' });
+    
+    // الطلبات عبر المسوقين
+    const affiliateOrders = await CustomerOrder.countDocuments({ ...dateQuery, orderSource: 'affiliate' });
+    
+    // إجمالي المبيعات
+    const salesData = await CustomerOrder.aggregate([
+      { $match: dateQuery },
+      {
+        $group: {
+          _id: null,
+          totalRevenue: { $sum: '$totalAmount' },
+          totalDeliveryFees: { $sum: '$deliveryFee' },
+          totalAffiliatePayments: { $sum: '$affiliateProfit' }
+        }
+      }
+    ]);
+    
+    const stats = salesData[0] || { totalRevenue: 0, totalDeliveryFees: 0, totalAffiliatePayments: 0 };
+    
+    // صافي الربح = إجمالي المبيعات + رسوم التوصيل - مدفوعات المسوقين
+    const netProfit = stats.totalRevenue + stats.totalDeliveryFees - stats.totalAffiliatePayments;
+    
+    // الطلبات حسب الحالة
+    const ordersByStatus = await CustomerOrder.aggregate([
+      { $match: dateQuery },
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+    
+    // أكثر المسوقين نشاطاً
+    const topAffiliates = await CustomerOrder.aggregate([
+      { $match: { ...dateQuery, orderSource: 'affiliate' } },
+      {
+        $group: {
+          _id: '$affiliate',
+          ordersCount: { $sum: 1 },
+          totalCommission: { $sum: '$affiliateProfit' }
+        }
+      },
+      { $sort: { ordersCount: -1 } },
+      { $limit: 10 },
+      {
+        $lookup: {
+          from: 'users',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'affiliateInfo'
+        }
+      },
+      { $unwind: '$affiliateInfo' }
+    ]);
+    
+    // المنتجات الأكثر مبيعاً
+    const topProducts = await CustomerOrder.aggregate([
+      { $match: dateQuery },
+      {
+        $group: {
+          _id: '$product',
+          totalSold: { $sum: '$quantity' },
+          revenue: { $sum: '$totalAmount' }
+        }
+      },
+      { $sort: { totalSold: -1 } },
+      { $limit: 10 },
+      {
+        $lookup: {
+          from: 'products',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'productInfo'
+        }
+      },
+      { $unwind: '$productInfo' }
+    ]);
+    
+    res.json({
+      overview: {
+        totalOrders,
+        directOrders,
+        affiliateOrders,
+        totalRevenue: stats.totalRevenue,
+        totalDeliveryFees: stats.totalDeliveryFees,
+        totalAffiliatePayments: stats.totalAffiliatePayments,
+        netProfit
+      },
+      ordersByStatus,
+      topAffiliates,
+      topProducts
+    });
+  } catch (error) {
+    console.error('Error fetching owner statistics:', error);
     res.status(500).json({ error: error.message });
   }
 });
