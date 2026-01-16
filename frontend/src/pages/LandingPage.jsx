@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import axios from '../services/api';
+import api from '../services/api';
 import { ShoppingCart, MapPin, Phone, User, Package, MessageSquare, DollarSign, CheckCircle } from 'lucide-react';
 
 function LandingPage() {
@@ -289,7 +289,7 @@ function LandingPage() {
     try {
       setLoading(true);
       console.log('Fetching product with ID:', productId);
-      const { data } = await axios.get(`/products/${productId}`);
+      const { data } = await api.get(`/products/${productId}`);
       console.log('Product data received:', data);
       
       // البيانات قد تأتي في data.product أو data مباشرة
@@ -299,7 +299,7 @@ function LandingPage() {
       // جلب المنتجات المشابهة (نفس الفئة)
       if (productData && productData.category) {
         console.log('Fetching similar products for category:', productData.category);
-        const { data: allProducts } = await axios.get('/products');
+        const { data: allProducts } = await api.get('/products');
         const similar = allProducts.products
           .filter(p => 
             p._id !== productId && 
@@ -419,7 +419,7 @@ function LandingPage() {
         affiliateCode: affiliateCode
       };
 
-      await axios.post('/orders', orderData);
+      await api.post('/orders', orderData);
       
       setSuccess(true);
       

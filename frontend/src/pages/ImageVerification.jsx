@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, ArrowRight, Check, X, AlertTriangle } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api';
 
 export default function ImageVerification() {
   const [products, setProducts] = useState([]);
@@ -14,7 +14,7 @@ export default function ImageVerification() {
 
   const loadProducts = async () => {
     try {
-      const { data } = await axios.get('/api/products');
+      const { data } = await api.get('/products');
       setProducts(data.products);
     } catch (error) {
       console.error('Error loading products:', error);

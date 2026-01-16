@@ -3,7 +3,7 @@ import {
   Users, Package, ShoppingBag, TrendingUp, DollarSign, 
   Phone, MapPin, Eye, CheckCircle, Clock, Truck, XCircle 
 } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api';
 
 function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -29,9 +29,9 @@ function AdminDashboard() {
     try {
       setLoading(true);
       const [ordersRes, affiliatesRes, productsRes] = await Promise.all([
-        axios.get('/api/admin/orders'),
-        axios.get('/api/admin/affiliates'),
-        axios.get('/api/products')
+        api.get('/admin/orders'),
+        api.get('/admin/affiliates'),
+        api.get('/products')
       ]);
 
       const orders = ordersRes.data.orders || [];

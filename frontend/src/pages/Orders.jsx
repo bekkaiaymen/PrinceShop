@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Package, Phone, MapPin, Clock, CheckCircle, XCircle, Truck, Eye } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api';
 
 function Orders() {
   const [orders, setOrders] = useState([]);
@@ -18,7 +18,7 @@ function Orders() {
       const params = {};
       if (filter !== 'all') params.status = filter;
       
-      const { data } = await axios.get('/api/orders', { params });
+      const { data } = await api.get('/orders', { params });
       setOrders(data.orders);
     } catch (error) {
       console.error('Error fetching orders:', error);
@@ -29,7 +29,7 @@ function Orders() {
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
-      await axios.patch(`/api/orders/${orderId}`, { status: newStatus });
+      await api.patch(`/orders/${orderId}`, { status: newStatus });
       fetchOrders();
     } catch (error) {
       console.error('Error updating order:', error);

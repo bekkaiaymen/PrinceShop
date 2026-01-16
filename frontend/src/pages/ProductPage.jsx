@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowRight, DollarSign, Package, TrendingUp, Copy, Check, Share2 } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api';
 
 function ProductPage() {
   const { id } = useParams();
@@ -18,7 +18,7 @@ function ProductPage() {
 
   const fetchProduct = async () => {
     try {
-      const { data } = await axios.get(`/api/products/${id}`);
+      const { data } = await api.get(`/products/${id}`);
       setProduct(data);
     } catch (error) {
       console.error('Error fetching product:', error);
