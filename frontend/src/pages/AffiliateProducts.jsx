@@ -32,7 +32,7 @@ export default function AffiliateProducts() {
       setError(null);
       const { data } = await affiliate.getProducts();
       console.log('Products data:', data);
-      setAllProducts(data.data || []);
+      setAllProducts(data.products || data.data || []);
     } catch (error) {
       console.error('Error loading products:', error);
       setError(error.response?.data?.message || 'فشل في تحميل المنتجات');
@@ -46,9 +46,11 @@ export default function AffiliateProducts() {
     const categorized = {};
     categoryOrder.forEach(cat => { categorized[cat.name] = []; });
 
+    if (!Array.isArray(allProducts)) return categorized;
+
     allProducts.forEach(product => {
       let matched = false;
-      const productName = product.name.toUpperCase();
+      const productName = product.name?.toUpperCase() || '';
       
       for (const cat of categoryOrder) {
         if (cat.keywords.length === 0) continue;
