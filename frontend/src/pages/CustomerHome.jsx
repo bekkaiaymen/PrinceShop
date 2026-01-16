@@ -53,16 +53,43 @@ function CustomerHome() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      console.log('Fetching products directly from Render...');
-      // DIRECT FETCH BYPASSING AXIOS TO PREVENT CONFIG ISSUES
-      const response = await fetch('https://princeshop-backend.onrender.com/api/products');
-      const data = await response.json();
+      console.log('🔄 CustomerHome v5.0: Fetching products...');
       
-      console.log('Direct Fetch Response:', data);
-      setAllProducts(data.products || []);
+      // استخدام رابط نسبي - سيتم توجيهه عبر Vercel Rewrites
+      // أو رابط مباشر كـ fallback
+      const apiUrl = '/api/products';
+      const directUrl = 'https://princeshop-backend.onrender.com/api/products';
+      
+      let response;
+      let data;
+      
+      try {
+        // أولاً: جرب الرابط النسبي (عبر Vercel proxy)
+        response = await fetch(apiUrl);
+        const contentType = response.headers.get('content-type');
+        
+        // تحقق إذا كان الرد HTML بدلاً من JSON
+        if (!contentType || !contentType.includes('application/json')) {
+          console.warn('⚠️ Proxy returned HTML, trying direct URL...');
+          throw new Error('Not JSON');
+        }
+        
+        data = await response.json();
+      } catch (proxyError) {
+        // ثانياً: جرب الرابط المباشر
+        console.log('🔄 Trying direct backend URL...');
+        response = await fetch(directUrl);
+        data = await response.json();
+      }
+      
+      console.log('✅ Products fetched:', data);
+      
+      // دعم كلا الصيغتين: products أو data
+      const products = data.products || data.data || [];
+      setAllProducts(products);
+      
     } catch (error) {
-      console.error('Error fetching products:', error);
-      // Fallback empty array to prevent crash
+      console.error('❌ Error fetching products:', error);
       setAllProducts([]);
     } finally {
       setLoading(false);

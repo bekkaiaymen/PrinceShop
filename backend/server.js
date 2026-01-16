@@ -352,9 +352,19 @@ app.get('/api/stats', async (req, res) => {
   }
 });
 
-// Health check
+// Health check - Also serves as a keep-alive endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date() });
+  res.json({ status: 'OK', timestamp: new Date(), uptime: process.uptime() });
+});
+
+// ROOT endpoint - Important for Render health checks
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'Backend is running!', 
+    version: '2.0',
+    timestamp: new Date(),
+    endpoints: ['/api/products', '/api/orders', '/api/health']
+  });
 });
 
 // Start server
