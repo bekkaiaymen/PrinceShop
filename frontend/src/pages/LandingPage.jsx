@@ -684,19 +684,27 @@ function LandingPage() {
                 
                 // رسالة للموقع الجديد إذا كان قريباً واختار مساءً
                 if (isNearNew && formData.deliveryTime === 'evening' && !isNearOld) {
+                  const productPrice = product?.customerPrice || product?.suggested_price || 0;
+                  const productTotal = productPrice * formData.quantity;
+                  const morningFee = getNearbyDeliveryFee(productTotal);
+                  const savedAmount = DELIVERY_FEE - morningFee;
+                  
                   return (
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-4 flex items-start gap-3">
+                    <div className="bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 border-2 border-orange-300 rounded-xl p-5 flex items-start gap-3 animate-pulse shadow-lg">
                       <div className="flex-shrink-0 mt-0.5">
-                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-bold text-green-800 mb-1 flex items-center gap-2">
-                          💡 نصيحة لتوفير المال
+                        <h4 className="font-bold text-orange-900 mb-2 flex items-center gap-2 text-lg">
+                          🌅 وفّر {savedAmount} دج على التوصيل!
                         </h4>
-                        <p className="text-sm text-green-700">
-                          أنت قريب من موقعنا! اختر <span className="font-bold">التوصيل صباحاً</span> لتحصل على خصم يصل إلى <span className="font-bold">75%</span> على سعر التوصيل 🎉
+                        <p className="text-sm text-orange-800 leading-relaxed mb-2">
+                          أنت على بعد <span className="font-bold">{(distanceNew * 1000).toFixed(0)} متر</span> فقط من موقعنا الجديد!
+                        </p>
+                        <p className="text-sm text-orange-800 leading-relaxed">
+                          اختر <span className="font-bold bg-orange-200 px-2 py-0.5 rounded">التوصيل صباحاً</span> وادفع <span className="font-bold text-green-700">{morningFee} دج</span> بدلاً من <span className="line-through">{DELIVERY_FEE} دج</span> للتوصيل 💰✨
                         </p>
                       </div>
                     </div>
