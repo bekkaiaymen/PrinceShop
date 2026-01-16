@@ -393,12 +393,28 @@ function LandingPage() {
     
     let deliveryFee = DELIVERY_FEE; // السعر الافتراضي
     
-    // الموقع القديم: تخفيض صباحاً ومساءً ضمن 2 كم
-    if (distanceOld < OLD_NEARBY_RADIUS_KM) {
-      deliveryFee = getNearbyDeliveryFee(productTotal);
-    }
-    // الموقع الجديد: تخفيض صباحاً فقط ضمن 1 كم
-    else if (distanceNew < NEW_NEARBY_RADIUS_KM && formData.deliveryTime === 'morning') {
+    // نحدد الموقع الأقرب
+    const isNearOld = distanceOld < OLD_NEARBY_RADIUS_KM;
+    const isNearNew = distanceNew < NEW_NEARBY_RADIUS_KM;
+    
+    if (isNearNew && isNearOld) {
+      // إذا كان قريباً من الاثنين، نعطي الأولوية للأقرب
+      if (distanceNew < distanceOld) {
+        // الموقع الجديد أقرب: تخفيض صباحاً فقط
+        if (formData.deliveryTime === 'morning') {
+          deliveryFee = getNearbyDeliveryFee(productTotal);
+        }
+      } else {
+        // الموقع القديم أقرب: تخفيض صباحاً ومساءً
+        deliveryFee = getNearbyDeliveryFee(productTotal);
+      }
+    } else if (isNearNew) {
+      // قريب من الموقع الجديد فقط: تخفيض صباحاً فقط
+      if (formData.deliveryTime === 'morning') {
+        deliveryFee = getNearbyDeliveryFee(productTotal);
+      }
+    } else if (isNearOld) {
+      // قريب من الموقع القديم فقط: تخفيض صباحاً ومساءً
       deliveryFee = getNearbyDeliveryFee(productTotal);
     }
     
@@ -435,12 +451,27 @@ function LandingPage() {
       
       let deliveryFee = DELIVERY_FEE;
       
-      // الموقع القديم: تخفيض صباحاً ومساءً
-      if (distanceOld < OLD_NEARBY_RADIUS_KM) {
-        deliveryFee = getNearbyDeliveryFee(productTotal);
-      }
-      // الموقع الجديد: تخفيض صباحاً فقط
-      else if (distanceNew < NEW_NEARBY_RADIUS_KM && formData.deliveryTime === 'morning') {
+      const isNearOld = distanceOld < OLD_NEARBY_RADIUS_KM;
+      const isNearNew = distanceNew < NEW_NEARBY_RADIUS_KM;
+      
+      if (isNearNew && isNearOld) {
+        // إذا كان قريباً من الاثنين، نعطي الأولوية للأقرب
+        if (distanceNew < distanceOld) {
+          // الموقع الجديد أقرب: تخفيض صباحاً فقط
+          if (formData.deliveryTime === 'morning') {
+            deliveryFee = getNearbyDeliveryFee(productTotal);
+          }
+        } else {
+          // الموقع القديم أقرب: تخفيض صباحاً ومساءً
+          deliveryFee = getNearbyDeliveryFee(productTotal);
+        }
+      } else if (isNearNew) {
+        // قريب من الموقع الجديد فقط: تخفيض صباحاً فقط
+        if (formData.deliveryTime === 'morning') {
+          deliveryFee = getNearbyDeliveryFee(productTotal);
+        }
+      } else if (isNearOld) {
+        // قريب من الموقع القديم فقط: تخفيض صباحاً ومساءً
         deliveryFee = getNearbyDeliveryFee(productTotal);
       }
       
@@ -989,19 +1020,30 @@ function LandingPage() {
                     
                     let deliveryFee = DELIVERY_FEE;
                     let hasDiscount = false;
-                    let discountReason = '';
                     
-                    // الموقع القديم: تخفيض صباحاً ومساءً
-                    if (isNearOld) {
+                    if (isNearNew && isNearOld) {
+                      // إذا كان قريباً من الاثنين، نعطي الأولوية للأقرب
+                      if (distanceNew < distanceOld) {
+                        // الموقع الجديد أقرب: تخفيض صباحاً فقط
+                        if (isMorning) {
+                          deliveryFee = getNearbyDeliveryFee(productTotal);
+                          hasDiscount = true;
+                        }
+                      } else {
+                        // الموقع القديم أقرب: تخفيض صباحاً ومساءً
+                        deliveryFee = getNearbyDeliveryFee(productTotal);
+                        hasDiscount = true;
+                      }
+                    } else if (isNearNew) {
+                      // قريب من الموقع الجديد فقط: تخفيض صباحاً فقط
+                      if (isMorning) {
+                        deliveryFee = getNearbyDeliveryFee(productTotal);
+                        hasDiscount = true;
+                      }
+                    } else if (isNearOld) {
+                      // قريب من الموقع القديم فقط: تخفيض صباحاً ومساءً
                       deliveryFee = getNearbyDeliveryFee(productTotal);
                       hasDiscount = true;
-                      discountReason = 'موقع قريب';
-                    }
-                    // الموقع الجديد: تخفيض صباحاً فقط
-                    else if (isNearNew && isMorning) {
-                      deliveryFee = getNearbyDeliveryFee(productTotal);
-                      hasDiscount = true;
-                      discountReason = 'موقع قريب + صباحاً';
                     }
                     
                     const savedAmount = DELIVERY_FEE - deliveryFee;
