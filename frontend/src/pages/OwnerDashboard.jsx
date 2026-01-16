@@ -30,6 +30,7 @@ export default function OwnerDashboard() {
   });
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [updatingOrderId, setUpdatingOrderId] = useState(null);
 
   useEffect(() => {
     // التحقق من تسجيل الدخول
@@ -96,6 +97,27 @@ export default function OwnerDashboard() {
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
     setPage(1);
+  };
+
+  const handleUpdateStatus = async (orderId, newStatus) => {
+    setUpdatingOrderId(orderId);
+    try {
+      const token = localStorage.getItem('ownerToken');
+      await axios.patch(
+        `${API_URL}/orders/${orderId}`,
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      // تحديث القائمة
+      fetchOrders();
+      fetchStatistics();
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      alert('حدث خطأ أثناء تحديث حالة الطلب');
+    } finally {
+      setUpdatingOrderId(null);
+    }
   };
 
   const getStatusColor = (status) => {
@@ -325,6 +347,7 @@ export default function OwnerDashboard() {
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">العمولة</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الحالة</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">التاريخ</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الإجراءات</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -395,6 +418,49 @@ export default function OwnerDashboard() {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {new Date(order.createdAt).toLocaleDateString('ar-DZ')}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        {order.status === 'pending' && (
+                          <>
+                            <button
+                              onClick={() => handleUpdateStatus(order._id, 'confirmed')}
+                              disabled={updatingOrderId === order._id}
+                              className="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                              {updatingOrderId === order._id ? '...' : 'تأكيد'}
+                            </button>
+                            <button
+                              onClick={() => handleUpdateStatus(order._id, 'cancelled')}
+                              disabled={updatingOrderId === order._id}
+                              className="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                              {updatingOrderId === order._id ? '...' : 'إلغاء'}
+                            </button>
+                          </>
+                        )}
+                        {order.status === 'confirmed' && (
+                          <button
+                            onClick={() => handleUpdateStatus(order._id, 'shipping')}
+                            disabled={updatingOrderId === order._id}
+                            className="px-3 py-1.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            {updatingOrderId === order._id ? '...' : 'قيد التوصيل'}
+                          </button>
+                        )}
+                        {order.status === 'shipping' && (
+                          <button
+                            onClick={() => handleUpdateStatus(order._id, 'delivered')}
+                            disabled={updatingOrderId === order._id}
+                            className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            {updatingOrderId === order._id ? '...' : 'تم التوصيل'}
+                          </button>
+                        )}
+                        {(order.status === 'delivered' || order.status === 'cancelled') && (
+                          <span className="text-xs text-gray-400">لا توجد إجراءات</span>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
