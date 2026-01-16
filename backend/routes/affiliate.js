@@ -141,8 +141,9 @@ router.post('/withdrawals', async (req, res) => {
       paymentDetails: affiliate.paymentDetails
     });
     
-    // خصم المبلغ من الرصيد المتاح
+    // خصم المبلغ من الرصيد المتاح وإضافته إلى المسحوب
     affiliate.earnings.available -= amount;
+    affiliate.earnings.withdrawn += amount;
     await affiliate.save();
     
     res.status(201).json({

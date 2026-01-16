@@ -181,6 +181,44 @@ export default function Dashboard() {
         ))}
       </div>
 
+      {/* Earnings Explanation */}
+      <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-6">
+        <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <span className="text-2xl">💡</span>
+          كيف تعمل الأرباح؟
+        </h3>
+        <div className="space-y-3">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">💰</span>
+            <div>
+              <p className="font-semibold text-gray-900">إجمالي الأرباح</p>
+              <p className="text-sm text-gray-600">مجموع كل أرباحك من الطلبات التي تم توصيلها بنجاح</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">✅</span>
+            <div>
+              <p className="font-semibold text-gray-900">رصيد متاح</p>
+              <p className="text-sm text-gray-600">الأرباح من الطلبات المسلمة - يمكنك سحبها الآن</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">⏳</span>
+            <div>
+              <p className="font-semibold text-gray-900">رصيد معلق</p>
+              <p className="text-sm text-gray-600">الأرباح من الطلبات المؤكدة أو قيد التوصيل - ستصبح متاحة بعد التسليم</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">📤</span>
+            <div>
+              <p className="font-semibold text-gray-900">تم سحبه</p>
+              <p className="text-sm text-gray-600">المبلغ الذي سحبته من أرباحك</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Orders Stats */}
       <div>
         <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">إحصائيات الطلبات</h2>
