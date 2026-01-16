@@ -388,7 +388,7 @@ export default function AffiliateProducts() {
                     value={minPrice}
                     onChange={(e) => setMinPrice(e.target.value)}
                     min="0"
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
                   />
                 </div>
                 <div className="flex items-center text-gray-500 font-bold">-</div>
@@ -399,7 +399,7 @@ export default function AffiliateProducts() {
                     value={maxPrice}
                     onChange={(e) => setMaxPrice(e.target.value)}
                     min="0"
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
                   />
                 </div>
               </div>
