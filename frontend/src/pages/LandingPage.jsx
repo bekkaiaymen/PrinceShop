@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
-import { ShoppingCart, MapPin, Phone, User, Package, MessageSquare, DollarSign, CheckCircle } from 'lucide-react';
+import { ShoppingCart, MapPin, Phone, User, Package, MessageSquare, DollarSign, CheckCircle, Clock } from 'lucide-react';
 
 function LandingPage() {
   const { productId } = useParams();
@@ -22,7 +22,8 @@ function LandingPage() {
     customerName: '',
     customerPhone: '',
     quantity: 1,
-    notes: ''
+    notes: '',
+    deliveryTime: 'morning' // 'morning' أو 'evening'
   });
   
   // موقع التوصيل
@@ -46,9 +47,9 @@ function LandingPage() {
   const markerRef = useRef(null);
   const lastUpdateTime = useRef(0);
   
-  const DELIVERY_FEE = 200; // سعر التوصيل للبعيدين (أكثر من 2 كم)
+  const DELIVERY_FEE = 200; // سعر التوصيل للبعيدين (أكثر من 1 كم)
   const STORE_LOCATION = { lat: 32.490353, lng: 3.646553 }; // موقع المتجر في غرداية
-  const NEARBY_RADIUS_KM = 2; // نصف قطر التخفيض (2 كيلومتر)
+  const NEARBY_RADIUS_KM = 1; // نصف قطر التخفيض (1 كيلومتر)
 
   // حساب سعر التوصيل للقريبين حسب سعر السلعة
   const getNearbyDeliveryFee = (productPrice) => {
@@ -373,7 +374,7 @@ function LandingPage() {
     const productPrice = product.customerPrice || product.suggested_price || 0;
     const productTotal = productPrice * formData.quantity;
     
-    // حساب سعر التوصيل بناءً على المسافة وسعر السلعة
+    // حساب سعر التوصيل بناءً على المسافة، سعر السلعة، ووقت التوصيل
     const distance = calculateDistance(
       STORE_LOCATION.lat,
       STORE_LOCATION.lng,
@@ -382,11 +383,12 @@ function LandingPage() {
     );
     
     let deliveryFee;
-    if (distance < NEARBY_RADIUS_KM) {
-      // قريب: سعر حسب قيمة السلعة
+    // التخفيض فقط للتوصيل الصباحي ضمن 1 كم
+    if (distance < NEARBY_RADIUS_KM && formData.deliveryTime === 'morning') {
+      // قريب + صباحاً: سعر مخفض حسب قيمة السلعة
       deliveryFee = getNearbyDeliveryFee(productTotal);
     } else {
-      // بعيد: سعر ثابت
+      // بعيد أو مساءً: سعر ثابت
       deliveryFee = DELIVERY_FEE;
     }
     
@@ -404,7 +406,7 @@ function LandingPage() {
     try {
       setSubmitting(true);
       
-      // حساب سعر التوصيل
+      // حساب سعر التوصيل (التخفيض فقط للتوصيل الصباحي)
       const productTotal = (product.suggested_price || product.customerPrice) * formData.quantity;
       const distance = calculateDistance(
         STORE_LOCATION.lat,
@@ -412,7 +414,7 @@ function LandingPage() {
         locationCoords.lat,
         locationCoords.lng
       );
-      const deliveryFee = distance < NEARBY_RADIUS_KM 
+      const deliveryFee = (distance < NEARBY_RADIUS_KM && formData.deliveryTime === 'morning')
         ? getNearbyDeliveryFee(productTotal) 
         : DELIVERY_FEE;
       
@@ -429,7 +431,8 @@ function LandingPage() {
         quantity: formData.quantity,
         notes: formData.notes,
         affiliateCode: affiliateCode,
-        deliveryFee: deliveryFee
+        deliveryFee: deliveryFee,
+        deliveryTime: formData.deliveryTime
       };
 
       await api.post('/orders', orderData);
@@ -438,7 +441,7 @@ function LandingPage() {
       
       // إعادة تعيين النموذج بعد 3 ثواني
       setTimeout(() => {
-        setFormData({ customerName: '', customerPhone: '', quantity: 1, notes: '' });
+        setFormData({ customerName: '', customerPhone: '', quantity: 1, notes: '', deliveryTime: 'morning' });
         setSuccess(false);
       }, 3000);
       
@@ -591,6 +594,47 @@ function LandingPage() {
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   placeholder="0555123456"
                 />
+              </div>
+
+              {/* وقت التوصيل */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-blue-600" />
+                  وقت التوصيل المفضل <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, deliveryTime: 'morning' })}
+                    className={`py-3 px-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${
+                      formData.deliveryTime === 'morning'
+                        ? 'bg-gradient-to-r from-orange-500 to-yellow-500 text-white shadow-lg'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-gray-300'
+                    }`}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                    </svg>
+                    صباحاً (8ص - 12م)
+                    {formData.deliveryTime === 'morning' && (
+                      <span className="text-xs bg-white/30 px-2 py-1 rounded-full">خصم التوصيل ✨</span>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, deliveryTime: 'evening' })}
+                    className={`py-3 px-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${
+                      formData.deliveryTime === 'evening'
+                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-gray-300'
+                    }`}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                    </svg>
+                    مساءً (2م - 8م)
+                  </button>
+                </div>
               </div>
 
               {/* الولاية */}
@@ -856,7 +900,8 @@ function LandingPage() {
                       locationCoords.lng
                     );
                     const isNearby = distance < NEARBY_RADIUS_KM;
-                    const deliveryFee = isNearby ? getNearbyDeliveryFee(productTotal) : DELIVERY_FEE;
+                    const isMorning = formData.deliveryTime === 'morning';
+                    const deliveryFee = (isNearby && isMorning) ? getNearbyDeliveryFee(productTotal) : DELIVERY_FEE;
                     
                     // حساب نسبة التخفيض
                     const savedAmount = DELIVERY_FEE - deliveryFee;
@@ -866,17 +911,22 @@ function LandingPage() {
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
                           <span className="text-gray-700">سعر التوصيل:</span>
-                          {isNearby && savedAmount > 0 && (
+                          {isNearby && isMorning && savedAmount > 0 && (
                             <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">
-                              خصم {discountPercent}%
+                              خصم {discountPercent}% (صباحاً)
+                            </span>
+                          )}
+                          {isNearby && !isMorning && (
+                            <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full font-bold">
+                              خصم متاح صباحاً فقط
                             </span>
                           )}
                         </div>
                         <div className="flex items-center gap-2">
-                          {isNearby && savedAmount > 0 && (
+                          {isNearby && isMorning && savedAmount > 0 && (
                             <span className="text-sm text-gray-400 line-through">{DELIVERY_FEE} دج</span>
                           )}
-                          <span className={`font-bold ${isNearby ? 'text-green-600' : 'text-gray-800'}`}>
+                          <span className={`font-bold ${(isNearby && isMorning) ? 'text-green-600' : 'text-gray-800'}`}>
                             {deliveryFee} دج
                           </span>
                         </div>

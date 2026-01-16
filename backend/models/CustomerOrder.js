@@ -63,6 +63,13 @@ const customerOrderSchema = new mongoose.Schema({
     default: 0
   },
   
+  // وقت التوصيل (صباحاً أو مساءً)
+  deliveryTime: {
+    type: String,
+    enum: ['morning', 'evening'],
+    default: 'morning'
+  },
+  
   // ربح المسوق من هذا الطلب
   affiliateProfit: {
     type: Number,

@@ -88,7 +88,7 @@ app.use('/api/admin', adminRoutes);
 // إنشاء طلب جديد
 app.post('/api/orders', async (req, res) => {
   try {
-    const { productId, customerName, customerPhone, deliveryLocation, deliveryCoordinates, quantity, notes, affiliateCode, deliveryFee } = req.body;
+    const { productId, customerName, customerPhone, deliveryLocation, deliveryCoordinates, quantity, notes, affiliateCode, deliveryFee, deliveryTime } = req.body;
     
     console.log('Received order data:', req.body);
     
@@ -139,6 +139,7 @@ app.post('/api/orders', async (req, res) => {
       quantity: quantity || 1,
       totalAmount,
       deliveryFee: deliveryFee || 0,
+      deliveryTime: deliveryTime || 'morning',
       notes,
       affiliate: affiliateId,
       affiliateProfit

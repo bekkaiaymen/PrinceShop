@@ -301,7 +301,18 @@ function OrderDetailsModal({ order, statusConfig, onClose, onStatusChange }) {
                   </div>
                   <div className="flex items-center justify-between bg-white p-2 rounded-lg">
                     <span className="text-gray-600">سعر التوصيل:</span>
-                    <span className="font-bold text-orange-600">{order.deliveryFee || 0} دج</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-orange-600">{order.deliveryFee || 0} دج</span>
+                      {order.deliveryTime && (
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          order.deliveryTime === 'morning' 
+                            ? 'bg-orange-100 text-orange-700' 
+                            : 'bg-blue-100 text-blue-700'
+                        }`}>
+                          {order.deliveryTime === 'morning' ? '🌅 صباحاً' : '🌙 مساءً'}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center justify-between bg-blue-50 p-3 rounded-lg border-2 border-blue-200">
                     <span className="text-gray-900 font-bold">المجموع:</span>
