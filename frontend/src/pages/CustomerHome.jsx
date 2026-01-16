@@ -220,11 +220,33 @@ function CustomerHome() {
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  متجر الإلكترونيات
+                  Prince Shop
                 </h1>
                 <p className="text-xs text-gray-500">أفضل الأسعار والعروض</p>
               </div>
             </Link>
+
+            {/* Contact Info - Desktop */}
+            <div className="hidden lg:flex items-center gap-6">
+              <a 
+                href="tel:0664021599" 
+                className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors"
+              >
+                <Phone className="w-4 h-4" />
+                <span className="font-medium">0664021599</span>
+              </a>
+              <a
+                href="https://www.facebook.com/share/17uSs6CPgo/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                <span className="font-medium">تابعنا</span>
+              </a>
+            </div>
 
             {/* Navigation */}
             <nav className="hidden md:flex items-center gap-6">
@@ -263,11 +285,33 @@ function CustomerHome() {
       <section className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white py-12 sm:py-20">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 animate-fade-in">
-            اكتشف أفضل المنتجات الإلكترونية ⚡
+            Prince Shop - متجرك المميز ⚡
           </h2>
           <p className="text-lg sm:text-xl mb-6 sm:mb-8 text-blue-100">
             جودة عالية • أسعار منافسة • توصيل سريع 🚚
           </p>
+          
+          {/* Contact Info - Mobile/Tablet */}
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mb-6 lg:hidden">
+            <a 
+              href="tel:0664021599" 
+              className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-xl hover:bg-white/30 transition-all"
+            >
+              <Phone className="w-4 h-4" />
+              <span className="font-medium">0664021599</span>
+            </a>
+            <a
+              href="https://www.facebook.com/share/17uSs6CPgo/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-xl hover:bg-white/30 transition-all"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+              <span className="font-medium">تابعنا على Facebook</span>
+            </a>
+          </div>
           
           {/* Search Box */}
           <div className="max-w-2xl mx-auto relative mb-6">
@@ -538,19 +582,67 @@ function CustomerHome() {
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-8 sm:py-12 mt-12">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 text-center">
-          <div className="mb-6">
-            <h4 className="text-xl sm:text-2xl font-bold mb-2">متجر الإلكترونيات</h4>
-            <p className="text-gray-400 text-sm sm:text-base">أفضل الأسعار والعروض في الجزائر 🇩🇿</p>
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            {/* معلومات المتجر */}
+            <div className="text-center md:text-right">
+              <h4 className="text-xl sm:text-2xl font-bold mb-3 flex items-center justify-center md:justify-start gap-2">
+                <ShoppingCart className="w-6 h-6" />
+                Prince Shop
+              </h4>
+              <p className="text-gray-400 text-sm sm:text-base mb-3">
+                أفضل الأسعار والعروض في الجزائر 🇩🇿
+              </p>
+              <p className="text-gray-400 text-xs">
+                متجر إلكتروني متخصص في بيع الإكسسوارات والأجهزة الإلكترونية
+              </p>
+            </div>
+
+            {/* روابط سريعة */}
+            <div className="text-center">
+              <h5 className="text-lg font-bold mb-4">روابط سريعة</h5>
+              <div className="flex flex-col gap-2 text-sm">
+                <Link to="/" className="hover:text-blue-400 transition-colors">الرئيسية</Link>
+                <Link to="/register" className="hover:text-blue-400 transition-colors">كن مسوقاً 🚀</Link>
+                <Link to="/login" className="hover:text-blue-400 transition-colors">تسجيل الدخول</Link>
+              </div>
+            </div>
+
+            {/* معلومات الاتصال */}
+            <div className="text-center md:text-left">
+              <h5 className="text-lg font-bold mb-4">تواصل معنا</h5>
+              <div className="flex flex-col gap-3">
+                <a 
+                  href="tel:0664021599" 
+                  className="flex items-center justify-center md:justify-start gap-2 hover:text-blue-400 transition-colors"
+                >
+                  <Phone className="w-4 h-4" />
+                  <span>0664021599</span>
+                </a>
+                <a
+                  href="https://www.facebook.com/share/17uSs6CPgo/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center md:justify-start gap-2 hover:text-blue-400 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  </svg>
+                  <span>تابعنا على Facebook</span>
+                </a>
+                <div className="flex items-center justify-center md:justify-start gap-2 text-gray-400">
+                  <MapPin className="w-4 h-4" />
+                  <span className="text-sm">غرداية، الجزائر</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-6 text-sm sm:text-base">
-            <Link to="/" className="hover:text-blue-400 transition-colors">الرئيسية</Link>
-            <Link to="/register" className="hover:text-blue-400 transition-colors">كن مسوقاً</Link>
-            <Link to="/login" className="hover:text-blue-400 transition-colors">تسجيل الدخول</Link>
+
+          <div className="border-t border-gray-800 pt-6 text-center">
+            <p className="text-gray-500 text-xs sm:text-sm">
+              © 2026 Prince Shop - جميع الحقوق محفوظة
+            </p>
           </div>
-          <p className="text-gray-500 text-xs sm:text-sm">
-            © 2026 جميع الحقوق محفوظة
-          </p>
         </div>
       </footer>
     </div>
