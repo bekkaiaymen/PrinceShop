@@ -11,7 +11,8 @@ export default function AffiliateProducts() {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('الكل');
-  const [profitFilter, setProfitFilter] = useState('all');
+  const [minProfit, setMinProfit] = useState('');
+  const [maxProfit, setMaxProfit] = useState('');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [sortBy, setSortBy] = useState('profit-high');
@@ -62,21 +63,13 @@ export default function AffiliateProducts() {
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.sku?.toLowerCase().includes(searchTerm.toLowerCase());
       
-      // فلتر نسبة الربح
-      let matchProfit = profitFilter === 'all';
-      if (!matchProfit) {
-        const profitPercent = product.profit_percent || 0;
-        switch(profitFilter) {
-          case 'low':
-            matchProfit = profitPercent < 15;
-            break;
-          case 'medium':
-            matchProfit = profitPercent >= 15 && profitPercent < 25;
-            break;
-          case 'high':
-            matchProfit = profitPercent >= 25;
-            break;
-        }
+      // فلتر قيمة الربح
+      let matchProfit = true;
+      if (minProfit !== '' || maxProfit !== '') {
+        const profit = product.affiliate_profit || 0;
+        const min = minProfit === '' ? 0 : parseFloat(minProfit);
+        const max = maxProfit === '' ? Infinity : parseFloat(maxProfit);
+        matchProfit = profit >= min && profit <= max;
       }
       
       // فلتر السعر المخصص
@@ -93,16 +86,22 @@ export default function AffiliateProducts() {
 
     // ترتيب المنتجات
     filtered.sort((a, b) => {
-      const profitA = a.profit_percent || 0;
-      const profitB = b.profit_percent || 0;
+      const profitPercentA = a.profit_percent || 0;
+      const profitPercentB = b.profit_percent || 0;
+      const profitAmountA = a.affiliate_profit || 0;
+      const profitAmountB = b.affiliate_profit || 0;
       const priceA = a.customerPrice || a.suggested_price || 0;
       const priceB = b.customerPrice || b.suggested_price || 0;
       
       switch(sortBy) {
         case 'profit-high':
-          return profitB - profitA;
+          return profitAmountB - profitAmountA; // ترتيب حسب قيمة الربح
         case 'profit-low':
-          return profitA - profitB;
+          return profitAmountA - profitAmountB; // ترتيب حسب قيمة الربح
+        case 'profit-percent-high':
+          return profitPercentB - profitPercentA; // ترتيب حسب نسبة الربح
+        case 'profit-percent-low':
+          return profitPercentA - profitPercentB; // ترتيب حسب نسبة الربح
         case 'price-high':
           return priceB - priceA;
         case 'price-low':
@@ -145,7 +144,7 @@ export default function AffiliateProducts() {
   const activeFiltersCount = [
     searchTerm,
     selectedCategory !== 'الكل',
-    profitFilter !== 'all',
+    minProfit !== '' || maxProfit !== '',
     minPrice !== '' || maxPrice !== ''
   ].filter(Boolean).length;
   
@@ -157,7 +156,8 @@ export default function AffiliateProducts() {
   const clearAllFilters = () => {
     setSearchTerm('');
     setSelectedCategory('الكل');
-    setProfitFilter('all');
+    setMinProfit('');
+    setMaxProfit('');
     setMinPrice('');
     setMaxPrice('');
     setSortBy('profit-high');
@@ -356,22 +356,36 @@ export default function AffiliateProducts() {
               </select>
             </div>
 
-            {/* Profit Filter */}
-            <div>
+            {/* Profit Range Filter */}
+            <div className="lg:col-span-2">
               <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
                 <span className="text-lg">💰</span>
-                نسبة الربح
+                نطاق الربح (دج)
               </label>
-              <select
-                value={profitFilter}
-                onChange={(e) => setProfitFilter(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              >
-                <option value="all">الكل</option>
-                <option value="low">📉 أقل من 15%</option>
-                <option value="medium">📊 15% - 25%</option>
-                <option value="high">📈 أكثر من 25%</option>
-              </select>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <input
+                    type="number"
+                    placeholder="من (مثال: 100)"
+                    value={minProfit}
+                    onChange={(e) => setMinProfit(e.target.value)}
+                    min="0"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900"
+                  />
+                </div>
+                <div className="flex items-center text-gray-500 font-bold">-</div>
+                <div className="flex-1">
+                  <input
+                    type="number"
+                    placeholder="إلى (مثال: 500)"
+                    value={maxProfit}
+                    onChange={(e) => setMaxProfit(e.target.value)}
+                    min="0"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900"
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">ابحث عن المنتجات حسب قيمة الربح</p>
             </div>
 
             {/* Custom Price Range */}
@@ -412,10 +426,12 @@ export default function AffiliateProducts() {
               <span className="text-lg">↕️</span>
               الترتيب حسب
             </label>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
               {[
-                { value: 'profit-high', label: '💎 الربح: الأعلى أولاً', color: 'green' },
-                { value: 'profit-low', label: '📉 الربح: الأقل أولاً', color: 'orange' },
+                { value: 'profit-high', label: '💎 قيمة الربح: الأعلى أولاً', color: 'green' },
+                { value: 'profit-low', label: '📉 قيمة الربح: الأقل أولاً', color: 'orange' },
+                { value: 'profit-percent-high', label: '📈 نسبة الربح: الأعلى أولاً', color: 'emerald' },
+                { value: 'profit-percent-low', label: '📊 نسبة الربح: الأقل أولاً', color: 'teal' },
                 { value: 'price-high', label: '💰 السعر: الأغلى أولاً', color: 'purple' },
                 { value: 'price-low', label: '🏷️ السعر: الأرخص أولاً', color: 'blue' },
                 { value: 'newest', label: '🆕 الأحدث', color: 'indigo' },
