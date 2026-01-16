@@ -1,7 +1,7 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import connectDB from './config/db.js';
 import Product from './models/Product.js';
 import Order from './models/Order.js';
 import CustomerOrder from './models/CustomerOrder.js';
@@ -32,9 +32,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ MongoDB Connected'))
-  .catch(err => console.error('❌ MongoDB Error:', err));
+connectDB();
 
 // ============ دالة حساب سعر البيع بناءً على نسب الربح ============
 function calculateCustomerPrice(wholesalePrice) {
