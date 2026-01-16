@@ -68,7 +68,7 @@ function HomePage() {
     try {
       setLoading(true);
       const { data } = await api.get('/products');
-      setAllProducts(data.products);
+      setAllProducts(data.products || []);
     } catch (error) {
       console.error('Error fetching products:', error);
     } finally {
@@ -84,24 +84,26 @@ function HomePage() {
       categorized[cat.name] = [];
     });
 
-    allProducts.forEach(product => {
-      let matched = false;
-      const productName = product.name.toUpperCase();
-      
-      for (const cat of categoryOrder) {
-        if (cat.keywords.length === 0) continue;
+    if (Array.isArray(allProducts)) {
+      allProducts.forEach(product => {
+        let matched = false;
+        const productName = product.name.toUpperCase();
         
-        if (cat.keywords.some(keyword => productName.includes(keyword))) {
-          categorized[cat.name].push(product);
-          matched = true;
-          break;
+        for (const cat of categoryOrder) {
+          if (cat.keywords.length === 0) continue;
+          
+          if (cat.keywords.some(keyword => productName.includes(keyword))) {
+            categorized[cat.name].push(product);
+            matched = true;
+            break;
+          }
         }
-      }
-      
-      if (!matched) {
-        categorized['أخرى'].push(product);
-      }
-    });
+        
+        if (!matched) {
+          categorized['أخرى'].push(product);
+        }
+      });
+    }
 
     return categorized;
   };

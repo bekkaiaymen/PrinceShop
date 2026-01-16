@@ -69,9 +69,11 @@ function CustomerHome() {
     const categorized = {};
     categoryOrder.forEach(cat => { categorized[cat.name] = []; });
 
+    if (!Array.isArray(allProducts)) return categorized;
+
     allProducts.forEach(product => {
       let matched = false;
-      const productName = product.name.toUpperCase();
+      const productName = product.name?.toUpperCase() || '';
       
       for (const cat of categoryOrder) {
         if (cat.keywords.length === 0) continue;
