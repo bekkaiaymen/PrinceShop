@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { affiliate } from '../services/api';
-import { TrendingUp, ShoppingBag, Clock, XCircle, DollarSign, Activity } from 'lucide-react';
+import { TrendingUp, ShoppingBag, Clock, XCircle, DollarSign, Activity, Copy, Check, Link } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [copiedCode, setCopiedCode] = useState(false);
 
   useEffect(() => {
     loadDashboard();
@@ -18,6 +21,16 @@ export default function Dashboard() {
       console.error('Error loading dashboard:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const copyAffiliateCode = async () => {
+    try {
+      await navigator.clipboard.writeText(user?.affiliateCode);
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
     }
   };
 
@@ -101,6 +114,56 @@ export default function Dashboard() {
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">لوحة التحكم</h1>
         <p className="text-sm sm:text-base text-gray-600 mt-2">متابعة أرباحك وطلباتك</p>
+      </div>
+
+      {/* Affiliate Code Card */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 text-white shadow-xl">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="bg-white/20 p-3 rounded-lg">
+              <Link className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold">رمز المسوق الخاص بك</h3>
+              <p className="text-blue-100 text-sm">استخدمه في روابط التسويق</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex-1">
+              <p className="text-xs text-blue-100 mb-1">الكود</p>
+              <p className="text-2xl font-mono font-bold">{user?.affiliateCode}</p>
+            </div>
+            <button
+              onClick={copyAffiliateCode}
+              className="flex items-center gap-2 px-4 py-2.5 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-semibold"
+            >
+              {copiedCode ? (
+                <>
+                  <Check className="w-5 h-5" />
+                  <span>تم النسخ!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-5 h-5" />
+                  <span>نسخ</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-4 p-4 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
+          <p className="text-sm text-blue-100 mb-2">💡 <strong>كيف تستخدم رمزك؟</strong></p>
+          <ol className="text-sm text-blue-100 space-y-1 mr-4">
+            <li>1. اذهب إلى قسم "المنتجات"</li>
+            <li>2. اختر منتج واضغط "نسخ رابط التسويق"</li>
+            <li>3. شارك الرابط مع عملائك على فيسبوك، واتساب، أو إنستغرام</li>
+            <li>4. عندما يشتري أحد من رابطك، تحصل على ربحك تلقائياً! 🎉</li>
+          </ol>
+        </div>
       </div>
 
       {/* Earnings Stats */}
