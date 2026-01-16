@@ -27,7 +27,7 @@ function LandingPage() {
   });
   
   // موقع التوصيل
-  const [locationCoords, setLocationCoords] = useState({ lat: 32.4917, lng: 3.6746 }); // غرداية افتراضياً
+  const [locationCoords, setLocationCoords] = useState({ lat: 32.490353, lng: 3.646553 }); // موقع المتجر في غرداية افتراضياً
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [locationMethod, setLocationMethod] = useState(''); // 'current' أو 'manual'
   const [gettingLocation, setGettingLocation] = useState(false);
@@ -38,7 +38,7 @@ function LandingPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 }); // للتحريك البصري
-  const [mapCenter, setMapCenter] = useState({ lat: 32.4917, lng: 3.6746 }); // للخريطة الفعلية
+  const [mapCenter, setMapCenter] = useState({ lat: 32.490353, lng: 3.646653 }); // للخريطة الفعلية
   const [mapLayer, setMapLayer] = useState('roadmap'); // 'roadmap' or 'satellite'
   const [isMapLoading, setIsMapLoading] = useState(false); // تعطيل loading مؤقتاً
   
@@ -615,7 +615,7 @@ function LandingPage() {
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                     </svg>
-                    صباحاً (8ص - 12م)
+                    صباحاً
                     {formData.deliveryTime === 'morning' && (
                       <span className="text-xs bg-white/30 px-2 py-1 rounded-full">خصم التوصيل ✨</span>
                     )}
@@ -632,10 +632,42 @@ function LandingPage() {
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                       <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
                     </svg>
-                    مساءً (2م - 8م)
+                    مساءً
                   </button>
                 </div>
               </div>
+
+              {/* رسالة توضيحية للتخفيض */}
+              {(() => {
+                const distance = calculateDistance(
+                  STORE_LOCATION.lat,
+                  STORE_LOCATION.lng,
+                  locationCoords.lat,
+                  locationCoords.lng
+                );
+                const isNearby = distance < NEARBY_RADIUS_KM;
+                
+                if (isNearby && formData.deliveryTime === 'evening') {
+                  return (
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-4 flex items-start gap-3">
+                      <div className="flex-shrink-0 mt-0.5">
+                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-bold text-green-800 mb-1 flex items-center gap-2">
+                          💡 نصيحة لتوفير المال
+                        </h4>
+                        <p className="text-sm text-green-700">
+                          أنت قريب من موقعنا! اختر <span className="font-bold">التوصيل صباحاً</span> لتحصل على خصم يصل إلى <span className="font-bold">75%</span> على سعر التوصيل 🎉
+                        </p>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
 
               {/* الولاية */}
               <div>
