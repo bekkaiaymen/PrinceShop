@@ -27,7 +27,7 @@ function LandingPage() {
   });
   
   // موقع التوصيل
-  const [locationCoords, setLocationCoords] = useState({ lat: 32.490353, lng: 3.646553 }); // موقع المتجر في غرداية افتراضياً
+  const [locationCoords, setLocationCoords] = useState({ lat: 32.4917, lng: 3.6746 }); // غرداية افتراضياً
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [locationMethod, setLocationMethod] = useState(''); // 'current' أو 'manual'
   const [gettingLocation, setGettingLocation] = useState(false);
@@ -38,7 +38,7 @@ function LandingPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 }); // للتحريك البصري
-  const [mapCenter, setMapCenter] = useState({ lat: 32.490353, lng: 3.646653 }); // للخريطة الفعلية
+  const [mapCenter, setMapCenter] = useState({ lat: 32.4917, lng: 3.6746 }); // للخريطة الفعلية
   const [mapLayer, setMapLayer] = useState('roadmap'); // 'roadmap' or 'satellite'
   const [isMapLoading, setIsMapLoading] = useState(false); // تعطيل loading مؤقتاً
   
@@ -47,9 +47,11 @@ function LandingPage() {
   const markerRef = useRef(null);
   const lastUpdateTime = useRef(0);
   
-  const DELIVERY_FEE = 200; // سعر التوصيل للبعيدين (أكثر من 1 كم)
-  const STORE_LOCATION = { lat: 32.490353, lng: 3.646553 }; // موقع المتجر في غرداية
-  const NEARBY_RADIUS_KM = 1; // نصف قطر التخفيض (1 كيلومتر)
+  const DELIVERY_FEE = 200; // سعر التوصيل للبعيدين
+  const OLD_STORE_LOCATION = { lat: 32.4917, lng: 3.6746 }; // الموقع القديم
+  const NEW_STORE_LOCATION = { lat: 32.490353, lng: 3.646553 }; // الموقع الجديد (FMPF+F6X)
+  const OLD_NEARBY_RADIUS_KM = 2; // نصف قطر الموقع القديم (2 كيلومتر) - تخفيض صباحاً ومساءً
+  const NEW_NEARBY_RADIUS_KM = 1; // نصف قطر الموقع الجديد (1 كيلومتر) - تخفيض صباحاً فقط
 
   // حساب سعر التوصيل للقريبين حسب سعر السلعة
   const getNearbyDeliveryFee = (productPrice) => {
@@ -374,22 +376,30 @@ function LandingPage() {
     const productPrice = product.customerPrice || product.suggested_price || 0;
     const productTotal = productPrice * formData.quantity;
     
-    // حساب سعر التوصيل بناءً على المسافة، سعر السلعة، ووقت التوصيل
-    const distance = calculateDistance(
-      STORE_LOCATION.lat,
-      STORE_LOCATION.lng,
+    // حساب المسافة من الموقعين
+    const distanceOld = calculateDistance(
+      OLD_STORE_LOCATION.lat,
+      OLD_STORE_LOCATION.lng,
       locationCoords.lat,
       locationCoords.lng
     );
     
-    let deliveryFee;
-    // التخفيض فقط للتوصيل الصباحي ضمن 1 كم
-    if (distance < NEARBY_RADIUS_KM && formData.deliveryTime === 'morning') {
-      // قريب + صباحاً: سعر مخفض حسب قيمة السلعة
+    const distanceNew = calculateDistance(
+      NEW_STORE_LOCATION.lat,
+      NEW_STORE_LOCATION.lng,
+      locationCoords.lat,
+      locationCoords.lng
+    );
+    
+    let deliveryFee = DELIVERY_FEE; // السعر الافتراضي
+    
+    // الموقع القديم: تخفيض صباحاً ومساءً ضمن 2 كم
+    if (distanceOld < OLD_NEARBY_RADIUS_KM) {
       deliveryFee = getNearbyDeliveryFee(productTotal);
-    } else {
-      // بعيد أو مساءً: سعر ثابت
-      deliveryFee = DELIVERY_FEE;
+    }
+    // الموقع الجديد: تخفيض صباحاً فقط ضمن 1 كم
+    else if (distanceNew < NEW_NEARBY_RADIUS_KM && formData.deliveryTime === 'morning') {
+      deliveryFee = getNearbyDeliveryFee(productTotal);
     }
     
     return productTotal + deliveryFee;
@@ -406,17 +416,33 @@ function LandingPage() {
     try {
       setSubmitting(true);
       
-      // حساب سعر التوصيل (التخفيض فقط للتوصيل الصباحي)
+      // حساب سعر التوصيل حسب الموقعين
       const productTotal = (product.suggested_price || product.customerPrice) * formData.quantity;
-      const distance = calculateDistance(
-        STORE_LOCATION.lat,
-        STORE_LOCATION.lng,
+      
+      const distanceOld = calculateDistance(
+        OLD_STORE_LOCATION.lat,
+        OLD_STORE_LOCATION.lng,
         locationCoords.lat,
         locationCoords.lng
       );
-      const deliveryFee = (distance < NEARBY_RADIUS_KM && formData.deliveryTime === 'morning')
-        ? getNearbyDeliveryFee(productTotal) 
-        : DELIVERY_FEE;
+      
+      const distanceNew = calculateDistance(
+        NEW_STORE_LOCATION.lat,
+        NEW_STORE_LOCATION.lng,
+        locationCoords.lat,
+        locationCoords.lng
+      );
+      
+      let deliveryFee = DELIVERY_FEE;
+      
+      // الموقع القديم: تخفيض صباحاً ومساءً
+      if (distanceOld < OLD_NEARBY_RADIUS_KM) {
+        deliveryFee = getNearbyDeliveryFee(productTotal);
+      }
+      // الموقع الجديد: تخفيض صباحاً فقط
+      else if (distanceNew < NEW_NEARBY_RADIUS_KM && formData.deliveryTime === 'morning') {
+        deliveryFee = getNearbyDeliveryFee(productTotal);
+      }
       
       const orderData = {
         productId: product._id,
@@ -639,15 +665,25 @@ function LandingPage() {
 
               {/* رسالة توضيحية للتخفيض */}
               {(() => {
-                const distance = calculateDistance(
-                  STORE_LOCATION.lat,
-                  STORE_LOCATION.lng,
+                const distanceOld = calculateDistance(
+                  OLD_STORE_LOCATION.lat,
+                  OLD_STORE_LOCATION.lng,
                   locationCoords.lat,
                   locationCoords.lng
                 );
-                const isNearby = distance < NEARBY_RADIUS_KM;
                 
-                if (isNearby && formData.deliveryTime === 'evening') {
+                const distanceNew = calculateDistance(
+                  NEW_STORE_LOCATION.lat,
+                  NEW_STORE_LOCATION.lng,
+                  locationCoords.lat,
+                  locationCoords.lng
+                );
+                
+                const isNearOld = distanceOld < OLD_NEARBY_RADIUS_KM;
+                const isNearNew = distanceNew < NEW_NEARBY_RADIUS_KM;
+                
+                // رسالة للموقع الجديد إذا كان قريباً واختار مساءً
+                if (isNearNew && formData.deliveryTime === 'evening' && !isNearOld) {
                   return (
                     <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-4 flex items-start gap-3">
                       <div className="flex-shrink-0 mt-0.5">
@@ -925,17 +961,41 @@ function LandingPage() {
                   
                   {/* سعر التوصيل مع الخصم */}
                   {(() => {
-                    const distance = calculateDistance(
-                      STORE_LOCATION.lat,
-                      STORE_LOCATION.lng,
+                    const distanceOld = calculateDistance(
+                      OLD_STORE_LOCATION.lat,
+                      OLD_STORE_LOCATION.lng,
                       locationCoords.lat,
                       locationCoords.lng
                     );
-                    const isNearby = distance < NEARBY_RADIUS_KM;
-                    const isMorning = formData.deliveryTime === 'morning';
-                    const deliveryFee = (isNearby && isMorning) ? getNearbyDeliveryFee(productTotal) : DELIVERY_FEE;
                     
-                    // حساب نسبة التخفيض
+                    const distanceNew = calculateDistance(
+                      NEW_STORE_LOCATION.lat,
+                      NEW_STORE_LOCATION.lng,
+                      locationCoords.lat,
+                      locationCoords.lng
+                    );
+                    
+                    const isNearOld = distanceOld < OLD_NEARBY_RADIUS_KM;
+                    const isNearNew = distanceNew < NEW_NEARBY_RADIUS_KM;
+                    const isMorning = formData.deliveryTime === 'morning';
+                    
+                    let deliveryFee = DELIVERY_FEE;
+                    let hasDiscount = false;
+                    let discountReason = '';
+                    
+                    // الموقع القديم: تخفيض صباحاً ومساءً
+                    if (isNearOld) {
+                      deliveryFee = getNearbyDeliveryFee(productTotal);
+                      hasDiscount = true;
+                      discountReason = 'موقع قريب';
+                    }
+                    // الموقع الجديد: تخفيض صباحاً فقط
+                    else if (isNearNew && isMorning) {
+                      deliveryFee = getNearbyDeliveryFee(productTotal);
+                      hasDiscount = true;
+                      discountReason = 'موقع قريب + صباحاً';
+                    }
+                    
                     const savedAmount = DELIVERY_FEE - deliveryFee;
                     const discountPercent = Math.round((savedAmount / DELIVERY_FEE) * 100);
                     
@@ -943,22 +1003,22 @@ function LandingPage() {
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
                           <span className="text-gray-700">سعر التوصيل:</span>
-                          {isNearby && isMorning && savedAmount > 0 && (
+                          {hasDiscount && savedAmount > 0 && (
                             <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">
-                              خصم {discountPercent}% (صباحاً)
+                              خصم {discountPercent}%
                             </span>
                           )}
-                          {isNearby && !isMorning && (
+                          {isNearNew && !isMorning && !isNearOld && (
                             <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full font-bold">
                               خصم متاح صباحاً فقط
                             </span>
                           )}
                         </div>
                         <div className="flex items-center gap-2">
-                          {isNearby && isMorning && savedAmount > 0 && (
+                          {hasDiscount && savedAmount > 0 && (
                             <span className="text-sm text-gray-400 line-through">{DELIVERY_FEE} دج</span>
                           )}
-                          <span className={`font-bold ${(isNearby && isMorning) ? 'text-green-600' : 'text-gray-800'}`}>
+                          <span className={`font-bold ${hasDiscount ? 'text-green-600' : 'text-gray-800'}`}>
                             {deliveryFee} دج
                           </span>
                         </div>
