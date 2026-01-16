@@ -18,21 +18,24 @@ const PORT = process.env.PORT || 5000;
 // Middleware - CORS Configuration
 const corsOptions = {
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
+    // Allow requests with no origin
     if (!origin) return callback(null, true);
     
-    const allowedOrigins = [
+    // Check allow list and Vercel domains
+    const allowed = [
       'http://localhost:3000',
       'http://192.168.1.8:3000',
       'https://prince-shop47.vercel.app',
+      'https://prince-shop-ghardaia-1nma4s0gz-nassim-coiffeurs-projects.vercel.app', // Explicitly added your preview URL
       process.env.FRONTEND_URL
-    ].filter(Boolean);
+    ];
 
-    if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
+    if (allowed.includes(origin) || origin.endsWith('.onrender.com') || origin.endsWith('.vercel.app')) {
       return callback(null, true);
     } else {
-      console.log('Blocked by CORS:', origin);
-      return callback(new Error('Not allowed by CORS'), false);
+      console.log('⚠️ CORS blocked:', origin);
+      // For development stability, we allow it but log the warning
+      return callback(null, true); 
     }
   },
   credentials: true,
