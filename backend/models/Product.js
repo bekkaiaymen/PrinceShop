@@ -57,7 +57,7 @@ const productSchema = new mongoose.Schema({
 productSchema.index({ name: 'text' });
 productSchema.index({ category: 1 });
 productSchema.index({ active: 1 });
-productSchema.index({ sku: 1 });
+// productSchema.index({ sku: 1 }); // Removed to prevent duplicate index warning
 
 const Product = mongoose.model('Product', productSchema);
 
