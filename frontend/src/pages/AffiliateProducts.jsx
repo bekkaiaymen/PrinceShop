@@ -457,54 +457,73 @@ export default function AffiliateProducts() {
       {/* عرض المنتجات حسب الفئات */}
       {!loading && !error && (
         <div className="space-y-8">
-          {categoryOrder.map(category => {
+          {(() => {
             const categorizedProducts = categorizeProducts();
-            const products = categorizedProducts[category.name] || [];
             
-            // فلتر الفئة المحددة
-            if (selectedCategory !== 'الكل' && category.name !== selectedCategory) return null;
-            if (products.length === 0) return null;
-            
-            return (
-              <div key={category.name}>
-                {/* رأس الفئة */}
-                <div className="bg-gradient-to-r from-gray-800 to-gray-900 rounded-xl p-4 mb-4 shadow-lg">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-4xl">{category.icon}</span>
-                      <div>
-                        <h3 className="text-2xl font-bold text-white">
-                          {category.name}
-                        </h3>
-                        <p className="text-sm text-gray-300">
-                          {products.length} منتج • ربح يصل إلى {Math.max(...products.map(p => p.affiliate_profit))} دج
-                        </p>
+            return categoryOrder.map(category => {
+              const products = categorizedProducts[category.name] || [];
+              
+              // فلتر الفئة المحددة
+              if (selectedCategory !== 'الكل' && category.name !== selectedCategory) return null;
+              if (products.length === 0) return null;
+              
+              return (
+                <div key={category.name}>
+                  {/* رأس الفئة */}
+                  <div className="bg-gradient-to-r from-gray-800 to-gray-900 rounded-xl p-4 mb-4 shadow-lg">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="text-4xl">{category.icon}</span>
+                        <div>
+                          <h3 className="text-2xl font-bold text-white">
+                            {category.name}
+                          </h3>
+                          <p className="text-sm text-gray-300">
+                            {products.length} منتج • ربح يصل إلى {Math.max(...products.map(p => p.affiliate_profit))} دج
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
+                  
+                  {/* المنتجات */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {products.map(product => (
+                      <ProductCard
+                        key={product._id}
+                        product={product}
+                        copiedLink={copiedLink}
+                        copiedText={copiedText}
+                        copiedImage={copiedImage}
+                        onCopyLink={() => copyToClipboard(product.affiliateLink, 'link', product._id)}
+                        onCopyText={() => copyToClipboard(product.shareText, 'text', product._id)}
+                        onCopyAll={() => copyImageAndText(product)}
+                      />
+                    ))}
+                  </div>
                 </div>
-                
-                {/* المنتجات */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {products.map(product => (
-                    <ProductCard
-                      key={product._id}
-                      product={product}
-                      copiedLink={copiedLink}
-                      copiedText={copiedText}
-                      copiedImage={copiedImage}
-                      onCopyLink={() => copyToClipboard(product.affiliateLink, 'link', product._id)}
-                      onCopyText={() => copyToClipboard(product.shareText, 'text', product._id)}
-                      onCopyAll={() => copyImageAndText(product)}
-                    />
-                  ))}
-                </div>
-              </div>
-            );
-          })}
+              );
+            });
+          })()}
         </div>
       )}
 
+      {/* رسالة عدم وجود نتائج بعد الفلترة */}
+      {!loading && !error && totalFilteredProducts === 0 && allProducts.length > 0 && (
+        <div className="text-center py-12 bg-white rounded-2xl shadow-lg border-2 border-dashed border-gray-300">
+          <div className="text-6xl mb-4">🔍</div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">لا توجد نتائج</h3>
+          <p className="text-gray-600 mb-4">لم نجد منتجات تطابق معايير البحث الخاصة بك</p>
+          <button
+            onClick={clearAllFilters}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+          >
+            مسح جميع الفلاتر
+          </button>
+        </div>
+      )}
+
+      {/* رسالة عدم وجود منتجات من الأساس */}
       {allProducts.length === 0 && !loading && !error && (
         <div className="text-center py-12 bg-white rounded-2xl shadow">
           <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
