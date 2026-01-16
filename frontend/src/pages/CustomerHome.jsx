@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Search, ShoppingCart, User, Menu, X, MapPin, Phone } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, X, MapPin, Phone, ChevronDown } from 'lucide-react';
 import api from '../services/api';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 
+// عدد المنتجات المعروضة مبدئياً لكل فئة
+const INITIAL_PRODUCTS_PER_CATEGORY = 8;
+
 function CustomerHome() {
-  console.log('CustomerHome: Component Loaded (v4.0 - Force Update)'); // Debug Log v4
+  console.log('CustomerHome: Component Loaded (v6.0 - Performance Fix)'); // Debug Log v6
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const affiliateCode = searchParams.get('ref'); // رمز المسوق من الرابط
@@ -15,6 +18,9 @@ function CustomerHome() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [orderModalOpen, setOrderModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  
+  // حالة عرض المزيد لكل فئة
+  const [expandedCategories, setExpandedCategories] = useState({});
 
   // الفئات
   const categoryOrder = [
@@ -126,7 +132,7 @@ function CustomerHome() {
     ? allProducts.filter(p => 
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.sku?.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      ).slice(0, 50) // تحديد 50 منتج كحد أقصى في البحث
     : null;
 
   const categorizedProducts = !searchTerm ? categorizeProducts() : null;
@@ -245,6 +251,13 @@ function CustomerHome() {
             const products = categorizedProducts[category.name] || [];
             if (products.length === 0) return null;
             
+            // تحديد عدد المنتجات المعروضة
+            const isExpanded = expandedCategories[category.name];
+            const displayedProducts = isExpanded 
+              ? products 
+              : products.slice(0, INITIAL_PRODUCTS_PER_CATEGORY);
+            const hasMore = products.length > INITIAL_PRODUCTS_PER_CATEGORY;
+            
             return (
               <div key={category.name} className="mb-10 sm:mb-16">
                 {/* عنوان الفئة */}
@@ -262,7 +275,7 @@ function CustomerHome() {
                 
                 {/* المنتجات */}
                 <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
-                  {products.map(product => (
+                  {displayedProducts.map(product => (
                     <ProductCard 
                       key={product._id} 
                       product={product}
@@ -273,6 +286,22 @@ function CustomerHome() {
                     />
                   ))}
                 </div>
+                
+                {/* زر عرض المزيد */}
+                {hasMore && !isExpanded && (
+                  <div className="text-center mt-6">
+                    <button
+                      onClick={() => setExpandedCategories(prev => ({
+                        ...prev,
+                        [category.name]: true
+                      }))}
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all font-bold shadow-lg hover:shadow-xl"
+                    >
+                      <span>عرض المزيد ({products.length - INITIAL_PRODUCTS_PER_CATEGORY} منتج)</span>
+                      <ChevronDown className="w-5 h-5" />
+                    </button>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -324,6 +353,8 @@ function ProductCard({ product, onBuyClick }) {
         <img
           src={product.image}
           alt={product.name}
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-contain p-3 sm:p-4 group-hover:scale-105 transition-transform duration-300"
           onError={(e) => { e.target.src = '/products/placeholder.png'; }}
         />
