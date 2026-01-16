@@ -48,8 +48,8 @@ function LandingPage() {
   const lastUpdateTime = useRef(0);
   
   const DELIVERY_FEE = 200; // سعر التوصيل للبعيدين
-  const OLD_STORE_LOCATION = { lat: 32.4917, lng: 3.6746 }; // الموقع القديم
-  const NEW_STORE_LOCATION = { lat: 32.490353, lng: 3.646553 }; // الموقع الجديد (FMPF+F6X)
+  const OLD_STORE_LOCATION = { lat: 32.490353, lng: 3.646553 }; // الموقع القديم (كان الجديد - FMPF+F6X)
+  const NEW_STORE_LOCATION = { lat: 32.4917, lng: 3.6746 }; // الموقع الجديد (كان القديم)
   const OLD_NEARBY_RADIUS_KM = 2; // نصف قطر الموقع القديم (2 كيلومتر) - تخفيض صباحاً ومساءً
   const NEW_NEARBY_RADIUS_KM = 1; // نصف قطر الموقع الجديد (1 كيلومتر) - تخفيض صباحاً فقط
 
