@@ -1,13 +1,14 @@
 import axios from 'axios';
 
-// استخدام نفس domain للـ API (Vercel سيوجهه للـ Backend)
-const API_URL = '/api';
+// استخدام Backend URL مباشرة
+const API_URL = 'https://princeshop-backend.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json'
-  }
+  },
+  withCredentials: false
 });
 
 // إضافة Token تلقائياً لكل طلب
