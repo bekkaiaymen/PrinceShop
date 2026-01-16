@@ -4,7 +4,7 @@ import api from '../services/api';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 
 function CustomerHome() {
-  console.log('CustomerHome: Component Loaded (v3.0 - Robust)'); // Debug Log
+  console.log('CustomerHome: Component Loaded (v4.0 - Force Update)'); // Debug Log v4
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const affiliateCode = searchParams.get('ref'); // رمز المسوق من الرابط
