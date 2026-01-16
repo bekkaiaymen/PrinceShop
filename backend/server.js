@@ -128,6 +128,19 @@ app.post('/api/orders', async (req, res) => {
         affiliateId = affiliate._id;
         affiliateProfit = product.affiliate_profit * (quantity || 1);
         orderSource = 'affiliate'; // الطلب من مسوق
+        
+        // تحديث إحصائيات المسوق
+        affiliate.stats.totalOrders += 1;
+        
+        console.log(`New order for affiliate ${affiliate.affiliateCode}: adding ${affiliateProfit} to pending`);
+        console.log(`Before: available=${affiliate.earnings.available}, pending=${affiliate.earnings.pending}, total=${affiliate.earnings.total}`);
+        
+        // إضافة الربح إلى الأرباح المعلقة فوراً عند إنشاء الطلب
+        affiliate.earnings.pending += affiliateProfit;
+        
+        console.log(`After: available=${affiliate.earnings.available}, pending=${affiliate.earnings.pending}, total=${affiliate.earnings.total}`);
+        
+        await affiliate.save();
       }
     }
     
@@ -201,12 +214,14 @@ app.patch('/api/orders/:id', async (req, res) => {
     const { status } = req.body;
     
     // جلب الطلب القديم لمعرفة الحالة السابقة
-    const oldOrder = await CustomerOrder.findById(req.params.id).populate('affiliate');
+    const oldOrder = await CustomerOrder.findById(req.params.id);
     if (!oldOrder) {
       return res.status(404).json({ error: 'الطلب غير موجود' });
     }
     
     const oldStatus = oldOrder.status;
+    const affiliateProfit = oldOrder.affiliateProfit || 0;
+    const affiliateId = oldOrder.affiliate;
     
     // تحديث الطلب
     const order = await CustomerOrder.findByIdAndUpdate(
@@ -215,41 +230,41 @@ app.patch('/api/orders/:id', async (req, res) => {
       { new: true }
     ).populate('product').populate('affiliate');
     
-    // إذا كان هناك مسوق، تحديث أرباحه
-    if (order.affiliate && order.affiliateProfit > 0) {
-      const affiliate = await User.findById(order.affiliate._id);
+    console.log(`Order ${order._id} status changed: ${oldStatus} -> ${status}`);
+    
+    // إذا كان هناك مسوق وربح، تحديث أرباحه
+    if (affiliateId && affiliateProfit > 0) {
+      const affiliate = await User.findById(affiliateId);
       
       if (affiliate) {
-        // من pending أو confirmed أو shipping إلى delivered
+        console.log(`Updating earnings for affiliate ${affiliate.affiliateCode}`);
+        console.log(`Before: available=${affiliate.earnings.available}, pending=${affiliate.earnings.pending}, total=${affiliate.earnings.total}`);
+        
+        // الحالة الجديدة: delivered (نقل من معلق إلى متاح)
         if (status === 'delivered' && oldStatus !== 'delivered') {
-          // نقل من معلق إلى متاح
-          affiliate.earnings.pending = Math.max(0, affiliate.earnings.pending - order.affiliateProfit);
-          affiliate.earnings.available += order.affiliateProfit;
-          affiliate.earnings.total += order.affiliateProfit;
+          affiliate.earnings.pending = Math.max(0, affiliate.earnings.pending - affiliateProfit);
+          affiliate.earnings.available += affiliateProfit;
+          affiliate.earnings.total += affiliateProfit;
           affiliate.stats.deliveredOrders += 1;
-        }
-        // من delivered إلى أي حالة أخرى (إلغاء بعد توصيل مثلاً)
-        else if (oldStatus === 'delivered' && status !== 'delivered') {
-          // إرجاع من متاح إلى معلق أو حذف
-          affiliate.earnings.available = Math.max(0, affiliate.earnings.available - order.affiliateProfit);
-          affiliate.earnings.total = Math.max(0, affiliate.earnings.total - order.affiliateProfit);
-          affiliate.stats.deliveredOrders = Math.max(0, affiliate.stats.deliveredOrders - 1);
-          
-          if (status !== 'cancelled') {
-            affiliate.earnings.pending += order.affiliateProfit;
-          }
-        }
-        // من حالة غير delivered إلى cancelled
-        else if (status === 'cancelled' && oldStatus !== 'cancelled' && oldStatus !== 'delivered') {
-          // إزالة من معلق
-          affiliate.earnings.pending = Math.max(0, affiliate.earnings.pending - order.affiliateProfit);
-        }
-        // من حالة أخرى (pending) إلى confirmed أو shipping
-        else if ((status === 'confirmed' || status === 'shipping') && oldStatus === 'pending') {
-          // إضافة إلى معلق
-          affiliate.earnings.pending += order.affiliateProfit;
+          console.log(`Moved ${affiliateProfit} from pending to available (order delivered)`);
         }
         
+        // الحالة الجديدة: cancelled من حالة غير delivered
+        else if (status === 'cancelled' && oldStatus !== 'delivered') {
+          // إزالة من معلق
+          affiliate.earnings.pending = Math.max(0, affiliate.earnings.pending - affiliateProfit);
+          console.log(`Removed ${affiliateProfit} from pending (order cancelled)`);
+        }
+        
+        // إلغاء بعد التوصيل (نادر)
+        else if (status === 'cancelled' && oldStatus === 'delivered') {
+          affiliate.earnings.available = Math.max(0, affiliate.earnings.available - affiliateProfit);
+          affiliate.earnings.total = Math.max(0, affiliate.earnings.total - affiliateProfit);
+          affiliate.stats.deliveredOrders = Math.max(0, affiliate.stats.deliveredOrders - 1);
+          console.log(`Reversed delivery: removed ${affiliateProfit} from available (order cancelled after delivery)`);
+        }
+        
+        console.log(`After: available=${affiliate.earnings.available}, pending=${affiliate.earnings.pending}, total=${affiliate.earnings.total}`);
         await affiliate.save();
       }
     }
