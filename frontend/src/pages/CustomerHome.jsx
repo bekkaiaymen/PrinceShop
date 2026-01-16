@@ -16,7 +16,12 @@ function CustomerHome() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('الكل');
-  const [priceRange, setPriceRange] = useState('all');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+  const [exactPrice, setExactPrice] = useState('');
+  const [priceFilterMode, setPriceFilterMode] = useState('range'); // 'range' أو 'exact'
+  const [sortBy, setSortBy] = useState('newest');
+  const [showFilters, setShowFilters] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [orderModalOpen, setOrderModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -130,7 +135,7 @@ function CustomerHome() {
     return categorized;
   };
 
-  const filteredProducts = searchTerm || selectedCategory !== 'الكل' || priceRange !== 'all'
+  const filteredProducts = searchTerm || selectedCategory !== 'الكل' || minPrice !== '' || maxPrice !== '' || exactPrice !== ''
     ? allProducts.filter(p => {
         // فلتر البحث
         const matchSearch = !searchTerm || 
@@ -147,29 +152,58 @@ function CustomerHome() {
           }
         }
         
-        // فلتر السعر
-        let matchPrice = priceRange === 'all';
-        if (!matchPrice) {
+        // فلتر السعر المخصص
+        let matchPrice = true;
+        if (priceFilterMode === 'exact' && exactPrice !== '') {
+          // البحث عن سعر محدد
           const price = p.customerPrice || p.suggested_price || 0;
-          switch(priceRange) {
-            case 'under1000':
-              matchPrice = price < 1000;
-              break;
-            case '1000-2000':
-              matchPrice = price >= 1000 && price <= 2000;
-              break;
-            case '2000-3000':
-              matchPrice = price >= 2000 && price <= 3000;
-              break;
-            case 'above3000':
-              matchPrice = price > 3000;
-              break;
-          }
+          const exact = parseFloat(exactPrice);
+          matchPrice = price === exact;
+        } else if (priceFilterMode === 'range' && (minPrice !== '' || maxPrice !== '')) {
+          // البحث في مدى سعري
+          const price = p.customerPrice || p.suggested_price || 0;
+          const min = minPrice === '' ? 0 : parseFloat(minPrice);
+          const max = maxPrice === '' ? Infinity : parseFloat(maxPrice);
+          matchPrice = price >= min && price <= max;
         }
         
         return matchSearch && matchCategory && matchPrice;
+      }).sort((a, b) => {
+        // ترتيب النتائج
+        const priceA = a.customerPrice || a.suggested_price || 0;
+        const priceB = b.customerPrice || b.suggested_price || 0;
+        
+        switch(sortBy) {
+          case 'price-low':
+            return priceA - priceB;
+          case 'price-high':
+            return priceB - priceA;
+          case 'name':
+            return a.name.localeCompare(b.name, 'ar');
+          case 'newest':
+          default:
+            return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+        }
       }).slice(0, 50)
     : null;
+  
+  // حساب عدد الفلاتر النشطة
+  const activeFiltersCount = [
+    searchTerm,
+    selectedCategory !== 'الكل',
+    (priceFilterMode === 'exact' && exactPrice !== '') || (priceFilterMode === 'range' && (minPrice !== '' || maxPrice !== ''))
+  ].filter(Boolean).length;
+  
+  // مسح كل الفلاتر
+  const clearAllFilters = () => {
+    setSearchTerm('');
+    setSelectedCategory('الكل');
+    setMinPrice('');
+    setMaxPrice('');
+    setExactPrice('');
+    setPriceFilterMode('range');
+    setSortBy('newest');
+  };
 
   const categorizedProducts = !searchTerm ? categorizeProducts() : null;
 
@@ -247,33 +281,151 @@ function CustomerHome() {
             />
           </div>
 
-          {/* Filters */}
-          <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {/* Category Filter */}
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-4 py-3 border-2 border-white/30 rounded-xl focus:ring-4 focus:ring-white/30 text-gray-800 bg-white/90 backdrop-blur font-medium shadow-lg"
+          {/* Filter Toggle Button */}
+          <div className="max-w-2xl mx-auto mb-4">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="w-full flex items-center justify-between px-6 py-3 bg-white/90 backdrop-blur rounded-xl shadow-lg hover:shadow-xl transition-all"
             >
-              <option value="الكل">🏷️ جميع الفئات</option>
-              {categoryOrder.filter(cat => cat.keywords.length > 0).map(cat => (
-                <option key={cat.name} value={cat.name}>{cat.icon} {cat.name}</option>
-              ))}
-            </select>
-
-            {/* Price Filter */}
-            <select
-              value={priceRange}
-              onChange={(e) => setPriceRange(e.target.value)}
-              className="px-4 py-3 border-2 border-white/30 rounded-xl focus:ring-4 focus:ring-white/30 text-gray-800 bg-white/90 backdrop-blur font-medium shadow-lg"
-            >
-              <option value="all">💰 جميع الأسعار</option>
-              <option value="under1000">أقل من 1000 دج</option>
-              <option value="1000-2000">1000 - 2000 دج</option>
-              <option value="2000-3000">2000 - 3000 دج</option>
-              <option value="above3000">أكثر من 3000 دج</option>
-            </select>
+              <div className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+                <span className="font-bold text-gray-800">فلاتر البحث المتقدمة</span>
+                {activeFiltersCount > 0 && (
+                  <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+                    {activeFiltersCount}
+                  </span>
+                )}
+              </div>
+              <ChevronDown className={`w-5 h-5 text-gray-600 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+            </button>
           </div>
+
+          {/* Advanced Filters */}
+          {showFilters && (
+            <div className="max-w-4xl mx-auto bg-white/95 backdrop-blur rounded-2xl shadow-2xl p-6 mb-4 animate-fade-in">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                {/* Category Filter */}
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                    <span className="text-lg">🏷️</span>
+                    الفئة
+                  </label>
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-800 font-medium"
+                  >
+                    <option value="الكل">جميع الفئات</option>
+                    {categoryOrder.filter(cat => cat.keywords.length > 0).map(cat => (
+                      <option key={cat.name} value={cat.name}>{cat.icon} {cat.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Custom Price Filter */}
+                <div className="lg:col-span-2">
+                  <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                    <span className="text-lg">💵</span>
+                    فلترة السعر
+                  </label>
+                  
+                  {/* خيارات نوع الفلتر */}
+                  <div className="flex gap-2 mb-3">
+                    <button
+                      onClick={() => setPriceFilterMode('range')}
+                      className={`flex-1 px-3 py-2 rounded-lg font-medium text-sm transition-all ${
+                        priceFilterMode === 'range'
+                          ? 'bg-purple-100 text-purple-700 ring-2 ring-purple-500'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      📊 مدى سعري
+                    </button>
+                    <button
+                      onClick={() => setPriceFilterMode('exact')}
+                      className={`flex-1 px-3 py-2 rounded-lg font-medium text-sm transition-all ${
+                        priceFilterMode === 'exact'
+                          ? 'bg-purple-100 text-purple-700 ring-2 ring-purple-500'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      🎯 سعر محدد
+                    </button>
+                  </div>
+                  
+                  {/* حقل السعر المحدد */}
+                  {priceFilterMode === 'exact' ? (
+                    <input
+                      type="number"
+                      placeholder="أدخل السعر المحدد (مثال: 1500 دج)"
+                      value={exactPrice}
+                      onChange={(e) => setExactPrice(e.target.value)}
+                      min="0"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  ) : (
+                    /* حقول المدى السعري */
+                    <div className="flex gap-2">
+                      <div className="flex-1">
+                        <input
+                          type="number"
+                          placeholder="من (مثال: 500)"
+                          value={minPrice}
+                          onChange={(e) => setMinPrice(e.target.value)}
+                          min="0"
+                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        />
+                      </div>
+                      <div className="flex items-center text-gray-500 font-bold">-</div>
+                      <div className="flex-1">
+                        <input
+                          type="number"
+                          placeholder="إلى (مثال: 2000)"
+                          value={maxPrice}
+                          onChange={(e) => setMaxPrice(e.target.value)}
+                          min="0"
+                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Sort By */}
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                    <span className="text-lg">↕️</span>
+                    الترتيب حسب
+                  </label>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-800 font-medium"
+                  >
+                    <option value="newest">الأحدث</option>
+                    <option value="price-low">السعر: من الأقل للأعلى</option>
+                    <option value="price-high">السعر: من الأعلى للأقل</option>
+                    <option value="name">الاسم (أ - ي)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Clear Filters Button */}
+              {activeFiltersCount > 0 && (
+                <button
+                  onClick={clearAllFilters}
+                  className="w-full py-2 px-4 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  مسح جميع الفلاتر
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </section>
 

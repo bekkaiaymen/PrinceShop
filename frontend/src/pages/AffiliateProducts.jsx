@@ -12,6 +12,10 @@ export default function AffiliateProducts() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('الكل');
   const [profitFilter, setProfitFilter] = useState('all');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+  const [sortBy, setSortBy] = useState('profit-high');
+  const [showFilters, setShowFilters] = useState(true);
 
   // الفئات بنفس الترتيب في صفحة الزبون
   const categoryOrder = [
@@ -75,7 +79,40 @@ export default function AffiliateProducts() {
         }
       }
       
-      return matchSearch && matchProfit;
+      // فلتر السعر المخصص
+      let matchPrice = true;
+      if (minPrice !== '' || maxPrice !== '') {
+        const price = product.customerPrice || product.suggested_price || 0;
+        const min = minPrice === '' ? 0 : parseFloat(minPrice);
+        const max = maxPrice === '' ? Infinity : parseFloat(maxPrice);
+        matchPrice = price >= min && price <= max;
+      }
+      
+      return matchSearch && matchProfit && matchPrice;
+    });
+
+    // ترتيب المنتجات
+    filtered.sort((a, b) => {
+      const profitA = a.profit_percent || 0;
+      const profitB = b.profit_percent || 0;
+      const priceA = a.customerPrice || a.suggested_price || 0;
+      const priceB = b.customerPrice || b.suggested_price || 0;
+      
+      switch(sortBy) {
+        case 'profit-high':
+          return profitB - profitA;
+        case 'profit-low':
+          return profitA - profitB;
+        case 'price-high':
+          return priceB - priceA;
+        case 'price-low':
+          return priceA - priceB;
+        case 'name':
+          return a.name.localeCompare(b.name, 'ar');
+        case 'newest':
+        default:
+          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+      }
     });
 
     filtered.forEach(product => {
@@ -102,6 +139,28 @@ export default function AffiliateProducts() {
     });
 
     return categorized;
+  };
+  
+  // حساب عدد الفلاتر النشطة
+  const activeFiltersCount = [
+    searchTerm,
+    selectedCategory !== 'الكل',
+    profitFilter !== 'all',
+    minPrice !== '' || maxPrice !== ''
+  ].filter(Boolean).length;
+  
+  // حساب إحصائيات الفلترة
+  const filteredCategories = categorizeProducts();
+  const totalFilteredProducts = Object.values(filteredCategories).reduce((sum, products) => sum + products.length, 0);
+  
+  // مسح كل الفلاتر
+  const clearAllFilters = () => {
+    setSearchTerm('');
+    setSelectedCategory('الكل');
+    setProfitFilter('all');
+    setMinPrice('');
+    setMaxPrice('');
+    setSortBy('profit-high');
   };
 
   const copyToClipboard = async (text, type, productId) => {
@@ -206,59 +265,178 @@ export default function AffiliateProducts() {
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-lg p-6 text-white">
-        <h1 className="text-3xl font-bold mb-2">منتجاتك للتسويق 🚀</h1>
-        <p className="text-blue-100">اختر منتج، انسخ رابطك الخاص، وابدأ الربح!</p>
-        <div className="mt-4 bg-white/20 backdrop-blur-sm rounded-xl p-4">
-          <p className="text-sm mb-2">💡 <strong>نصيحة:</strong> يمكنك نسخ الرابط أو نسخ المنتج كاملاً (صورة + وصف + رابط)</p>
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold mb-2">منتجاتك للتسويق 🚀</h1>
+            <p className="text-blue-100 mb-4">اختر منتج، انسخ رابطك الخاص، وابدأ الربح!</p>
+            
+            {/* إحصائيات الفلترة */}
+            <div className="flex flex-wrap gap-3">
+              <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
+                <div className="text-xs text-blue-100">إجمالي المنتجات</div>
+                <div className="text-2xl font-bold">{allProducts.length}</div>
+              </div>
+              {activeFiltersCount > 0 && (
+                <div className="bg-green-500/30 backdrop-blur-sm rounded-lg px-4 py-2 border-2 border-green-300">
+                  <div className="text-xs text-green-100">نتائج الفلترة</div>
+                  <div className="text-2xl font-bold">{totalFilteredProducts}</div>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          {/* زر التحكم بالفلاتر */}
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-xl px-4 py-2 transition-all flex items-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            {showFilters ? 'إخفاء الفلاتر' : 'إظهار الفلاتر'}
+          </button>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-lg p-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Search */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">🔍 البحث</label>
-            <input
-              type="text"
-              placeholder="ابحث عن منتج..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+      {showFilters && (
+        <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-gray-100">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+              </svg>
+              فلاتر البحث المتقدمة
+            </h3>
+            
+            {activeFiltersCount > 0 && (
+              <button
+                onClick={clearAllFilters}
+                className="text-sm text-red-600 hover:text-red-700 font-medium flex items-center gap-1"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                مسح الكل ({activeFiltersCount})
+              </button>
+            )}
           </div>
 
-          {/* Category Filter */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">🏷️ الفئة</label>
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="الكل">جميع الفئات</option>
-              {categoryOrder.filter(cat => cat.keywords.length > 0).map(cat => (
-                <option key={cat.name} value={cat.name}>{cat.icon} {cat.name}</option>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {/* Search */}
+            <div className="lg:col-span-2">
+              <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                <span className="text-lg">🔍</span>
+                البحث
+              </label>
+              <input
+                type="text"
+                placeholder="اسم المنتج أو الكود..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              />
+            </div>
+
+            {/* Category Filter */}
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                <span className="text-lg">🏷️</span>
+                الفئة
+              </label>
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="الكل">الكل</option>
+                {categoryOrder.filter(cat => cat.keywords.length > 0).map(cat => (
+                  <option key={cat.name} value={cat.name}>{cat.icon} {cat.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Profit Filter */}
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                <span className="text-lg">💰</span>
+                نسبة الربح
+              </label>
+              <select
+                value={profitFilter}
+                onChange={(e) => setProfitFilter(e.target.value)}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              >
+                <option value="all">الكل</option>
+                <option value="low">📉 أقل من 15%</option>
+                <option value="medium">📊 15% - 25%</option>
+                <option value="high">📈 أكثر من 25%</option>
+              </select>
+            </div>
+
+            {/* Custom Price Range */}
+            <div className="lg:col-span-2">
+              <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                <span className="text-lg">💵</span>
+                نطاق السعر (دج)
+              </label>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <input
+                    type="number"
+                    placeholder="من (مثال: 500)"
+                    value={minPrice}
+                    onChange={(e) => setMinPrice(e.target.value)}
+                    min="0"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
+                </div>
+                <div className="flex items-center text-gray-500 font-bold">-</div>
+                <div className="flex-1">
+                  <input
+                    type="number"
+                    placeholder="إلى (مثال: 2000)"
+                    value={maxPrice}
+                    onChange={(e) => setMaxPrice(e.target.value)}
+                    min="0"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Sort By - Full Width */}
+          <div className="mt-4 pt-4 border-t-2 border-gray-100">
+            <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+              <span className="text-lg">↕️</span>
+              الترتيب حسب
+            </label>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+              {[
+                { value: 'profit-high', label: '💎 الربح: الأعلى أولاً', color: 'green' },
+                { value: 'profit-low', label: '📉 الربح: الأقل أولاً', color: 'orange' },
+                { value: 'price-high', label: '💰 السعر: الأغلى أولاً', color: 'purple' },
+                { value: 'price-low', label: '🏷️ السعر: الأرخص أولاً', color: 'blue' },
+                { value: 'newest', label: '🆕 الأحدث', color: 'indigo' },
+                { value: 'name', label: '🔤 الاسم (أ-ي)', color: 'gray' }
+              ].map(option => (
+                <button
+                  key={option.value}
+                  onClick={() => setSortBy(option.value)}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition-all ${
+                    sortBy === option.value
+                      ? `bg-${option.color}-100 text-${option.color}-700 ring-2 ring-${option.color}-500`
+                      : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  {option.label}
+                </button>
               ))}
-            </select>
-          </div>
-
-          {/* Profit Filter */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">💰 نسبة الربح</label>
-            <select
-              value={profitFilter}
-              onChange={(e) => setProfitFilter(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">جميع النسب</option>
-              <option value="low">أقل من 15%</option>
-              <option value="medium">15% - 25%</option>
-              <option value="high">أكثر من 25%</option>
-            </select>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* عرض المنتجات حسب الفئات */}
       {!loading && !error && (
