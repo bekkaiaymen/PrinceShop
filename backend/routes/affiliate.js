@@ -133,22 +133,19 @@ router.post('/withdrawals', async (req, res) => {
       return res.status(400).json({ message: 'الحد الأدنى للسحب 100 دج' });
     }
     
-    // إنشاء طلب السحب
+    // إنشاء طلب السحب بدون خصم من الرصيد
+    // سيتم الخصم عند الموافقة من صاحب الموقع
     const withdrawal = await Withdrawal.create({
       affiliate: affiliate._id,
       amount,
       paymentMethod: affiliate.paymentMethod,
-      paymentDetails: affiliate.paymentDetails
+      paymentDetails: affiliate.paymentDetails,
+      status: 'pending' // قيد المراجعة
     });
-    
-    // خصم المبلغ من الرصيد المتاح وإضافته إلى المسحوب
-    affiliate.earnings.available -= amount;
-    affiliate.earnings.withdrawn += amount;
-    await affiliate.save();
     
     res.status(201).json({
       success: true,
-      message: 'تم إرسال طلب السحب بنجاح',
+      message: 'تم إرسال طلب السحب بنجاح! سيتم مراجعته قريباً.',
       data: withdrawal
     });
   } catch (error) {

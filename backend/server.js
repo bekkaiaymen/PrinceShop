@@ -656,6 +656,83 @@ app.get('/api/owner/statistics', async (req, res) => {
   }
 });
 
+// جلب طلبات السحب لصاحب الموقع
+app.get('/api/owner/withdrawals', async (req, res) => {
+  try {
+    const { status } = req.query;
+    const Withdrawal = (await import('./models/Withdrawal.js')).default;
+    
+    const query = status ? { status } : {};
+    
+    const withdrawals = await Withdrawal.find(query)
+      .populate('affiliate', 'name email affiliateCode phone')
+      .sort({ createdAt: -1 });
+    
+    res.json({
+      success: true,
+      count: withdrawals.length,
+      data: withdrawals
+    });
+  } catch (error) {
+    console.error('Error fetching withdrawals:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// تحديث حالة طلب السحب (موافقة/رفض)
+app.patch('/api/owner/withdrawals/:id', async (req, res) => {
+  try {
+    const { status, adminNotes } = req.body;
+    const Withdrawal = (await import('./models/Withdrawal.js')).default;
+    
+    const withdrawal = await Withdrawal.findById(req.params.id).populate('affiliate');
+    
+    if (!withdrawal) {
+      return res.status(404).json({ error: 'طلب السحب غير موجود' });
+    }
+    
+    const oldStatus = withdrawal.status;
+    
+    // تحديث حالة السحب
+    withdrawal.status = status;
+    if (adminNotes) withdrawal.adminNotes = adminNotes;
+    if (status === 'completed') withdrawal.completedAt = new Date();
+    
+    await withdrawal.save();
+    
+    // إذا تمت الموافقة (completed)، خصم من الرصيد المتاح وإضافة إلى المسحوب
+    if (status === 'completed' && oldStatus !== 'completed') {
+      const affiliate = await User.findById(withdrawal.affiliate._id);
+      if (affiliate) {
+        affiliate.earnings.available -= withdrawal.amount;
+        affiliate.earnings.withdrawn += withdrawal.amount;
+        await affiliate.save();
+        console.log(`✅ Withdrawal approved: ${withdrawal.amount} دج deducted from ${affiliate.name}`);
+      }
+    }
+    
+    // إذا تم الرفض بعد الموافقة (نادر)، إرجاع المبلغ
+    else if (oldStatus === 'completed' && status !== 'completed') {
+      const affiliate = await User.findById(withdrawal.affiliate._id);
+      if (affiliate) {
+        affiliate.earnings.available += withdrawal.amount;
+        affiliate.earnings.withdrawn -= withdrawal.amount;
+        await affiliate.save();
+        console.log(`↩️ Withdrawal reversed: ${withdrawal.amount} دج returned to ${affiliate.name}`);
+      }
+    }
+    
+    res.json({
+      success: true,
+      message: `تم تحديث حالة الطلب إلى: ${status}`,
+      data: withdrawal
+    });
+  } catch (error) {
+    console.error('Error updating withdrawal:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Health check - Also serves as a keep-alive endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date(), uptime: process.uptime() });
