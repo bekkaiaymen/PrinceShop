@@ -101,32 +101,45 @@ router.patch('/me', protect, async (req, res) => {
   try {
     const { name, phone, city, paymentInfo } = req.body;
     
-    console.log('Update Profile Body:', req.body);
-    console.log('Payment Info received:', paymentInfo);
+    // استخدام طريقة save() لضمان تحديث الكائنات المتداخلة
+    const user = await User.findById(req.user._id);
 
-    const updateData = {};
-    if (name) updateData.name = name;
-    if (phone) updateData.phone = phone;
-    if (city) updateData.city = city;
+    if (!user) {
+      return res.status(404).json({ message: 'المستخدم غير موجود' });
+    }
+
+    if (name) user.name = name;
+    if (phone) user.phone = phone;
+    if (city) user.city = city;
     
-    // إضافة معلومات الدفع إذا كانت موجودة
-    
-    // إضافة معلومات الدفع إذا كانت موجودة
     if (paymentInfo) {
-      updateData.paymentInfo = paymentInfo;
+      // التأكد من تهيئة paymentInfo
+      if (!user.paymentInfo) user.paymentInfo = {};
+
+      if (paymentInfo.baridimob) {
+        if (!user.paymentInfo.baridimob) user.paymentInfo.baridimob = {};
+        if (paymentInfo.baridimob.rip !== undefined) user.paymentInfo.baridimob.rip = paymentInfo.baridimob.rip;
+        if (paymentInfo.baridimob.accountHolder !== undefined) user.paymentInfo.baridimob.accountHolder = paymentInfo.baridimob.accountHolder;
+      }
+
+      if (paymentInfo.cash) {
+        if (!user.paymentInfo.cash) user.paymentInfo.cash = {};
+        if (paymentInfo.cash.location !== undefined) user.paymentInfo.cash.location = paymentInfo.cash.location;
+        if (paymentInfo.cash.details !== undefined) user.paymentInfo.cash.details = paymentInfo.cash.details;
+      }
+      
+      // Mark as modified explicitly to be safe
+      user.markModified('paymentInfo');
     }
     
-    const updatedUser = await User.findByIdAndUpdate(
-      req.user._id,
-      updateData,
-      { new: true, runValidators: true }
-    );
+    const updatedUser = await user.save();
     
     res.json({
       success: true,
       user: updatedUser
     });
   } catch (error) {
+    console.error('Update Error:', error);
     res.status(400).json({ message: error.message });
   }
 });
