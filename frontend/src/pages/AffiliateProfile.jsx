@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { auth } from '../services/api';
 import { User, Mail, Phone, MapPin, CreditCard, Lock, Save } from 'lucide-react';
@@ -26,6 +26,28 @@ export default function AffiliateProfile() {
       details: user?.paymentInfo?.cash?.details || ''
     }
   });
+
+  // Update state when user data changes
+  useEffect(() => {
+    if (user) {
+      setProfileData({
+        name: user.name || '',
+        phone: user.phone || '',
+        city: user.city || ''
+      });
+      
+      setPaymentData({
+        baridimob: {
+          rip: user.paymentInfo?.baridimob?.rip || '',
+          accountHolder: user.paymentInfo?.baridimob?.accountHolder || ''
+        },
+        cash: {
+          location: user.paymentInfo?.cash?.location || '',
+          details: user.paymentInfo?.cash?.details || ''
+        }
+      });
+    }
+  }, [user]);
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -56,13 +78,22 @@ export default function AffiliateProfile() {
     setError('');
     setSuccess('');
 
+    console.log('Payment data being sent:', paymentData);
+
     try {
       const { data } = await auth.updateProfile({
         paymentInfo: paymentData
       });
+      console.log('Response from server:', data);
       updateUser(data.user);
       setSuccess('تم تحديث معلومات الدفع بنجاح');
+      
+      // إعادة تحميل الصفحة بعد ثانيتين لإظهار التحديثات
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (err) {
+      console.error('Error updating payment info:', err);
       setError(err.response?.data?.message || 'حدث خطأ أثناء التحديث');
     } finally {
       setLoading(false);
