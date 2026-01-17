@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { affiliate } from '../services/api';
-import { DollarSign, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { DollarSign, Clock, CheckCircle, XCircle, AlertCircle, CreditCard, MapPin } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const statusConfig = {
@@ -16,6 +16,7 @@ export default function AffiliateWithdrawals() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [amount, setAmount] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -56,12 +57,33 @@ export default function AffiliateWithdrawals() {
     e.preventDefault();
     setError('');
     setSuccess('');
+
+    if (!paymentMethod) {
+      setError('الرجاء اختيار طريقة الدفع');
+      return;
+    }
+
+    // Check if payment info is filled
+    if (paymentMethod === 'baridimob' && !user?.paymentInfo?.baridimob?.rip) {
+      setError('الرجاء ملء معلومات بريدي موب في صفحة الإعدادات أولاً');
+      return;
+    }
+
+    if (paymentMethod === 'cash' && !user?.paymentInfo?.cash?.location) {
+      setError('الرجاء ملء معلومات الدفع النقدي في صفحة الإعدادات أولاً');
+      return;
+    }
+
     setSubmitting(true);
 
     try {
-      await affiliate.requestWithdrawal({ amount: Number(amount) });
+      await affiliate.requestWithdrawal({ 
+        amount: Number(amount),
+        paymentMethod 
+      });
       setSuccess('تم إرسال طلب السحب بنجاح! سيتم مراجعته قريباً.');
       setAmount('');
+      setPaymentMethod('');
       setShowForm(false);
       loadWithdrawals();
       // Reload user data to update available balance
@@ -153,7 +175,66 @@ export default function AffiliateWithdrawals() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* اختيار طريقة الدفع */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                طريقة الدفع
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* بريدي موب */}
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('baridimob')}
+                  className={`p-4 border-2 rounded-lg transition-all ${
+                    paymentMethod === 'baridimob'
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-blue-300'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <CreditCard className={`w-5 h-5 ${paymentMethod === 'baridimob' ? 'text-blue-600' : 'text-gray-400'}`} />
+                    <span className="font-semibold">بريدي موب</span>
+                  </div>
+                  {user?.paymentInfo?.baridimob?.rip ? (
+                    <div className="text-xs text-left">
+                      <p className="text-gray-600">RIP: {user.paymentInfo.baridimob.rip}</p>
+                      <p className="text-gray-500">{user.paymentInfo.baridimob.accountHolder}</p>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-red-500">لم يتم ملء المعلومات</p>
+                  )}
+                </button>
+
+                {/* نقدي */}
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('cash')}
+                  className={`p-4 border-2 rounded-lg transition-all ${
+                    paymentMethod === 'cash'
+                      ? 'border-green-500 bg-green-50'
+                      : 'border-gray-200 hover:border-green-300'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <MapPin className={`w-5 h-5 ${paymentMethod === 'cash' ? 'text-green-600' : 'text-gray-400'}`} />
+                    <span className="font-semibold">نقداً</span>
+                  </div>
+                  {user?.paymentInfo?.cash?.location ? (
+                    <div className="text-xs text-left">
+                      <p className="text-gray-600">{user.paymentInfo.cash.location}</p>
+                      {user.paymentInfo.cash.details && (
+                        <p className="text-gray-500 line-clamp-1">{user.paymentInfo.cash.details}</p>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-red-500">لم يتم ملء المعلومات</p>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* المبلغ */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 المبلغ (دج)
@@ -176,14 +257,18 @@ export default function AffiliateWithdrawals() {
             <div className="flex gap-3">
               <button
                 type="submit"
-                disabled={submitting}
+                disabled={submitting || !paymentMethod}
                 className="flex-1 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:opacity-50"
               >
                 {submitting ? 'جاري الإرسال...' : 'إرسال الطلب'}
               </button>
               <button
                 type="button"
-                onClick={() => setShowForm(false)}
+                onClick={() => {
+                  setShowForm(false);
+                  setPaymentMethod('');
+                  setAmount('');
+                }}
                 className="px-6 bg-gray-100 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
               >
                 إلغاء

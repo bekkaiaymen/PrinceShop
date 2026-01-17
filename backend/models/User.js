@@ -53,15 +53,17 @@ const userSchema = new mongoose.Schema({
   },
   
   // معلومات الدفع
-  paymentMethod: {
-    type: String,
-    enum: ['bank', 'ccp', 'baridimob', 'cash'],
-    default: 'cash'
-  },
-  paymentDetails: {
-    accountHolder: String,
-    accountNumber: String,
-    bankName: String
+  paymentInfo: {
+    // معلومات بريدي موب
+    baridimob: {
+      rip: { type: String, default: '' },
+      accountHolder: { type: String, default: '' }
+    },
+    // معلومات الدفع النقدي
+    cash: {
+      location: { type: String, default: '' },
+      details: { type: String, default: '' }
+    }
   },
   
   // الأرباح

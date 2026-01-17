@@ -17,10 +17,14 @@ export default function AffiliateProfile() {
   });
 
   const [paymentData, setPaymentData] = useState({
-    paymentMethod: user?.paymentMethod || 'cash',
-    accountHolder: user?.paymentDetails?.accountHolder || '',
-    accountNumber: user?.paymentDetails?.accountNumber || '',
-    bankName: user?.paymentDetails?.bankName || ''
+    baridimob: {
+      rip: user?.paymentInfo?.baridimob?.rip || '',
+      accountHolder: user?.paymentInfo?.baridimob?.accountHolder || ''
+    },
+    cash: {
+      location: user?.paymentInfo?.cash?.location || '',
+      details: user?.paymentInfo?.cash?.details || ''
+    }
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -54,12 +58,7 @@ export default function AffiliateProfile() {
 
     try {
       const { data } = await auth.updateProfile({
-        paymentMethod: paymentData.paymentMethod,
-        paymentDetails: {
-          accountHolder: paymentData.accountHolder,
-          accountNumber: paymentData.accountNumber,
-          bankName: paymentData.bankName
-        }
+        paymentInfo: paymentData
       });
       updateUser(data.user);
       setSuccess('تم تحديث معلومات الدفع بنجاح');
@@ -212,71 +211,106 @@ export default function AffiliateProfile() {
       {/* Payment Tab */}
       {activeTab === 'payment' && (
         <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-200">
-          <form onSubmit={handlePaymentUpdate} className="space-y-4 sm:space-y-5">
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
-                وسيلة الدفع
-              </label>
-              <select
-                value={paymentData.paymentMethod}
-                onChange={(e) => setPaymentData({ ...paymentData, paymentMethod: e.target.value })}
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
-              >
-                <option value="cash">نقداً</option>
-                <option value="bank">تحويل بنكي</option>
-                <option value="ccp">CCP</option>
-                <option value="baridimob">Baridimob</option>
-              </select>
-            </div>
+          <div className="mb-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">معلومات طرق الدفع</h3>
+            <p className="text-sm text-gray-600">املأ معلومات طرق الدفع المتاحة. ستستخدم هذه المعلومات عند طلب السحب.</p>
+          </div>
 
-            {paymentData.paymentMethod !== 'cash' && (
-              <>
+          <form onSubmit={handlePaymentUpdate} className="space-y-6">
+            {/* بريدي موب */}
+            <div className="border-2 border-blue-100 rounded-xl p-4 bg-blue-50">
+              <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <CreditCard className="w-5 h-5 text-blue-600" />
+                بريدي موب (Baridimob)
+              </h4>
+              
+              <div className="space-y-4">
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    رقم RIP (20 رقم)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="00799999001234567890"
+                    value={paymentData.baridimob.rip}
+                    onChange={(e) => setPaymentData({
+                      ...paymentData,
+                      baridimob: { ...paymentData.baridimob, rip: e.target.value }
+                    })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
+                    maxLength="20"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">أدخل رقم RIP الخاص ببريدي موب (20 رقم)</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     اسم صاحب الحساب
                   </label>
                   <input
                     type="text"
-                    value={paymentData.accountHolder}
-                    onChange={(e) => setPaymentData({ ...paymentData, accountHolder: e.target.value })}
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                    placeholder="الاسم الكامل كما في البطاقة"
+                    value={paymentData.baridimob.accountHolder}
+                    onChange={(e) => setPaymentData({
+                      ...paymentData,
+                      baridimob: { ...paymentData.baridimob, accountHolder: e.target.value }
+                    })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
+              </div>
+            </div>
 
+            {/* الدفع النقدي */}
+            <div className="border-2 border-green-100 rounded-xl p-4 bg-green-50">
+              <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-green-600" />
+                الدفع النقدي (Cash)
+              </h4>
+              
+              <div className="space-y-4">
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
-                    رقم الحساب
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    مكان الاستلام
                   </label>
                   <input
                     type="text"
-                    value={paymentData.accountNumber}
-                    onChange={(e) => setPaymentData({ ...paymentData, accountNumber: e.target.value })}
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                    placeholder="مثال: الجزائر العاصمة - باب الوادي"
+                    value={paymentData.cash.location}
+                    onChange={(e) => setPaymentData({
+                      ...paymentData,
+                      cash: { ...paymentData.cash, location: e.target.value }
+                    })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
+                  <p className="text-xs text-gray-500 mt-1">أين تريد استلام الأموال نقداً؟</p>
                 </div>
 
-                {paymentData.paymentMethod === 'bank' && (
-                  <div>
-                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
-                      اسم البنك
-                    </label>
-                    <input
-                      type="text"
-                      value={paymentData.bankName}
-                      onChange={(e) => setPaymentData({ ...paymentData, bankName: e.target.value })}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
-                    />
-                  </div>
-                )}
-              </>
-            )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    تفاصيل إضافية
+                  </label>
+                  <textarea
+                    placeholder="مثال: أمام مقهى النصر، بجانب البريد المركزي"
+                    value={paymentData.cash.details}
+                    onChange={(e) => setPaymentData({
+                      ...paymentData,
+                      cash: { ...paymentData.cash, details: e.target.value }
+                    })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    rows="3"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">معلومات إضافية لتسهيل الاستلام</p>
+                </div>
+              </div>
+            </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 text-white py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 text-sm sm:text-base touch-manipulation"
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 touch-manipulation"
             >
-              <Save className="w-4 h-4 sm:w-5 sm:h-5" />
+              <Save className="w-5 h-5" />
               {loading ? 'جاري الحفظ...' : 'حفظ معلومات الدفع'}
             </button>
           </form>

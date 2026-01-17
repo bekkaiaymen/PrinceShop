@@ -118,8 +118,22 @@ router.get('/orders', async (req, res) => {
 // طلب سحب
 router.post('/withdrawals', async (req, res) => {
   try {
-    const { amount } = req.body;
+    const { amount, paymentMethod } = req.body;
     const affiliate = req.user;
+    
+    // التحقق من طريقة الدفع
+    if (!paymentMethod || !['baridimob', 'cash'].includes(paymentMethod)) {
+      return res.status(400).json({ message: 'الرجاء اختيار طريقة دفع صحيحة' });
+    }
+    
+    // التحقق من وجود معلومات الدفع
+    if (paymentMethod === 'baridimob' && !affiliate.paymentInfo?.baridimob?.rip) {
+      return res.status(400).json({ message: 'الرجاء ملء معلومات بريدي موب في صفحة الإعدادات' });
+    }
+    
+    if (paymentMethod === 'cash' && !affiliate.paymentInfo?.cash?.location) {
+      return res.status(400).json({ message: 'الرجاء ملء معلومات الدفع النقدي في صفحة الإعدادات' });
+    }
     
     // التحقق من الرصيد المتاح
     if (amount > affiliate.earnings.available) {
@@ -133,13 +147,19 @@ router.post('/withdrawals', async (req, res) => {
       return res.status(400).json({ message: 'الحد الأدنى للسحب 100 دج' });
     }
     
+    // تحضير معلومات الدفع
+    const paymentDetails = {
+      baridimob: paymentMethod === 'baridimob' ? affiliate.paymentInfo.baridimob : undefined,
+      cash: paymentMethod === 'cash' ? affiliate.paymentInfo.cash : undefined
+    };
+    
     // إنشاء طلب السحب بدون خصم من الرصيد
     // سيتم الخصم عند الموافقة من صاحب الموقع
     const withdrawal = await Withdrawal.create({
       affiliate: affiliate._id,
       amount,
-      paymentMethod: affiliate.paymentMethod,
-      paymentDetails: affiliate.paymentDetails,
+      paymentMethod,
+      paymentDetails,
       status: 'pending' // قيد المراجعة
     });
     

@@ -15,14 +15,21 @@ const withdrawalSchema = new mongoose.Schema({
   
   paymentMethod: {
     type: String,
-    enum: ['bank', 'ccp', 'baridimob', 'cash'],
+    enum: ['baridimob', 'cash'],
     required: true
   },
   
   paymentDetails: {
-    accountHolder: String,
-    accountNumber: String,
-    bankName: String
+    // \u0644\u0628\u0631\u064a\u062f\u064a \u0645\u0648\u0628
+    baridimob: {
+      rip: String,
+      accountHolder: String
+    },
+    // \u0646\u0642\u062f\u064a
+    cash: {
+      location: String,
+      details: String
+    }
   },
   
   status: {
