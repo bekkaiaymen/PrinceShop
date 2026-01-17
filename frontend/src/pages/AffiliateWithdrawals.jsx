@@ -11,7 +11,7 @@ const statusConfig = {
 };
 
 export default function AffiliateWithdrawals() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [withdrawals, setWithdrawals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -22,7 +22,22 @@ export default function AffiliateWithdrawals() {
 
   useEffect(() => {
     loadWithdrawals();
+    loadUserData();
   }, []);
+
+  const loadUserData = async () => {
+    try {
+      const { data: response } = await affiliate.getDashboard();
+      if (response.data.earnings && user) {
+        updateUser({
+          ...user,
+          earnings: response.data.earnings
+        });
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error);
+    }
+  };
 
   const loadWithdrawals = async () => {
     try {

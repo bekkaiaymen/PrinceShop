@@ -4,7 +4,7 @@ import { TrendingUp, ShoppingBag, Clock, XCircle, DollarSign, Activity, Copy, Ch
 import { useAuth } from '../context/AuthContext';
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copiedCode, setCopiedCode] = useState(false);
@@ -17,6 +17,14 @@ export default function Dashboard() {
     try {
       const { data: response } = await affiliate.getDashboard();
       setData(response.data);
+      
+      // تحديث بيانات المستخدم مع الأرباح الجديدة
+      if (response.data.earnings && user) {
+        updateUser({
+          ...user,
+          earnings: response.data.earnings
+        });
+      }
     } catch (error) {
       console.error('Error loading dashboard:', error);
     } finally {
@@ -45,7 +53,7 @@ export default function Dashboard() {
   const stats = [
     {
       title: 'إجمالي الأرباح',
-      value: `${data?.earnings?.total || 0} دج`,
+      value: `${user?.earnings?.total || 0} دج`,
       icon: DollarSign,
       color: 'bg-green-500',
       textColor: 'text-green-600',
@@ -53,7 +61,7 @@ export default function Dashboard() {
     },
     {
       title: 'رصيد متاح',
-      value: `${data?.earnings?.available || 0} دج`,
+      value: `${user?.earnings?.available || 0} دج`,
       icon: TrendingUp,
       color: 'bg-blue-500',
       textColor: 'text-blue-600',
@@ -61,7 +69,7 @@ export default function Dashboard() {
     },
     {
       title: 'رصيد معلق',
-      value: `${data?.earnings?.pending || 0} دج`,
+      value: `${user?.earnings?.pending || 0} دج`,
       icon: Clock,
       color: 'bg-yellow-500',
       textColor: 'text-yellow-600',
@@ -69,7 +77,7 @@ export default function Dashboard() {
     },
     {
       title: 'تم سحبه',
-      value: `${data?.earnings?.withdrawn || 0} دج`,
+      value: `${user?.earnings?.withdrawn || 0} دج`,
       icon: Activity,
       color: 'bg-purple-500',
       textColor: 'text-purple-600',
