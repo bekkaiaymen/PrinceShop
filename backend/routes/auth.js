@@ -90,9 +90,11 @@ router.post('/login', async (req, res) => {
 
 // الحصول على معلومات المستخدم الحالي
 router.get('/me', protect, async (req, res) => {
+  // إعادة جلب المستخدم للتأكد من الحصول على أحدث البيانات
+  const user = await User.findById(req.user._id);
   res.json({
     success: true,
-    user: req.user
+    user
   });
 });
 
@@ -133,9 +135,12 @@ router.patch('/me', protect, async (req, res) => {
       { new: true, runValidators: true }
     );
     
+    // التأكد من أن البيانات عادت بشكل صحيح
+    const finalUser = await User.findById(req.user._id);
+
     res.json({
       success: true,
-      user: updatedUser
+      user: finalUser
     });
   } catch (error) {
     console.error('Update Error:', error);
