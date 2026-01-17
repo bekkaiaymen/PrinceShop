@@ -706,9 +706,6 @@ function LandingPage() {
                         <h4 className="font-bold text-orange-900 mb-2 flex items-center gap-2 text-lg">
                           🌅 وفّر {savedAmount} دج على التوصيل!
                         </h4>
-                        <p className="text-sm text-orange-800 leading-relaxed mb-2">
-                          أنت على بعد <span className="font-bold">{(distanceNew * 1000).toFixed(0)} متر</span> فقط من موقعنا الجديد!
-                        </p>
                         <p className="text-sm text-orange-800 leading-relaxed">
                           اختر <span className="font-bold bg-orange-200 px-2 py-0.5 rounded">التوصيل صباحاً</span> وادفع <span className="font-bold text-green-700">{morningFee} دج</span> بدلاً من <span className="line-through">{DELIVERY_FEE} دج</span> للتوصيل 💰✨
                         </p>
