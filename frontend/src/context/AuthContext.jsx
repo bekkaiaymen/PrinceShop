@@ -21,13 +21,26 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuth = async () => {
     const token = localStorage.getItem('token');
-    if (token) {
+    const savedUser = localStorage.getItem('user');
+    
+    if (token && savedUser) {
       try {
+        // استخدام البيانات المحفوظة أولاً لتجنب إخراج المستخدم
+        setUser(JSON.parse(savedUser));
+        
+        // ثم التحقق من الـ API في الخلفية
         const { data } = await auth.getMe();
         setUser(data.user);
+        localStorage.setItem('user', JSON.stringify(data.user));
       } catch (error) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        // في حالة خطأ API، نبقي المستخدم مسجل دخوله من البيانات المحفوظة
+        console.warn('Failed to refresh user data, using cached data');
+        // فقط إذا كان خطأ 401 (غير مصرح) نخرج المستخدم
+        if (error.response?.status === 401) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setUser(null);
+        }
       }
     }
     setLoading(false);
