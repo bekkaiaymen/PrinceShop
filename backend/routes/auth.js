@@ -99,11 +99,18 @@ router.get('/me', protect, async (req, res) => {
 // تحديث الملف الشخصي
 router.patch('/me', protect, async (req, res) => {
   try {
-    const { name, phone, city, paymentMethod, paymentDetails } = req.body;
+    const { name, phone, city, paymentInfo } = req.body;
+    
+    const updateData = { name, phone, city };
+    
+    // إضافة معلومات الدفع إذا كانت موجودة
+    if (paymentInfo) {
+      updateData.paymentInfo = paymentInfo;
+    }
     
     const updatedUser = await User.findByIdAndUpdate(
       req.user._id,
-      { name, phone, city, paymentMethod, paymentDetails },
+      updateData,
       { new: true, runValidators: true }
     );
     
