@@ -40,9 +40,8 @@ function Orders() {
   };
 
   const statusConfig = {
-    pending: { label: 'قيد الانتظار', color: 'yellow', icon: Clock, bg: 'bg-yellow-100', text: 'text-yellow-800', border: 'border-yellow-300' },
-    confirmed: { label: 'مؤكد', color: 'blue', icon: CheckCircle, bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-300' },
-    shipping: { label: 'قيد التوصيل', color: 'purple', icon: Truck, bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-300' },
+    pending: { label: 'في الانتظار', color: 'yellow', icon: Clock, bg: 'bg-yellow-100', text: 'text-yellow-800', border: 'border-yellow-300' },
+    confirmed: { label: 'مؤكد (قيد التوصيل)', color: 'blue', icon: Truck, bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-300' },
     delivered: { label: 'تم التوصيل', color: 'green', icon: CheckCircle, bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-300' },
     cancelled: { label: 'ملغي', color: 'red', icon: XCircle, bg: 'bg-red-100', text: 'text-red-800', border: 'border-red-300' }
   };
@@ -51,7 +50,6 @@ function Orders() {
     all: orders.length,
     pending: orders.filter(o => o.status === 'pending').length,
     confirmed: orders.filter(o => o.status === 'confirmed').length,
-    shipping: orders.filter(o => o.status === 'shipping').length,
     delivered: orders.filter(o => o.status === 'delivered').length
   };
 
@@ -67,11 +65,10 @@ function Orders() {
       </div>
 
       {/* الإحصائيات */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <StatCard label="الكل" value={stats.all} active={filter === 'all'} onClick={() => setFilter('all')} color="gray" />
-        <StatCard label="قيد الانتظار" value={stats.pending} active={filter === 'pending'} onClick={() => setFilter('pending')} color="yellow" />
-        <StatCard label="مؤكد" value={stats.confirmed} active={filter === 'confirmed'} onClick={() => setFilter('confirmed')} color="blue" />
-        <StatCard label="قيد التوصيل" value={stats.shipping} active={filter === 'shipping'} onClick={() => setFilter('shipping')} color="purple" />
+        <StatCard label="في الانتظار" value={stats.pending} active={filter === 'pending'} onClick={() => setFilter('pending')} color="yellow" />
+        <StatCard label="مؤكد (قيد التوصيل)" value={stats.confirmed} active={filter === 'confirmed'} onClick={() => setFilter('confirmed')} color="blue" />
         <StatCard label="تم التوصيل" value={stats.delivered} active={filter === 'delivered'} onClick={() => setFilter('delivered')} color="green" />
       </div>
 
@@ -215,22 +212,13 @@ function OrderCard({ order, statusConfig, onStatusChange, onViewDetails, isAffil
                 {order.status === 'pending' && (
                   <button
                     onClick={() => onStatusChange(order._id, 'confirmed')}
-                    className="px-4 py-2 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors"
                   >
-                    ✅ تأكيد
+                    ✅ تأكيد وشحن
                   </button>
                 )}
                 
                 {order.status === 'confirmed' && (
-                  <button
-                    onClick={() => onStatusChange(order._id, 'shipping')}
-                    className="px-4 py-2 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-colors"
-                  >
-                    🚚 شحن
-                  </button>
-                )}
-                
-                {order.status === 'shipping' && (
                   <button
                     onClick={() => onStatusChange(order._id, 'delivered')}
                     className="px-4 py-2 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors"
@@ -244,7 +232,7 @@ function OrderCard({ order, statusConfig, onStatusChange, onViewDetails, isAffil
                     onClick={() => onStatusChange(order._id, 'cancelled')}
                     className="px-4 py-2 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors"
                   >
-                    ❌ إلغاء
+                    ❌ إلغاع
                   </button>
                 )}
               </>
@@ -425,9 +413,9 @@ function OrderDetailsModal({ order, statusConfig, onClose, onStatusChange, isAff
                       onStatusChange(order._id, 'confirmed');
                       onClose();
                     }}
-                    className="px-6 py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors"
+                    className="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors"
                   >
-                    ✅ تأكيد الطلب
+                    ✅ تأكيد وشحن الطلب
                   </button>
                   <button
                     onClick={() => {
@@ -445,12 +433,12 @@ function OrderDetailsModal({ order, statusConfig, onClose, onStatusChange, isAff
                 <>
                   <button
                     onClick={() => {
-                      onStatusChange(order._id, 'shipping');
+                      onStatusChange(order._id, 'delivered');
                       onClose();
                     }}
-                    className="px-6 py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-colors"
+                    className="px-6 py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors"
                   >
-                    🚚 شحن الطلب
+                    ✅ تم التوصيل
                   </button>
                   <button
                     onClick={() => {
@@ -462,18 +450,6 @@ function OrderDetailsModal({ order, statusConfig, onClose, onStatusChange, isAff
                     ❌ إلغاء
                   </button>
                 </>
-              )}
-              
-              {order.status === 'shipping' && (
-                <button
-                  onClick={() => {
-                    onStatusChange(order._id, 'delivered');
-                    onClose();
-                  }}
-                  className="col-span-2 px-6 py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors"
-                >
-                  ✅ تم التوصيل
-                </button>
               )}
               
               <button

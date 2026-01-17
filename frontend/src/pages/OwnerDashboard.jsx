@@ -180,21 +180,27 @@ export default function OwnerDashboard() {
   const getStatusColor = (status) => {
     const colors = {
       pending: 'bg-yellow-100 text-yellow-800',
+      new: 'bg-yellow-100 text-yellow-800',
       confirmed: 'bg-blue-100 text-blue-800',
-      shipping: 'bg-purple-100 text-purple-800',
+      shipping: 'bg-blue-100 text-blue-800',
+      shipped: 'bg-blue-100 text-blue-800',
       delivered: 'bg-green-100 text-green-800',
-      cancelled: 'bg-red-100 text-red-800'
+      cancelled: 'bg-red-100 text-red-800',
+      canceled: 'bg-red-100 text-red-800'
     };
     return colors[status] || 'bg-gray-100 text-gray-800';
   };
 
   const getStatusText = (status) => {
     const texts = {
-      pending: 'قيد الانتظار',
-      confirmed: 'مؤكد',
-      shipping: 'قيد التوصيل',
+      pending: 'في الانتظار',
+      new: 'في الانتظار',
+      confirmed: 'مؤكد (قيد التوصيل)',
+      shipping: 'مؤكد (قيد التوصيل)',
+      shipped: 'مؤكد (قيد التوصيل)',
       delivered: 'تم التوصيل',
-      cancelled: 'ملغي'
+      cancelled: 'ملغي',
+      canceled: 'ملغي'
     };
     return texts[status] || status;
   };
@@ -547,9 +553,9 @@ export default function OwnerDashboard() {
                             <button
                               onClick={() => handleUpdateStatus(order._id, 'confirmed')}
                               disabled={updatingOrderId === order._id}
-                              className="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                              className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
-                              {updatingOrderId === order._id ? '...' : 'تأكيد'}
+                              {updatingOrderId === order._id ? '...' : 'تأكيد وشحن'}
                             </button>
                             <button
                               onClick={() => handleUpdateStatus(order._id, 'cancelled')}
@@ -562,18 +568,9 @@ export default function OwnerDashboard() {
                         )}
                         {order.status === 'confirmed' && (
                           <button
-                            onClick={() => handleUpdateStatus(order._id, 'shipping')}
-                            disabled={updatingOrderId === order._id}
-                            className="px-3 py-1.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                          >
-                            {updatingOrderId === order._id ? '...' : 'قيد التوصيل'}
-                          </button>
-                        )}
-                        {order.status === 'shipping' && (
-                          <button
                             onClick={() => handleUpdateStatus(order._id, 'delivered')}
                             disabled={updatingOrderId === order._id}
-                            className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            className="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                           >
                             {updatingOrderId === order._id ? '...' : 'تم التوصيل'}
                           </button>

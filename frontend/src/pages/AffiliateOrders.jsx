@@ -3,12 +3,13 @@ import { affiliate } from '../services/api';
 import { Package, Clock, Truck, CheckCircle, XCircle, Calendar } from 'lucide-react';
 
 const statusConfig = {
-  new: { label: 'جديد', icon: Package, color: 'bg-blue-100 text-blue-700', borderColor: 'border-blue-200' },
-  confirmed: { label: 'مؤكد', icon: CheckCircle, color: 'bg-green-100 text-green-700', borderColor: 'border-green-200' },
-  shipped: { label: 'قيد التوصيل', icon: Truck, color: 'bg-yellow-100 text-yellow-700', borderColor: 'border-yellow-200' },
+  pending: { label: 'في الانتظار', icon: Clock, color: 'bg-yellow-100 text-yellow-700', borderColor: 'border-yellow-200' },
+  new: { label: 'في الانتظار', icon: Clock, color: 'bg-yellow-100 text-yellow-700', borderColor: 'border-yellow-200' },
+  confirmed: { label: 'مؤكد (قيد التوصيل)', icon: Truck, color: 'bg-blue-100 text-blue-700', borderColor: 'border-blue-200' },
+  shipped: { label: 'مؤكد (قيد التوصيل)', icon: Truck, color: 'bg-blue-100 text-blue-700', borderColor: 'border-blue-200' },
   delivered: { label: 'تم التسليم', icon: CheckCircle, color: 'bg-green-100 text-green-700', borderColor: 'border-green-200' },
   canceled: { label: 'ملغي', icon: XCircle, color: 'bg-red-100 text-red-700', borderColor: 'border-red-200' },
-  returned: { label: 'مرتجع', icon: XCircle, color: 'bg-gray-100 text-gray-700', borderColor: 'border-gray-200' }
+  cancelled: { label: 'ملغي', icon: XCircle, color: 'bg-red-100 text-red-700', borderColor: 'border-red-200' }
 };
 
 export default function AffiliateOrders() {
@@ -41,9 +42,8 @@ export default function AffiliateOrders() {
 
   const filters = [
     { value: 'all', label: 'الكل' },
-    { value: 'new', label: 'جديد' },
-    { value: 'confirmed', label: 'مؤكد' },
-    { value: 'shipped', label: 'قيد التوصيل' },
+    { value: 'new', label: 'في الانتظار' },
+    { value: 'confirmed', label: 'مؤكد (قيد التوصيل)' },
     { value: 'delivered', label: 'تم التسليم' },
     { value: 'canceled', label: 'ملغي' }
   ];
