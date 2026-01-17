@@ -9,8 +9,7 @@ import {
   User, 
   LogOut,
   Menu,
-  X,
-  ShoppingCart
+  X
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -27,7 +26,6 @@ export default function DashboardLayout() {
     { name: 'لوحة التحكم', href: '/dashboard', icon: LayoutDashboard },
     { name: 'المنتجات', href: '/dashboard/products', icon: Package },
     { name: 'طلباتي', href: '/dashboard/orders', icon: ShoppingBag },
-    { name: 'طلبات الزبائن', href: '/dashboard/customer-orders', icon: ShoppingCart },
     { name: 'السحوبات', href: '/dashboard/withdrawals', icon: Wallet },
     { name: 'الملف الشخصي', href: '/dashboard/profile', icon: User }
   ];

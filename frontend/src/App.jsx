@@ -40,7 +40,6 @@ function App() {
             <Route path="orders" element={<AffiliateOrders />} />
             <Route path="withdrawals" element={<AffiliateWithdrawals />} />
             <Route path="profile" element={<AffiliateProfile />} />
-            <Route path="customer-orders" element={<Orders />} />
           </Route>
           
           {/* Owner Routes - لصاحب الموقع */}
