@@ -15,20 +15,20 @@ const signToken = (id) => {
 // تسجيل مسوق جديد
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password, phone, city } = req.body;
+    const { name, password, phone, telegram, city } = req.body;
     
     // التحقق من وجود المستخدم
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ phone });
     if (existingUser) {
-      return res.status(400).json({ message: 'البريد الإلكتروني مستخدم بالفعل' });
+      return res.status(400).json({ message: 'رقم الهاتف مستخدم بالفعل' });
     }
     
     // إنشاء مسوق جديد
     const user = await User.create({
       name,
-      email,
       password,
       phone,
+      telegram,
       city,
       role: 'affiliate'
     });
@@ -41,7 +41,7 @@ router.post('/register', async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
-        email: user.email,
+        phone: user.phone,
         role: user.role,
         affiliateCode: user.affiliateCode
       }
@@ -54,16 +54,16 @@ router.post('/register', async (req, res) => {
 // تسجيل الدخول
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { phone, password } = req.body;
     
-    if (!email || !password) {
-      return res.status(400).json({ message: 'الرجاء إدخال البريد الإلكتروني وكلمة المرور' });
+    if (!phone || !password) {
+      return res.status(400).json({ message: 'الرجاء إدخال رقم الهاتف وكلمة المرور' });
     }
     
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ phone }).select('+password');
     
     if (!user || !(await user.comparePassword(password))) {
-      return res.status(401).json({ message: 'البريد الإلكتروني أو كلمة المرور غير صحيحة' });
+      return res.status(401).json({ message: 'رقم الهاتف أو كلمة المرور غير صحيحة' });
     }
     
     if (!user.isActive) {
@@ -78,7 +78,7 @@ router.post('/login', async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
-        email: user.email,
+        phone: user.phone,
         role: user.role,
         affiliateCode: user.affiliateCode
       }

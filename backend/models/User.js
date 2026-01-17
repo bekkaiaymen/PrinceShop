@@ -9,8 +9,8 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: [true, 'الرجاء إدخال البريد الإلكتروني'],
     unique: true,
+    sparse: true,
     lowercase: true,
     trim: true
   },
@@ -22,7 +22,13 @@ const userSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    required: [true, 'الرجاء إدخال رقم الهاتف']
+    required: [true, 'الرجاء إدخال رقم الهاتف'],
+    unique: true,
+    trim: true
+  },
+  telegram: {
+    type: String,
+    trim: true
   },
   role: {
     type: String,
