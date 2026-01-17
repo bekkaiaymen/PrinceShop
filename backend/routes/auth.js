@@ -101,38 +101,37 @@ router.patch('/me', protect, async (req, res) => {
   try {
     const { name, phone, city, paymentInfo } = req.body;
     
-    // استخدام طريقة save() لضمان تحديث الكائنات المتداخلة
-    const user = await User.findById(req.user._id);
-
-    if (!user) {
-      return res.status(404).json({ message: 'المستخدم غير موجود' });
-    }
-
-    if (name) user.name = name;
-    if (phone) user.phone = phone;
-    if (city) user.city = city;
+    // استخدام $set مع النقاط . للوصول للحقول المتداخلة مباشرة
+    // هذا يحل مشاكل Mongoose مع الكائنات المتداخلة
+    const updates = {};
+    
+    if (name) updates.name = name;
+    if (phone) updates.phone = phone;
+    if (city) updates.city = city;
     
     if (paymentInfo) {
-      // التأكد من تهيئة paymentInfo
-      if (!user.paymentInfo) user.paymentInfo = {};
-
       if (paymentInfo.baridimob) {
-        if (!user.paymentInfo.baridimob) user.paymentInfo.baridimob = {};
-        if (paymentInfo.baridimob.rip !== undefined) user.paymentInfo.baridimob.rip = paymentInfo.baridimob.rip;
-        if (paymentInfo.baridimob.accountHolder !== undefined) user.paymentInfo.baridimob.accountHolder = paymentInfo.baridimob.accountHolder;
+        if (paymentInfo.baridimob.rip !== undefined) 
+          updates['paymentInfo.baridimob.rip'] = paymentInfo.baridimob.rip;
+        if (paymentInfo.baridimob.accountHolder !== undefined) 
+          updates['paymentInfo.baridimob.accountHolder'] = paymentInfo.baridimob.accountHolder;
       }
 
       if (paymentInfo.cash) {
-        if (!user.paymentInfo.cash) user.paymentInfo.cash = {};
-        if (paymentInfo.cash.location !== undefined) user.paymentInfo.cash.location = paymentInfo.cash.location;
-        if (paymentInfo.cash.details !== undefined) user.paymentInfo.cash.details = paymentInfo.cash.details;
+        if (paymentInfo.cash.location !== undefined) 
+          updates['paymentInfo.cash.location'] = paymentInfo.cash.location;
+        if (paymentInfo.cash.details !== undefined) 
+          updates['paymentInfo.cash.details'] = paymentInfo.cash.details;
       }
-      
-      // Mark as modified explicitly to be safe
-      user.markModified('paymentInfo');
     }
     
-    const updatedUser = await user.save();
+    console.log('Sending updates to MongoDB:', updates);
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { $set: updates },
+      { new: true, runValidators: true }
+    );
     
     res.json({
       success: true,
