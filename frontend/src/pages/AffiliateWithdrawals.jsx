@@ -27,9 +27,11 @@ export default function AffiliateWithdrawals() {
   const loadWithdrawals = async () => {
     try {
       const { data } = await affiliate.getWithdrawals();
-      setWithdrawals(data.data);
+      console.log('Withdrawals data:', data);
+      setWithdrawals(data.data || []);
     } catch (error) {
       console.error('Error loading withdrawals:', error);
+      setWithdrawals([]);
     } finally {
       setLoading(false);
     }
@@ -187,10 +189,18 @@ export default function AffiliateWithdrawals() {
       {/* Withdrawals History */}
       <div>
         <h2 className="text-xl font-bold text-gray-900 mb-4">سجل السحوبات</h2>
-        <div className="space-y-3">
-          {withdrawals.map((withdrawal) => {
-            const status = statusConfig[withdrawal.status];
-            const StatusIcon = status.icon;
+        
+        {withdrawals.length === 0 ? (
+          <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
+            <DollarSign className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-500 mb-2">لم تقم بأي طلب سحب بعد</p>
+            <p className="text-sm text-gray-400">عندما يصبح لديك رصيد متاح ≥ 100 دج، يمكنك طلب السحب</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {withdrawals.map((withdrawal) => {
+              const status = statusConfig[withdrawal.status];
+              const StatusIcon = status.icon;
 
             return (
               <div key={withdrawal._id} className="bg-white rounded-lg p-5 border border-gray-200">
@@ -225,12 +235,6 @@ export default function AffiliateWithdrawals() {
               </div>
             );
           })}
-        </div>
-
-        {withdrawals.length === 0 && (
-          <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
-            <DollarSign className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500">لم تقم بأي طلب سحب بعد</p>
           </div>
         )}
       </div>
