@@ -101,7 +101,15 @@ router.patch('/me', protect, async (req, res) => {
   try {
     const { name, phone, city, paymentInfo } = req.body;
     
-    const updateData = { name, phone, city };
+    console.log('Update Profile Body:', req.body);
+    console.log('Payment Info received:', paymentInfo);
+
+    const updateData = {};
+    if (name) updateData.name = name;
+    if (phone) updateData.phone = phone;
+    if (city) updateData.city = city;
+    
+    // إضافة معلومات الدفع إذا كانت موجودة
     
     // إضافة معلومات الدفع إذا كانت موجودة
     if (paymentInfo) {
