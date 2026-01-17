@@ -33,7 +33,7 @@ function CustomerHome() {
   const categoryOrder = [
     { name: 'إيربودز', icon: '🎧', keywords: ['AIR PODS', 'AIRPODS'] },
     { name: 'حافظات مضادة للصدمات', icon: '📱', keywords: ['ANTICHOC'] },
-    { name: 'مكبرات الصوت', icon: '🔊', keywords: ['BAFFLE'] },
+    { name: 'مكبرات الصوت', icon: '🔊', keywords: ['BAFFLE', 'OMPLE'] },
     { name: 'كوابل', icon: '🔌', keywords: ['CABLE'] },
     { name: 'كاسكات', icon: '🎮', keywords: ['CASQUE'] },
     { name: 'شواحن', icon: '🔋', keywords: ['CHARGEUR'] },

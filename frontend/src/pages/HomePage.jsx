@@ -26,7 +26,7 @@ function HomePage() {
     { 
       name: 'مكبرات الصوت', 
       icon: '🔊', 
-      keywords: ['BAFFLE'], 
+      keywords: ['BAFFLE', 'OMPLE'], 
       featured: true 
     },
     { 

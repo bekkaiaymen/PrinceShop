@@ -22,7 +22,7 @@ export default function AffiliateProducts() {
   const categoryOrder = [
     { name: 'إيربودز', icon: '🎧', keywords: ['AIR PODS', 'AIRPODS'], featured: true },
     { name: 'حافظات مضادة للصدمات', icon: '📱', keywords: ['ANTICHOC'], featured: true },
-    { name: 'مكبرات الصوت', icon: '🔊', keywords: ['BAFFLE'], featured: true },
+    { name: 'مكبرات الصوت', icon: '🔊', keywords: ['BAFFLE', 'OMPLE'], featured: true },
     { name: 'كوابل', icon: '🔌', keywords: ['CABLE'], featured: true },
     { name: 'كاسكات', icon: '🎮', keywords: ['CASQUE'], featured: true },
     { name: 'شواحن', icon: '🔋', keywords: ['CHARGEUR'], featured: true },
