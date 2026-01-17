@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Package, Phone, MapPin, Clock, CheckCircle, XCircle, Truck, Eye } from 'lucide-react';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 function Orders() {
+  const { user } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -94,6 +96,7 @@ function Orders() {
               statusConfig={statusConfig}
               onStatusChange={updateOrderStatus}
               onViewDetails={() => setSelectedOrder(order)}
+              isAffiliate={user?.role === 'affiliate'}
             />
           ))}
         </div>
@@ -106,6 +109,7 @@ function Orders() {
           statusConfig={statusConfig}
           onClose={() => setSelectedOrder(null)}
           onStatusChange={updateOrderStatus}
+          isAffiliate={user?.role === 'affiliate'}
         />
       )}
     </div>
@@ -134,7 +138,7 @@ function StatCard({ label, value, active, onClick, color }) {
 }
 
 // بطاقة الطلب
-function OrderCard({ order, statusConfig, onStatusChange, onViewDetails }) {
+function OrderCard({ order, statusConfig, onStatusChange, onViewDetails, isAffiliate = false }) {
   const status = statusConfig[order.status];
   const StatusIcon = status.icon;
 
@@ -206,40 +210,44 @@ function OrderCard({ order, statusConfig, onStatusChange, onViewDetails }) {
               عرض التفاصيل
             </button>
             
-            {order.status === 'pending' && (
-              <button
-                onClick={() => onStatusChange(order._id, 'confirmed')}
-                className="px-4 py-2 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors"
-              >
-                ✅ تأكيد
-              </button>
-            )}
-            
-            {order.status === 'confirmed' && (
-              <button
-                onClick={() => onStatusChange(order._id, 'shipping')}
-                className="px-4 py-2 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-colors"
-              >
-                🚚 شحن
-              </button>
-            )}
-            
-            {order.status === 'shipping' && (
-              <button
-                onClick={() => onStatusChange(order._id, 'delivered')}
-                className="px-4 py-2 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors"
-              >
-                ✅ تم التوصيل
-              </button>
-            )}
-            
-            {order.status !== 'cancelled' && order.status !== 'delivered' && (
-              <button
-                onClick={() => onStatusChange(order._id, 'cancelled')}
-                className="px-4 py-2 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors"
-              >
-                ❌ إلغاء
-              </button>
+            {!isAffiliate && (
+              <>
+                {order.status === 'pending' && (
+                  <button
+                    onClick={() => onStatusChange(order._id, 'confirmed')}
+                    className="px-4 py-2 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors"
+                  >
+                    ✅ تأكيد
+                  </button>
+                )}
+                
+                {order.status === 'confirmed' && (
+                  <button
+                    onClick={() => onStatusChange(order._id, 'shipping')}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-colors"
+                  >
+                    🚚 شحن
+                  </button>
+                )}
+                
+                {order.status === 'shipping' && (
+                  <button
+                    onClick={() => onStatusChange(order._id, 'delivered')}
+                    className="px-4 py-2 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors"
+                  >
+                    ✅ تم التوصيل
+                  </button>
+                )}
+                
+                {order.status !== 'cancelled' && order.status !== 'delivered' && (
+                  <button
+                    onClick={() => onStatusChange(order._id, 'cancelled')}
+                    className="px-4 py-2 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors"
+                  >
+                    ❌ إلغاء
+                  </button>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -249,7 +257,7 @@ function OrderCard({ order, statusConfig, onStatusChange, onViewDetails }) {
 }
 
 // نافذة تفاصيل الطلب
-function OrderDetailsModal({ order, statusConfig, onClose, onStatusChange }) {
+function OrderDetailsModal({ order, statusConfig, onClose, onStatusChange, isAffiliate = false }) {
   const status = statusConfig[order.status];
   const StatusIcon = status.icon;
 
@@ -408,72 +416,83 @@ function OrderDetailsModal({ order, statusConfig, onClose, onStatusChange }) {
           </div>
 
           {/* أزرار الإجراءات */}
-          <div className="grid grid-cols-2 gap-3">
-            {order.status === 'pending' && (
-              <>
+          {!isAffiliate ? (
+            <div className="grid grid-cols-2 gap-3">
+              {order.status === 'pending' && (
+                <>
+                  <button
+                    onClick={() => {
+                      onStatusChange(order._id, 'confirmed');
+                      onClose();
+                    }}
+                    className="px-6 py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors"
+                  >
+                    ✅ تأكيد الطلب
+                  </button>
+                  <button
+                    onClick={() => {
+                      onStatusChange(order._id, 'cancelled');
+                      onClose();
+                    }}
+                    className="px-6 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors"
+                  >
+                    ❌ إلغاء الطلب
+                  </button>
+                </>
+              )}
+              
+              {order.status === 'confirmed' && (
+                <>
+                  <button
+                    onClick={() => {
+                      onStatusChange(order._id, 'shipping');
+                      onClose();
+                    }}
+                    className="px-6 py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-colors"
+                  >
+                    🚚 شحن الطلب
+                  </button>
+                  <button
+                    onClick={() => {
+                      onStatusChange(order._id, 'cancelled');
+                      onClose();
+                    }}
+                    className="px-6 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors"
+                  >
+                    ❌ إلغاء
+                  </button>
+                </>
+              )}
+              
+              {order.status === 'shipping' && (
                 <button
                   onClick={() => {
-                    onStatusChange(order._id, 'confirmed');
+                    onStatusChange(order._id, 'delivered');
                     onClose();
                   }}
-                  className="px-6 py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors"
+                  className="col-span-2 px-6 py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors"
                 >
-                  ✅ تأكيد الطلب
+                  ✅ تم التوصيل
                 </button>
-                <button
-                  onClick={() => {
-                    onStatusChange(order._id, 'cancelled');
-                    onClose();
-                  }}
-                  className="px-6 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors"
-                >
-                  ❌ إلغاء الطلب
-                </button>
-              </>
-            )}
-            
-            {order.status === 'confirmed' && (
-              <>
-                <button
-                  onClick={() => {
-                    onStatusChange(order._id, 'shipping');
-                    onClose();
-                  }}
-                  className="px-6 py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-colors"
-                >
-                  🚚 شحن الطلب
-                </button>
-                <button
-                  onClick={() => {
-                    onStatusChange(order._id, 'cancelled');
-                    onClose();
-                  }}
-                  className="px-6 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors"
-                >
-                  ❌ إلغاء
-                </button>
-              </>
-            )}
-            
-            {order.status === 'shipping' && (
+              )}
+              
               <button
-                onClick={() => {
-                  onStatusChange(order._id, 'delivered');
-                  onClose();
-                }}
-                className="col-span-2 px-6 py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors"
+                onClick={onClose}
+                className={`${order.status === 'delivered' || order.status === 'cancelled' ? 'col-span-2' : 'col-span-2'} px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-colors`}
               >
-                ✅ تم التوصيل
+                إغلاق
               </button>
-            )}
-            
-            <button
-              onClick={onClose}
-              className={`${order.status === 'delivered' || order.status === 'cancelled' ? 'col-span-2' : 'col-span-2'} px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-colors`}
-            >
-              إغلاق
-            </button>
-          </div>
+            </div>
+          ) : (
+            <div>
+              <button
+                onClick={onClose}
+                className="w-full px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors"
+              >
+                إغلاق
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
