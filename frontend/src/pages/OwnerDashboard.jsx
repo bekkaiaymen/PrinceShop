@@ -426,7 +426,7 @@ export default function OwnerDashboard() {
           </div>
           
           <div className="flex gap-3">
-            {['pending', 'approved', 'completed', 'rejected', 'all'].map((status) => (
+            {['pending', 'completed', 'rejected', 'all'].map((status) => (
               <button
                 key={status}
                 onClick={() => {
@@ -659,7 +659,6 @@ export default function OwnerDashboard() {
                       <td className="px-6 py-4">
                         <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
                           withdrawal.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                          withdrawal.status === 'approved' ? 'bg-blue-100 text-blue-800' :
                           withdrawal.status === 'completed' ? 'bg-green-100 text-green-800' :
                           'bg-red-100 text-red-800'
                         }`}>
@@ -680,10 +679,14 @@ export default function OwnerDashboard() {
                           {withdrawal.status === 'pending' && (
                             <>
                               <button
-                                onClick={() => updateWithdrawalStatus(withdrawal._id, 'approved')}
-                                className="px-3 py-1 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600"
+                                onClick={() => {
+                                  if (confirm(`هل أنت متأكد من الموافقة ودفع ${withdrawal.amount} دج للمسوق ${withdrawal.affiliate?.name}؟`)) {
+                                    updateWithdrawalStatus(withdrawal._id, 'completed');
+                                  }
+                                }}
+                                className="px-3 py-1 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600"
                               >
-                                موافقة
+                                موافقة ودفع
                               </button>
                               <button
                                 onClick={() => {
@@ -695,18 +698,6 @@ export default function OwnerDashboard() {
                                 رفض
                               </button>
                             </>
-                          )}
-                          {withdrawal.status === 'approved' && (
-                            <button
-                              onClick={() => {
-                                if (confirm(`هل أنت متأكد من تأكيد دفع ${withdrawal.amount} دج للمسوق ${withdrawal.affiliate?.name}؟`)) {
-                                  updateWithdrawalStatus(withdrawal._id, 'completed');
-                                }
-                              }}
-                              className="px-3 py-1 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600"
-                            >
-                              تأكيد الدفع
-                            </button>
                           )}
                           {(withdrawal.status === 'completed' || withdrawal.status === 'rejected') && (
                             <span className="text-xs text-gray-400">لا توجد إجراءات</span>
