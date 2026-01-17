@@ -1,7 +1,9 @@
 import axios from 'axios';
 
-// استخدام Backend URL مباشرة
-const API_URL = 'https://princeshop-backend.onrender.com/api';
+// استخدام متغير البيئة أو الرابط المباشر
+const API_URL = import.meta.env.VITE_API_URL || 'https://princeshop-backend.onrender.com/api';
+
+console.log('Connecting to API:', API_URL);
 
 const api = axios.create({
   baseURL: API_URL,
