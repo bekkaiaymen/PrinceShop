@@ -18,9 +18,10 @@ export default function OwnerDashboard() {
   const navigate = useNavigate();
   const [ownerData, setOwnerData] = useState(null);
   const [orders, setOrders] = useState([]);
+  const [withdrawals, setWithdrawals] = useState([]);
   const [statistics, setStatistics] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('all'); // all, direct, affiliate
+  const [activeTab, setActiveTab] = useState('orders'); // orders, withdrawals
   const [filters, setFilters] = useState({
     status: 'all',
     orderSource: 'all',
@@ -28,6 +29,7 @@ export default function OwnerDashboard() {
     startDate: '',
     endDate: ''
   });
+  const [withdrawalFilter, setWithdrawalFilter] = useState('pending'); // pending, approved, completed, rejected, all
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [updatingOrderId, setUpdatingOrderId] = useState(null);
@@ -43,9 +45,15 @@ export default function OwnerDashboard() {
     }
     
     setOwnerData(JSON.parse(data));
-    fetchOrders();
+    
+    if (activeTab === 'orders') {
+      fetchOrders();
+    } else if (activeTab === 'withdrawals') {
+      fetchWithdrawals();
+    }
+    
     fetchStatistics();
-  }, [page, filters]);
+  }, [page, filters, activeTab, withdrawalFilter]);
 
   const fetchOrders = async () => {
     try {
@@ -86,6 +94,55 @@ export default function OwnerDashboard() {
     } catch (error) {
       console.error('Error fetching statistics:', error);
     }
+  };
+
+  const fetchWithdrawals = async () => {
+    try {
+      const token = localStorage.getItem('ownerToken');
+      const params = new URLSearchParams();
+      if (withdrawalFilter !== 'all') {
+        params.append('status', withdrawalFilter);
+      }
+
+      const response = await axios.get(`${API_URL}/owner/withdrawals?${params}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setWithdrawals(response.data.data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching withdrawals:', error);
+      setLoading(false);
+    }
+  };
+
+  const updateWithdrawalStatus = async (withdrawalId, newStatus, adminNotes = '') => {
+    try {
+      const token = localStorage.getItem('ownerToken');
+      await axios.patch(
+        `${API_URL}/owner/withdrawals/${withdrawalId}`,
+        { status: newStatus, adminNotes },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      // إعادة تحميل القائمة
+      fetchWithdrawals();
+      alert(`تم تحديث حالة الطلب إلى: ${getStatusLabel(newStatus)}`);
+    } catch (error) {
+      console.error('Error updating withdrawal:', error);
+      alert('حدث خطأ في تحديث الطلب');
+    }
+  };
+
+  const getStatusLabel = (status) => {
+    const labels = {
+      pending: 'قيد المراجعة',
+      approved: 'تمت الموافقة',
+      completed: 'مكتمل',
+      rejected: 'مرفوض',
+      all: 'الكل'
+    };
+    return labels[status] || status;
   };
 
   const handleLogout = () => {
@@ -257,7 +314,40 @@ export default function OwnerDashboard() {
           </div>
         )}
 
-        {/* Filters */}
+        {/* Tabs */}
+        <div className="bg-white rounded-xl shadow-sm p-2 mb-6">
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                setActiveTab('orders');
+                setLoading(true);
+              }}
+              className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-colors ${
+                activeTab === 'orders'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              إدارة الطلبات
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab('withdrawals');
+                setLoading(true);
+              }}
+              className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-colors ${
+                activeTab === 'withdrawals'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              طلبات السحب
+            </button>
+          </div>
+        </div>
+
+        {/* Filters - للطلبات فقط */}
+        {activeTab === 'orders' && (
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="flex items-center gap-2 mb-4">
             <FunnelIcon className="h-5 w-5 text-gray-600" />
@@ -325,8 +415,39 @@ export default function OwnerDashboard() {
             </div>
           </div>
         </div>
+        )}
+
+        {/* Withdrawal Filters - للسحوبات فقط */}
+        {activeTab === 'withdrawals' && (
+        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <FunnelIcon className="h-5 w-5 text-gray-600" />
+            <h3 className="text-lg font-semibold text-gray-900">حالة الطلب</h3>
+          </div>
+          
+          <div className="flex gap-3">
+            {['pending', 'approved', 'completed', 'rejected', 'all'].map((status) => (
+              <button
+                key={status}
+                onClick={() => {
+                  setWithdrawalFilter(status);
+                  setLoading(true);
+                }}
+                className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+                  withdrawalFilter === status
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {getStatusLabel(status)}
+              </button>
+            ))}
+          </div>
+        </div>
+        )}
 
         {/* Orders Table */}
+        {activeTab === 'orders' && (
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <div className="p-6 border-b">
             <h3 className="text-lg font-semibold text-gray-900">
@@ -491,6 +612,115 @@ export default function OwnerDashboard() {
             </div>
           )}
         </div>
+        )}
+
+        {/* Withdrawals Table */}
+        {activeTab === 'withdrawals' && (
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="p-6 border-b">
+            <h2 className="text-xl font-bold text-gray-900">طلبات السحب ({withdrawals.length})</h2>
+          </div>
+
+          {loading ? (
+            <div className="p-12 text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">جاري التحميل...</p>
+            </div>
+          ) : withdrawals.length === 0 ? (
+            <div className="p-12 text-center text-gray-500">
+              <CurrencyDollarIcon className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+              <p>لا توجد طلبات سحب</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">المسوق</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">المبلغ</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الحالة</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">التاريخ</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الإجراءات</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {withdrawals.map((withdrawal) => (
+                    <tr key={withdrawal._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4">
+                        <div>
+                          <p className="font-medium text-gray-900">{withdrawal.affiliate?.name}</p>
+                          <p className="text-sm text-gray-500">{withdrawal.affiliate?.affiliateCode}</p>
+                          <p className="text-sm text-gray-500">{withdrawal.affiliate?.phone}</p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <p className="text-lg font-bold text-green-600">{withdrawal.amount.toLocaleString()} دج</p>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
+                          withdrawal.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                          withdrawal.status === 'approved' ? 'bg-blue-100 text-blue-800' :
+                          withdrawal.status === 'completed' ? 'bg-green-100 text-green-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {getStatusLabel(withdrawal.status)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {new Date(withdrawal.createdAt).toLocaleDateString('ar-DZ', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex gap-2">
+                          {withdrawal.status === 'pending' && (
+                            <>
+                              <button
+                                onClick={() => updateWithdrawalStatus(withdrawal._id, 'approved')}
+                                className="px-3 py-1 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600"
+                              >
+                                موافقة
+                              </button>
+                              <button
+                                onClick={() => {
+                                  const notes = prompt('سبب الرفض (اختياري):');
+                                  updateWithdrawalStatus(withdrawal._id, 'rejected', notes || '');
+                                }}
+                                className="px-3 py-1 bg-red-500 text-white text-sm rounded-lg hover:bg-red-600"
+                              >
+                                رفض
+                              </button>
+                            </>
+                          )}
+                          {withdrawal.status === 'approved' && (
+                            <button
+                              onClick={() => {
+                                if (confirm(`هل أنت متأكد من تأكيد دفع ${withdrawal.amount} دج للمسوق ${withdrawal.affiliate?.name}؟`)) {
+                                  updateWithdrawalStatus(withdrawal._id, 'completed');
+                                }
+                              }}
+                              className="px-3 py-1 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600"
+                            >
+                              تأكيد الدفع
+                            </button>
+                          )}
+                          {(withdrawal.status === 'completed' || withdrawal.status === 'rejected') && (
+                            <span className="text-xs text-gray-400">لا توجد إجراءات</span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+        )}
       </div>
     </div>
   );
