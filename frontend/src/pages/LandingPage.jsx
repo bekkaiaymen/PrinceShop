@@ -8,6 +8,11 @@ function LandingPage() {
   const [searchParams] = useSearchParams();
   const affiliateCode = searchParams.get('ref');
   
+  // دالة تدوير السعر
+  const formatPrice = (price) => {
+    return Math.ceil(price / 10) * 10;
+  };
+  
   console.log('LandingPage - Product ID:', productId);
   console.log('LandingPage - Affiliate Code:', affiliateCode);
   
@@ -373,7 +378,7 @@ function LandingPage() {
 
   const calculateTotal = () => {
     if (!product) return 0;
-    const productPrice = product.customerPrice || product.suggested_price || 0;
+    const productPrice = formatPrice(product.customerPrice || product.suggested_price || 0);
     const productTotal = productPrice * formData.quantity;
     
     // حساب المسافة من الموقعين
@@ -523,7 +528,7 @@ function LandingPage() {
     );
   }
 
-  const productPrice = product.customerPrice || product.suggested_price || 0;
+  const productPrice = formatPrice(product.customerPrice || product.suggested_price || 0);
   const productTotal = productPrice * formData.quantity;
   const totalPrice = calculateTotal();
 

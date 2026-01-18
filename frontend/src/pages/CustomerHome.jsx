@@ -689,6 +689,11 @@ function CustomerHome() {
 
 // بطاقة المنتج للعملاء (بدون معلومات الربح)
 function ProductCard({ product, onBuyClick }) {
+  // دالة لتدوير السعر إلى أقرب 10 دج (زيادة)
+  const formatPrice = (price) => {
+    return Math.ceil(price / 10) * 10;
+  };
+
   return (
     <div 
       id={`product-${product._id}`}
@@ -718,7 +723,7 @@ function ProductCard({ product, onBuyClick }) {
           {/* السعر */}
           <div className="flex-1">
             <p className="text-2xl sm:text-3xl font-bold text-blue-600">
-              {product.suggested_price}
+              {formatPrice(product.suggested_price)}
               <span className="text-sm sm:text-base"> دج</span>
             </p>
           </div>
