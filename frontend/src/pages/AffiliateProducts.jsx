@@ -207,9 +207,24 @@ export default function AffiliateProducts() {
   const copyImageAndText = async (product) => {
     // نسخ الصورة نفسها (وليس الرابط)
     try {
-      // تحميل الصورة كـ blob
-      const response = await fetch(product.image);
+      setCopiedImage(product._id);
+      
+      // تحميل الصورة كـ blob مع معالجة CORS
+      const response = await fetch(product.image, {
+        mode: 'cors',
+        credentials: 'omit'
+      });
+      
+      if (!response.ok) {
+        throw new Error('فشل تحميل الصورة');
+      }
+      
       const blob = await response.blob();
+      
+      // التأكد من أن المتصفح يدعم نسخ الصور
+      if (!navigator.clipboard || !navigator.clipboard.write) {
+        throw new Error('المتصفح لا يدعم نسخ الصور');
+      }
       
       // نسخ الصورة إلى الحافظة
       await navigator.clipboard.write([
@@ -218,20 +233,11 @@ export default function AffiliateProducts() {
         })
       ]);
       
-      setCopiedImage(product._id);
       setTimeout(() => setCopiedImage(null), 2000);
     } catch (error) {
       console.error('فشل نسخ الصورة:', error);
-      
-      // طريقة بديلة: نسخ رابط الصورة
-      try {
-        await navigator.clipboard.writeText(product.image);
-        setCopiedImage(product._id);
-        setTimeout(() => setCopiedImage(null), 2000);
-        alert('تم نسخ رابط الصورة بدلاً من الصورة نفسها. يمكنك لصق الرابط ثم تحميل الصورة.');
-      } catch (err) {
-        alert('فشل نسخ الصورة. الرجاء المحاولة مرة أخرى أو استخدام متصفح حديث.');
-      }
+      setCopiedImage(null);
+      alert('⚠️ فشل نسخ الصورة.\n\nالحلول:\n1. استخدم متصفح حديث (Chrome/Edge)\n2. تأكد من السماح بنسخ الصور\n3. حاول تحميل الصورة يدوياً من الرابط');
     }
   };
 
