@@ -6,6 +6,14 @@ class AIService {
   constructor() {
     this.apiKey = DEEPSEEK_API_KEY;
     this.cache = new Map(); // تخزين مؤقت للنتائج
+    
+    // التحقق من وجود API key
+    if (!this.apiKey || this.apiKey === 'undefined') {
+      console.error('⚠️ DEEPSEEK_API_KEY غير موجود! تأكد من ملف .env');
+      console.log('📝 يجب إضافة VITE_DEEPSEEK_API_KEY في ملف .env');
+    } else {
+      console.log('✅ DeepSeek API Key محمّل بنجاح');
+    }
   }
 
   // البحث الذكي عن المنتجات - محسّن بذكاء خارق لفهم الفقرات
@@ -91,7 +99,14 @@ ${productList}
 
 ⚠️ تذكر: الدقة > الكمية`;
 
+      // التحقق من API key
+      if (!this.apiKey || this.apiKey === 'undefined') {
+        console.error('❌ لا يوجد API key!');
+        throw new Error('API key is not configured');
+      }
+      
       console.log('📡 إرسال الطلب إلى DeepSeek...');
+      console.log('🔑 API Key:', this.apiKey.substring(0, 10) + '...');
 
       const response = await fetch(DEEPSEEK_API_URL, {
         method: 'POST',
@@ -117,12 +132,27 @@ ${productList}
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('❌ خطأ من DeepSeek:', response.status, errorData);
+        const errorText = await response.text();
+        console.error('❌ خطأ من DeepSeek:', response.status);
+        console.error('📋 تفاصيل:', errorText);
+        
+        if (response.status === 401) {
+          console.error('🔐 API Key غير صالح أو منتهي!');
+        } else if (response.status === 429) {
+          console.error('⏱️ تجاوزت الحد الأقصى للطلبات!');
+        }
+        
         throw new Error(`DeepSeek API Error: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log('📦 استجابة DeepSeek الكاملة:', JSON.stringify(data, null, 2));
+      
+      if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+        console.error('❌ استجابة DeepSeek غير صحيحة:', data);
+        throw new Error('Invalid DeepSeek response format');
+      }
+      
       const aiResponse = data.choices[0].message.content.trim();
       
       console.log('💡 رد DeepSeek AI:', aiResponse);

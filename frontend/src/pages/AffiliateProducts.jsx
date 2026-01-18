@@ -64,13 +64,23 @@ export default function AffiliateProducts() {
 
   // البحث الذكي عند تغيير searchTerm
   useEffect(() => {
+    console.log('🔄 useEffect triggered:', { searchTerm, productsCount: allProducts.length, useAI });
+    
     const doSearch = async () => {
-      if (searchTerm && allProducts.length > 0) {
+      if (searchTerm && searchTerm.trim() && allProducts.length > 0) {
         console.log('🔎 تفعيل البحث عن:', searchTerm);
-        const results = await performSmartSearch(searchTerm, allProducts);
-        console.log('📊 النتائج:', results.length, 'من أصل', allProducts.length);
-        setFilteredProducts(results);
+        console.log('🤖 AI مفعّل؟', useAI);
+        
+        try {
+          const results = await performSmartSearch(searchTerm, allProducts);
+          console.log('📊 النتائج:', results.length, 'من أصل', allProducts.length);
+          setFilteredProducts(results);
+        } catch (error) {
+          console.error('❌ خطأ في البحث:', error);
+          setFilteredProducts(allProducts);
+        }
       } else {
+        console.log('📋 عرض كل المنتجات');
         setFilteredProducts(allProducts);
       }
     };
