@@ -38,13 +38,7 @@ router.post('/register', async (req, res) => {
     res.status(201).json({
       success: true,
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        phone: user.phone,
-        role: user.role,
-        affiliateCode: user.affiliateCode
-      }
+      user
     });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -71,17 +65,14 @@ router.post('/login', async (req, res) => {
     }
     
     const token = signToken(user._id);
+
+    // إعادة جلب المستخدم بدون كلمة المرور لضمان عودة جميع الحقول (مثل paymentInfo)
+    const validUser = await User.findById(user._id);
     
     res.json({
       success: true,
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        phone: user.phone,
-        role: user.role,
-        affiliateCode: user.affiliateCode
-      }
+      user: validUser
     });
   } catch (error) {
     res.status(400).json({ message: error.message });
