@@ -138,6 +138,8 @@ ${productList}
         
         if (response.status === 401) {
           console.error('🔐 API Key غير صالح أو منتهي!');
+          console.error('⚠️ سيتم استخدام البحث المحلي الذكي كبديل');
+          console.error('💡 للحصول على API key جديد: https://platform.deepseek.com');
         } else if (response.status === 429) {
           console.error('⏱️ تجاوزت الحد الأقصى للطلبات!');
         }
@@ -192,13 +194,52 @@ ${productList}
     }
   }
 
-  // بحث احتياطي في حالة فشل AI
+  // بحث احتياطي ذكي في حالة فشل AI
   fallbackSearch(query, products) {
-    const lowerQuery = query.toLowerCase();
-    return products.filter(p => 
-      p.name.toLowerCase().includes(lowerQuery) || 
-      (p.sku && p.sku.toLowerCase().includes(lowerQuery))
-    );
+    console.log('🔍 استخدام البحث المحلي الذكي...');
+    const lowerQuery = query.toLowerCase().trim();
+    
+    // قاموس الترجمة العربية
+    const translations = {
+      'سماعات': ['airpods', 'casque', 'ecouteur', 'headphone'],
+      'سماعة': ['airpods', 'casque', 'ecouteur', 'headphone'],
+      'ايربودز': ['airpods', 'air pods'],
+      'إيربودز': ['airpods', 'air pods'],
+      'حافظة': ['antichoc', 'case', 'etui'],
+      'حافظات': ['antichoc', 'case', 'etui'],
+      'شاحن': ['chargeur', 'charger'],
+      'شواحن': ['chargeur', 'charger'],
+      'كابل': ['cable'],
+      'كبل': ['cable'],
+      'سلك': ['cable'],
+      'مكبر': ['baffle', 'speaker', 'haut parleur'],
+      'مكبرات': ['baffle', 'speaker', 'haut parleur'],
+      'كاسك': ['casque'],
+      'كاسكة': ['casque'],
+      'بلوتوث': ['bluetooth', 'sans fil', 'wireless'],
+      'لاسلكي': ['bluetooth', 'sans fil', 'wireless']
+    };
+    
+    // جمع كل الكلمات المفتاحية
+    const keywords = [lowerQuery];
+    Object.keys(translations).forEach(arabic => {
+      if (lowerQuery.includes(arabic)) {
+        keywords.push(...translations[arabic]);
+      }
+    });
+    
+    // البحث
+    const results = products.filter(p => {
+      const productName = p.name.toLowerCase();
+      const productSku = (p.sku || '').toLowerCase();
+      
+      return keywords.some(keyword => 
+        productName.includes(keyword) || productSku.includes(keyword)
+      );
+    });
+    
+    console.log(`✅ البحث المحلي وجد ${results.length} منتج`);
+    return results;
   }
 
   // تحليل الأرباح والإحصائيات
