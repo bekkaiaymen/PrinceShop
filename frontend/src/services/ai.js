@@ -20,6 +20,23 @@ class AIService {
     }
   }
 
+  // كشف اللغة العربية
+  isArabic(text) {
+    const arabicPattern = /[\u0600-\u06FF]/;
+    return arabicPattern.test(text);
+  }
+
+  // بحث عادي سريع (بدون AI)
+  quickSearch(query, products) {
+    const lowerQuery = query.toLowerCase().trim();
+    const results = products.filter(p => {
+      const name = (p.name || '').toLowerCase();
+      const sku = (p.sku || '').toLowerCase();
+      return name.includes(lowerQuery) || sku.includes(lowerQuery);
+    });
+    return results;
+  }
+
   // البحث الذكي عن المنتجات - محسّن بذكاء خارق لفهم الفقرات
   async searchProducts(query, products) {
     try {
@@ -28,6 +45,26 @@ class AIService {
       if (this.cache.has(cacheKey)) {
         console.log('📦 نتيجة من الذاكرة المؤقتة');
         return this.cache.get(cacheKey);
+      }
+
+      // 🧠 منطق البحث الذكي لتوفير استهلاك AI
+      const isArabicQuery = this.isArabic(query);
+      
+      if (isArabicQuery) {
+        // عربي → استخدم AI مباشرة
+        console.log('🌍 استعلام عربي → استخدام AI مباشرة');
+      } else {
+        // إنجليزي → جرب البحث العادي أولاً
+        console.log('🔤 استعلام إنجليزي → بحث عادي أولاً');
+        const quickResults = this.quickSearch(query, products);
+        
+        if (quickResults.length > 0) {
+          console.log(`✅ البحث العادي وجد ${quickResults.length} منتج - توفير AI! 💰`);
+          this.cache.set(cacheKey, quickResults);
+          return quickResults;
+        }
+        
+        console.log('⚠️ البحث العادي لم يجد نتائج → استخدام AI');
       }
 
       console.log('🤖 DeepSeek AI يحلل الاستعلام:', query);
