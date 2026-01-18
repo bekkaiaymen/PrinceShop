@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, ShoppingCart, User, Menu, X, MapPin, Phone, ChevronDown } from 'lucide-react';
 import api from '../services/api';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { smartSearch } from '../utils/arabicSearch';
 
 // عدد المنتجات المعروضة مبدئياً لكل فئة
 const INITIAL_PRODUCTS_PER_CATEGORY = 8;
@@ -162,12 +163,96 @@ function CustomerHome() {
     return categorized;
   };
 
+  // قاموس الترجمة من العربية للإنجليزية/الفرنسية
+  const translationDict = {
+    // إيربودز
+    'ايربودز': ['AIRPODS', 'AIR PODS'],
+    'إيربودز': ['AIRPODS', 'AIR PODS'],
+    'سماعات': ['AIRPODS', 'CASQUE', 'ECOUTEUR'],
+    'سماعة': ['AIRPODS', 'CASQUE', 'ECOUTEUR'],
+    
+    // حافظات
+    'حافظة': ['ANTICHOC', 'ETUI'],
+    'حافظات': ['ANTICHOC', 'ETUI'],
+    'مضاد للصدمات': ['ANTICHOC'],
+    'مضادة للصدمات': ['ANTICHOC'],
+    'جراب': ['ANTICHOC', 'ETUI'],
+    
+    // مكبرات الصوت
+    'مكبر': ['BAFFLE', 'OMPLE', 'HAUT PARLEUR'],
+    'مكبرات': ['BAFFLE', 'OMPLE', 'HAUT PARLEUR'],
+    'سماعات كبيرة': ['BAFFLE', 'OMPLE'],
+    
+    // كوابل
+    'كابل': ['CABLE'],
+    'كبل': ['CABLE'],
+    'سلك': ['CABLE'],
+    'كوابل': ['CABLE'],
+    
+    // شواحن
+    'شاحن': ['CHARGEUR'],
+    'شواحن': ['CHARGEUR'],
+    
+    // كاسكات
+    'كاسكة': ['CASQUE'],
+    'كاسك': ['CASQUE'],
+    'خوذة': ['CASQUE'],
+    
+    // آلات الحلاقة
+    'حلاقة': ['TONDEUSE'],
+    'ماكينة حلاقة': ['TONDEUSE'],
+    'آلة حلاقة': ['TONDEUSE'],
+    
+    // كلمات عامة
+    'يو اس بي': ['USB'],
+    'شاحن سيارة': ['VOITURE', 'CHARGEUR'],
+    'بلوتوث': ['BLUETOOTH'],
+    'لاسلكي': ['SANS FIL', 'WIRELESS']
+  };
+
+  // دالة البحث الذكي
+  const smartSearch = (products, searchQuery) => {
+    if (!searchQuery || searchQuery.trim() === '') return products;
+    
+    const query = searchQuery.toLowerCase().trim();
+    
+    // جمع كل الكلمات المترجمة
+    const translatedKeywords = [];
+    Object.keys(translationDict).forEach(arabicWord => {
+      if (query.includes(arabicWord)) {
+        translatedKeywords.push(...translationDict[arabicWord]);
+      }
+    });
+    
+    return products.filter(p => {
+      const productName = (p.name || '').toLowerCase();
+      const productSku = (p.sku || '').toLowerCase();
+      
+      // البحث بالعربية المباشر
+      if (productName.includes(query) || productSku.includes(query)) {
+        return true;
+      }
+      
+      // البحث بالكلمات المترجمة
+      if (translatedKeywords.some(keyword => 
+        productName.toUpperCase().includes(keyword.toUpperCase())
+      )) {
+        return true;
+      }
+      
+      return false;
+    });
+  };
+
   const filteredProducts = searchTerm || selectedCategory !== 'الكل' || minPrice !== '' || maxPrice !== '' || exactPrice !== ''
     ? allProducts.filter(p => {
-        // فلتر البحث
-        const matchSearch = !searchTerm || 
-          p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          p.sku?.toLowerCase().includes(searchTerm.toLowerCase());
+        // فلتر البحث الذكي بالعربية
+        let matchSearch = true;
+        if (searchTerm) {
+          // استخدام البحث الذكي
+          const searchResults = smartSearch([p], searchTerm);
+          matchSearch = searchResults.length > 0;
+        }
         
         // فلتر الفئة
         let matchCategory = selectedCategory === 'الكل';

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { affiliate } from '../services/api';
-import { Copy, Check, Share2, Package, Image as ImageIcon, Download, FileText } from 'lucide-react';
+import { Copy, Check, Share2, Package, Image as ImageIcon, Download, FileText, Sparkles } from 'lucide-react';
+import aiService from '../services/ai';
 
 export default function AffiliateProducts() {
   const [allProducts, setAllProducts] = useState([]);
@@ -11,6 +12,8 @@ export default function AffiliateProducts() {
   const [copiedName, setCopiedName] = useState(null);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [aiSearching, setAiSearching] = useState(false);
+  const [useAI, setUseAI] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('الكل');
   const [minProfit, setMinProfit] = useState('');
   const [maxProfit, setMaxProfit] = useState('');
@@ -50,20 +53,105 @@ export default function AffiliateProducts() {
     }
   };
 
+  // قاموس الترجمة من العربية للإنجليزية/الفرنسية
+  const translationDict = {
+    'ايربودز': ['AIRPODS', 'AIR PODS'],
+    'إيربودز': ['AIRPODS', 'AIR PODS'],
+    'سماعات': ['AIRPODS', 'CASQUE', 'ECOUTEUR'],
+    'سماعة': ['AIRPODS', 'CASQUE', 'ECOUTEUR'],
+    'حافظة': ['ANTICHOC', 'ETUI'],
+    'حافظات': ['ANTICHOC', 'ETUI'],
+    'مضاد للصدمات': ['ANTICHOC'],
+    'جراب': ['ANTICHOC', 'ETUI'],
+    'مكبر': ['BAFFLE', 'OMPLE', 'HAUT PARLEUR'],
+    'مكبرات': ['BAFFLE', 'OMPLE', 'HAUT PARLEUR'],
+    'كابل': ['CABLE'],
+    'كبل': ['CABLE'],
+    'سلك': ['CABLE'],
+    'شاحن': ['CHARGEUR'],
+    'شواحن': ['CHARGEUR'],
+    'كاسكة': ['CASQUE'],
+    'كاسك': ['CASQUE'],
+    'حلاقة': ['TONDEUSE'],
+    'ماكينة حلاقة': ['TONDEUSE'],
+    'يو اس بي': ['USB'],
+    'شاحن سيارة': ['VOITURE', 'CHARGEUR'],
+    'بلوتوث': ['BLUETOOTH'],
+    'لاسلكي': ['SANS FIL', 'WIRELESS']
+  };
+
+  // دالة البحث الذكي
+  const smartSearch = (query) => {
+    if (!query || query.trim() === '') return '';
+    
+    const lowerQuery = query.toLowerCase().trim();
+    
+    // جمع الكلمات المترجمة
+    const translatedKeywords = [];
+    Object.keys(translationDict).forEach(arabicWord => {
+      if (lowerQuery.includes(arabicWord)) {
+        translatedKeywords.push(...translationDict[arabicWord]);
+      }
+    });
+    
+    return { original: query, translated: translatedKeywords };
+  };
+
   // تصنيف المنتجات حسب الفئات مع الفلتر
-  const categorizeProducts = () => {
+  const categorizeProducts = async () => {
     const categorized = {};
     categoryOrder.forEach(cat => { categorized[cat.name] = []; });
 
     if (!Array.isArray(allProducts)) return categorized;
 
     // تطبيق الفلتر
-    let filtered = allProducts.filter(product => {
-      // فلتر البحث
-      const matchSearch = !searchTerm || 
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.sku?.toLowerCase().includes(searchTerm.toLowerCase());
-      
+    let filtered = allProducts;
+
+    // فلتر البحث (مع AI إذا كان مفعلاً)
+    if (searchTerm && useAI) {
+      try {
+        setAiSearching(true);
+        filtered = await aiService.searchProducts(searchTerm, allProducts);
+        setAiSearching(false);
+      } catch (error) {
+        console.error('AI search failed, using fallback:', error);
+        setAiSearching(false);
+        // استخدام البحث العادي
+        filtered = allProducts.filter(product => {
+          const searchData = smartSearch(searchTerm);
+          const productName = product.name.toLowerCase();
+          const productSku = (product.sku || '').toLowerCase();
+          
+          const directMatch = productName.includes(searchData.original.toLowerCase()) || 
+                            productSku.includes(searchData.original.toLowerCase());
+          
+          const translatedMatch = searchData.translated.some(keyword => 
+            productName.toUpperCase().includes(keyword.toUpperCase())
+          );
+          
+          return directMatch || translatedMatch;
+        });
+      }
+    } else if (searchTerm) {
+      // البحث العادي بدون AI
+      filtered = allProducts.filter(product => {
+        const searchData = smartSearch(searchTerm);
+        const productName = product.name.toLowerCase();
+        const productSku = (product.sku || '').toLowerCase();
+        
+        const directMatch = productName.includes(searchData.original.toLowerCase()) || 
+                          productSku.includes(searchData.original.toLowerCase());
+        
+        const translatedMatch = searchData.translated.some(keyword => 
+          productName.toUpperCase().includes(keyword.toUpperCase())
+        );
+        
+        return directMatch || translatedMatch;
+      });
+    }
+
+    // فلتر الربح والسعر
+    filtered = filtered.filter(product => {
       // فلتر قيمة الربح
       let matchProfit = true;
       if (minProfit !== '' || maxProfit !== '') {
@@ -82,7 +170,7 @@ export default function AffiliateProducts() {
         matchPrice = price >= min && price <= max;
       }
       
-      return matchSearch && matchProfit && matchPrice;
+      return matchProfit && matchPrice;
     });
 
     // ترتيب المنتجات
@@ -333,7 +421,15 @@ export default function AffiliateProducts() {
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-lg p-6 text-white">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <h1 className="text-3xl font-bold mb-2">منتجاتك للتسويق 🚀</h1>
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-3xl font-bold">منتجاتك للتسويق 🚀</h1>
+              {useAI && (
+                <div className="bg-gradient-to-r from-yellow-400 to-orange-400 px-3 py-1 rounded-full flex items-center gap-1 text-sm font-bold text-gray-900">
+                  <Sparkles className="w-4 h-4" />
+                  <span>AI مفعل</span>
+                </div>
+              )}
+            </div>
             <p className="text-blue-100 mb-4">اختر منتج، انسخ رابطك الخاص، وابدأ الربح!</p>
             
             {/* إحصائيات الفلترة */}
@@ -394,14 +490,32 @@ export default function AffiliateProducts() {
               <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
                 <span className="text-lg">🔍</span>
                 البحث
+                {aiSearching && (
+                  <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 animate-pulse" />
+                    AI يبحث...
+                  </span>
+                )}
               </label>
-              <input
-                type="text"
-                placeholder="اسم المنتج أو الكود..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="ابحث باللغة العربية أو الإنجليزية... (AI مفعل)"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all pr-12"
+                />
+                <button
+                  onClick={() => setUseAI(!useAI)}
+                  className={`absolute left-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-all ${
+                    useAI ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-100 text-gray-400'
+                  }`}
+                  title={useAI ? 'AI مفعل' : 'AI معطل'}
+                >
+                  <Sparkles className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
             </div>
 
             {/* Category Filter */}
