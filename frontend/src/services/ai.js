@@ -1,5 +1,9 @@
 // خدمة الذكاء الاصطناعي - DeepSeek API
-const DEEPSEEK_API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY;
+const ENV_API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY;
+// الحل المباشر لضمان العمل الآن
+const DIRECT_API_KEY = 'sk-0f06cf0af19d4171813116ae5ab033d1';
+const DEEPSEEK_API_KEY = ENV_API_KEY || DIRECT_API_KEY;
+
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
 class AIService {
