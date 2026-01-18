@@ -205,31 +205,33 @@ export default function AffiliateProducts() {
   };
 
   const copyImageAndText = async (product) => {
-    // نسخ رابط الصورة فقط
-    const imageUrl = product.image;
-    
+    // نسخ الصورة نفسها (وليس الرابط)
     try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(imageUrl);
-      } else {
-        // طريقة بديلة
-        const textArea = document.createElement('textarea');
-        textArea.value = imageUrl;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-999999px';
-        textArea.style.top = '-999999px';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        document.execCommand('copy');
-        textArea.remove();
-      }
+      // تحميل الصورة كـ blob
+      const response = await fetch(product.image);
+      const blob = await response.blob();
+      
+      // نسخ الصورة إلى الحافظة
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          [blob.type]: blob
+        })
+      ]);
       
       setCopiedImage(product._id);
       setTimeout(() => setCopiedImage(null), 2000);
     } catch (error) {
-      console.error('فشل النسخ:', error);
-      prompt('انسخ رابط الصورة:', imageUrl);
+      console.error('فشل نسخ الصورة:', error);
+      
+      // طريقة بديلة: نسخ رابط الصورة
+      try {
+        await navigator.clipboard.writeText(product.image);
+        setCopiedImage(product._id);
+        setTimeout(() => setCopiedImage(null), 2000);
+        alert('تم نسخ رابط الصورة بدلاً من الصورة نفسها. يمكنك لصق الرابط ثم تحميل الصورة.');
+      } catch (err) {
+        alert('فشل نسخ الصورة. الرجاء المحاولة مرة أخرى أو استخدام متصفح حديث.');
+      }
     }
   };
 
