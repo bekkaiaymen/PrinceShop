@@ -33,23 +33,16 @@ class AIService {
       console.log('🤖 DeepSeek AI يحلل الاستعلام:', query);
       console.log('📊 عدد المنتجات:', products.length);
 
-      // تحديد أول 500 منتج لتغطية أفضل
-      const limitedProducts = products.slice(0, 500);
-      console.log('✂️ إرسال', limitedProducts.length, 'منتج للـ AI');
-
-      // إنشاء قائمة تفصيلية بالمنتجات
-      const productList = limitedProducts.map((p, idx) => {
-        const parts = [`${idx}: ${p.name}`];
-        if (p.sku) parts.push(`[SKU: ${p.sku}]`);
-        return parts.join(' ');
-      }).join('\n');
+      // إرسال كل المنتجات (تبسيط: فقط الأسماء)
+      const productList = products.map((p, idx) => `${idx}: ${p.name}`).join('\n');
+      console.log('✂️ إرسال', products.length, 'منتج للـ AI');
 
       // Prompt بسيط ومباشر
       const prompt = `أنت محرك بحث ذكي للمنتجات. ابحث عن منتجات تطابق استعلام المستخدم.
 
 استعلام: "${query}"
 
-المنتجات (${limitedProducts.length}):
+المنتجات (${products.length}):
 ${productList}
 
 ترجمة سريعة:
@@ -141,11 +134,11 @@ ${productList}
         .replace(/[^\d,]/g, '') // إزالة كل شيء ماعدا الأرقام والفواصل
         .split(',')
         .map(idx => parseInt(idx.trim()))
-        .filter(idx => !isNaN(idx) && idx >= 0 && idx < limitedProducts.length);
+        .filter(idx => !isNaN(idx) && idx >= 0 && idx < products.length);
       
-      const results = indices.map(idx => limitedProducts[idx]).filter(p => p !== undefined);
+      const results = indices.map(idx => products[idx]).filter(p => p !== undefined);
 
-      console.log(`✅ AI وجد ${results.length} منتج مطابق من أصل ${limitedProducts.length}`);
+      console.log(`✅ AI وجد ${results.length} منتج مطابق من أصل ${products.length}`);
       
       if (results.length > 0) {
         console.log('🎯 المنتجات المطابقة:', results.map(p => p.name).join(', '));

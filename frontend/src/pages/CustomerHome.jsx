@@ -82,6 +82,8 @@ function CustomerHome() {
     const doSearch = async () => {
       if (searchTerm && allProducts.length > 0) {
         setAiSearching(true);
+        // مسح الـ cache لضمان نتائج جديدة
+        aiService.clearCache();
         const results = await performSmartSearch(searchTerm, allProducts);
         setSearchResults(results);
         setAiSearching(false);
