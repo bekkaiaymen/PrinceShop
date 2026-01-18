@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { affiliate } from '../services/api';
 import { Copy, Check, Share2, Package, Image as ImageIcon, Download, FileText, Sparkles } from 'lucide-react';
 import aiService from '../services/ai';
+import { smartSearch as arabicSearch } from '../utils/arabicSearch';
 
 export default function AffiliateProducts() {
   const [allProducts, setAllProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [copiedLink, setCopiedLink] = useState(null);
   const [copiedText, setCopiedText] = useState(null);
@@ -38,13 +40,29 @@ export default function AffiliateProducts() {
     loadProducts();
   }, []);
 
+  // البحث الذكي عند تغيير searchTerm
+  useEffect(() => {
+    const doSearch = async () => {
+      if (searchTerm) {
+        const results = await performSmartSearch(searchTerm, allProducts);
+        setFilteredProducts(results);
+      } else {
+        setFilteredProducts(allProducts);
+      }
+    };
+    
+    doSearch();
+  }, [searchTerm, allProducts, useAI]);
+
   const loadProducts = async () => {
     try {
       setLoading(true);
       setError(null);
       const { data } = await affiliate.getProducts();
       console.log('Products data:', data);
-      setAllProducts(data.products || data.data || []);
+      const products = data.products || data.data || [];
+      setAllProducts(products);
+      setFilteredProducts(products);
     } catch (error) {
       console.error('Error loading products:', error);
       setError(error.response?.data?.message || 'فشل في تحميل المنتجات');
@@ -80,9 +98,9 @@ export default function AffiliateProducts() {
     'لاسلكي': ['SANS FIL', 'WIRELESS']
   };
 
-  // دالة البحث الذكي
-  const smartSearch = (query) => {
-    if (!query || query.trim() === '') return '';
+  // دالة الترجمة من العربية للإنجليزية
+  const translateArabicSearch = (query) => {
+    if (!query || query.trim() === '') return { original: '', translated: [] };
     
     const lowerQuery = query.toLowerCase().trim();
     
@@ -97,61 +115,38 @@ export default function AffiliateProducts() {
     return { original: query, translated: translatedKeywords };
   };
 
-  // تصنيف المنتجات حسب الفئات مع الفلتر
-  const categorizeProducts = async () => {
-    const categorized = {};
-    categoryOrder.forEach(cat => { categorized[cat.name] = []; });
-
-    if (!Array.isArray(allProducts)) return categorized;
-
-    // تطبيق الفلتر
-    let filtered = allProducts;
-
-    // فلتر البحث (مع AI إذا كان مفعلاً)
-    if (searchTerm && useAI) {
+  // دالة البحث الذكي المنفصلة
+  const performSmartSearch = async (query, products) => {
+    if (!query) return products;
+    
+    if (useAI) {
       try {
         setAiSearching(true);
-        filtered = await aiService.searchProducts(searchTerm, allProducts);
+        const results = await aiService.searchProducts(query, products);
         setAiSearching(false);
+        return results;
       } catch (error) {
         console.error('AI search failed, using fallback:', error);
         setAiSearching(false);
-        // استخدام البحث العادي
-        filtered = allProducts.filter(product => {
-          const searchData = smartSearch(searchTerm);
-          const productName = product.name.toLowerCase();
-          const productSku = (product.sku || '').toLowerCase();
-          
-          const directMatch = productName.includes(searchData.original.toLowerCase()) || 
-                            productSku.includes(searchData.original.toLowerCase());
-          
-          const translatedMatch = searchData.translated.some(keyword => 
-            productName.toUpperCase().includes(keyword.toUpperCase())
-          );
-          
-          return directMatch || translatedMatch;
-        });
       }
-    } else if (searchTerm) {
-      // البحث العادي بدون AI
-      filtered = allProducts.filter(product => {
-        const searchData = smartSearch(searchTerm);
-        const productName = product.name.toLowerCase();
-        const productSku = (product.sku || '').toLowerCase();
-        
-        const directMatch = productName.includes(searchData.original.toLowerCase()) || 
-                          productSku.includes(searchData.original.toLowerCase());
-        
-        const translatedMatch = searchData.translated.some(keyword => 
-          productName.toUpperCase().includes(keyword.toUpperCase())
-        );
-        
-        return directMatch || translatedMatch;
-      });
     }
+    
+    // البحث العادي (احتياطي) - استخدام البحث العربي الذكي
+    return arabicSearch(products, query);
+  };
 
-    // فلتر الربح والسعر
-    filtered = filtered.filter(product => {
+  // تصنيف المنتجات حسب الفئات مع الفلتر (بدون async)
+  const categorizeProducts = () => {
+    const categorized = {};
+    categoryOrder.forEach(cat => { categorized[cat.name] = []; });
+
+    // استخدام المنتجات المفلترة بدلاً من جميع المنتجات
+    const productsToUse = searchTerm ? filteredProducts : allProducts;
+    
+    if (!Array.isArray(productsToUse)) return categorized;
+
+    // تطبيق فلتر الربح والسعر فقط
+    let filtered = productsToUse.filter(product => {
       // فلتر قيمة الربح
       let matchProfit = true;
       if (minProfit !== '' || maxProfit !== '') {
@@ -515,7 +510,6 @@ export default function AffiliateProducts() {
                   <Sparkles className="w-5 h-5" />
                 </button>
               </div>
-            </div>
             </div>
 
             {/* Category Filter */}
