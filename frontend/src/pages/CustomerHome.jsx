@@ -30,6 +30,7 @@ function CustomerHome() {
   const [useAI, setUseAI] = useState(true);
   const [aiSearching, setAiSearching] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
+  const [loadedImages, setLoadedImages] = useState(new Set());
   
   // حالة عرض المزيد لكل فئة
   const [expandedCategories, setExpandedCategories] = useState({});
@@ -364,6 +365,8 @@ function CustomerHome() {
               <img 
                 src="/assets/logo.png" 
                 alt="Prince Shop Logo" 
+                loading="eager"
+                fetchpriority="high"
                 className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl shadow-lg object-contain"
               />
               <div className="hidden sm:block">
@@ -827,13 +830,23 @@ function ProductCard({ product, onBuyClick }) {
     >
       {/* صورة المنتج */}
       <div className="relative h-40 sm:h-48 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+        {!loadedImages.has(product._id) && (
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 animate-pulse" />
+        )}
         <img
           src={product.image}
           alt={product.name}
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-contain p-3 sm:p-4 group-hover:scale-105 transition-transform duration-300"
-          onError={(e) => { e.target.src = '/products/placeholder.png'; }}
+          fetchpriority="low"
+          className={`w-full h-full object-contain p-3 sm:p-4 group-hover:scale-105 transition-transform duration-300 ${
+            loadedImages.has(product._id) ? 'opacity-100' : 'opacity-0'
+          }`}
+          onLoad={() => setLoadedImages(prev => new Set([...prev, product._id]))}
+          onError={(e) => { 
+            e.target.src = '/products/placeholder.png';
+            setLoadedImages(prev => new Set([...prev, product._id]));
+          }}
         />
       </div>
       
