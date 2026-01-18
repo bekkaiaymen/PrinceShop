@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { affiliate } from '../services/api';
-import { TrendingUp, ShoppingBag, Clock, XCircle, DollarSign, Activity, Copy, Check, Link, Sparkles } from 'lucide-react';
+import { TrendingUp, ShoppingBag, Clock, XCircle, DollarSign, Activity, Copy, Check, Link, Sparkles, Download } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import aiService from '../services/ai';
 
@@ -11,10 +11,49 @@ export default function Dashboard() {
   const [copiedCode, setCopiedCode] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState(null);
   const [loadingAI, setLoadingAI] = useState(false);
+  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
 
   useEffect(() => {
     loadDashboard();
   }, []);
+
+  // PWA Install Prompt - يظهر للمسوقين على الجوال
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      
+      // التحقق من أن التطبيق غير مثبت + على الجوال
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      
+      if (isMobile && !isStandalone) {
+        // إظهار الرسالة بعد 3 ثواني من دخول المسوق للداشبورد
+        setTimeout(() => setShowInstallPrompt(true), 3000);
+      }
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    
+    if (outcome === 'accepted') {
+      console.log('✅ تم تثبيت التطبيق بنجاح');
+    }
+    
+    setDeferredPrompt(null);
+    setShowInstallPrompt(false);
+  };
 
   const loadDashboard = async () => {
     try {
@@ -149,6 +188,39 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6 sm:space-y-8">
+      {/* PWA Install Prompt - يظهر للمسوقين غير المثبتين */}
+      {showInstallPrompt && (
+        <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-md z-50 animate-slide-up">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-2xl p-4 text-white">
+            <div className="flex items-start gap-3">
+              <div className="bg-white/20 p-2 rounded-xl flex-shrink-0">
+                <Download className="w-6 h-6" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-lg mb-1">ثبّت التطبيق 📱</h3>
+                <p className="text-sm text-white/90 mb-3">
+                  احصل على تجربة أفضل وأسرع! ثبّت التطبيق على هاتفك للوصول السريع وإدارة أرباحك
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleInstallClick}
+                    className="flex-1 bg-white text-blue-600 font-bold py-2 px-4 rounded-xl hover:bg-blue-50 transition-colors"
+                  >
+                    تثبيت الآن
+                  </button>
+                  <button
+                    onClick={() => setShowInstallPrompt(false)}
+                    className="bg-white/20 text-white font-bold py-2 px-4 rounded-xl hover:bg-white/30 transition-colors"
+                  >
+                    لاحقاً
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">لوحة التحكم</h1>
