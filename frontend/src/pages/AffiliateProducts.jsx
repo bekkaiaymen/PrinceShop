@@ -209,7 +209,7 @@ export default function AffiliateProducts() {
     try {
       setCopiedImage(product._id);
       
-      // تحميل الصورة كـ blob مع معالجة CORS
+      // تحميل الصورة
       const response = await fetch(product.image, {
         mode: 'cors',
         credentials: 'omit'
@@ -226,18 +226,43 @@ export default function AffiliateProducts() {
         throw new Error('المتصفح لا يدعم نسخ الصور');
       }
       
-      // نسخ الصورة إلى الحافظة
+      // تحويل الصورة إلى PNG لأن بعض المتصفحات لا تدعم JPEG
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = URL.createObjectURL(blob);
+      });
+      
+      // رسم الصورة على canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      
+      // تحويل canvas إلى blob PNG
+      const pngBlob = await new Promise(resolve => {
+        canvas.toBlob(resolve, 'image/png');
+      });
+      
+      // نسخ الصورة PNG إلى الحافظة
       await navigator.clipboard.write([
         new ClipboardItem({
-          [blob.type]: blob
+          'image/png': pngBlob
         })
       ]);
+      
+      // تنظيف
+      URL.revokeObjectURL(img.src);
       
       setTimeout(() => setCopiedImage(null), 2000);
     } catch (error) {
       console.error('فشل نسخ الصورة:', error);
       setCopiedImage(null);
-      alert('⚠️ فشل نسخ الصورة.\n\nالحلول:\n1. استخدم متصفح حديث (Chrome/Edge)\n2. تأكد من السماح بنسخ الصور\n3. حاول تحميل الصورة يدوياً من الرابط');
+      alert('⚠️ فشل نسخ الصورة.\n\nالحلول:\n1. استخدم متصفح حديث (Chrome/Edge)\n2. تأكد من السماح بنسخ الصور\n3. حاول تحميل الصورة يدوياً');
     }
   };
 
