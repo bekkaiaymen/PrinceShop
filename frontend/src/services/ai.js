@@ -140,11 +140,11 @@ ${productList}
         .replace(/[^\d,]/g, '') // إزالة كل شيء ماعدا الأرقام والفواصل
         .split(',')
         .map(idx => parseInt(idx.trim()))
-        .filter(idx => !isNaN(idx) && idx >= 0 && idx < products.length);
+        .filter(idx => !isNaN(idx) && idx >= 0 && idx < limitedProducts.length);
       
-      const results = indices.map(idx => products[idx]).filter(p => p !== undefined);
+      const results = indices.map(idx => limitedProducts[idx]).filter(p => p !== undefined);
 
-      console.log(`✅ AI وجد ${results.length} منتج مطابق من أصل ${products.length}`);
+      console.log(`✅ AI وجد ${results.length} منتج مطابق من أصل ${limitedProducts.length}`);
       
       if (results.length > 0) {
         console.log('🎯 المنتجات المطابقة:', results.map(p => p.name).join(', '));
@@ -181,11 +181,9 @@ ${productList}
       'كابل': ['cable'],
       'كبل': ['cable'],
       'سلك': ['cable'],
-      'مكبر': ['baffle', 'speaker', 'haut parleur'],limitedProducts.length);
-      
-      const results = indices.map(idx => limitedProducts[idx]).filter(p => p !== undefined);
-
-      console.log(`✅ AI وجد ${results.length} منتج مطابق من أصل ${limitedP
+      'مكبر': ['baffle', 'speaker', 'haut parleur'],
+      'مكبرات': ['baffle', 'speaker', 'haut parleur'],
+      'بلوتوث': ['bluetooth', 'sans fil', 'wireless'],
       'لاسلكي': ['bluetooth', 'sans fil', 'wireless']
     };
     
