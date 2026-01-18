@@ -51,6 +51,21 @@ app.use(express.json());
 // MongoDB Connection
 connectDB();
 
+// حذف email_1 index القديم (مؤقت - سيعمل مرة واحدة فقط)
+(async () => {
+  try {
+    await User.collection.dropIndex('email_1');
+    console.log('✅ تم حذف email_1 index القديم بنجاح');
+  } catch (error) {
+    // Index غير موجود أو تم حذفه بالفعل
+    if (error.code === 27 || error.codeName === 'IndexNotFound') {
+      console.log('ℹ️ email_1 index غير موجود (عادي)');
+    } else {
+      console.log('⚠️ خطأ عند حذف index:', error.message);
+    }
+  }
+})();
+
 // ============ دالة حساب سعر البيع بناءً على نسب الربح ============
 function calculateCustomerPrice(wholesalePrice) {
   if (wholesalePrice <= 100) {
