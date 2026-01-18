@@ -584,7 +584,7 @@ function LandingPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600 font-medium">السعر:</span>
                   <div className="text-3xl sm:text-4xl font-bold text-blue-600">
-                    {(product.customerPrice || product.suggested_price || 0).toLocaleString()} دج
+                    {formatPrice(product.customerPrice || product.suggested_price || 0).toLocaleString()} دج
                   </div>
                 </div>
               </div>
