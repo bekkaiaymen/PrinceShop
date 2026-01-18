@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { affiliate } from '../services/api';
-import { Copy, Check, Share2, Package, Image as ImageIcon, Download } from 'lucide-react';
+import { Copy, Check, Share2, Package, Image as ImageIcon, Download, FileText } from 'lucide-react';
 
 export default function AffiliateProducts() {
   const [allProducts, setAllProducts] = useState([]);
@@ -8,6 +8,7 @@ export default function AffiliateProducts() {
   const [copiedLink, setCopiedLink] = useState(null);
   const [copiedText, setCopiedText] = useState(null);
   const [copiedImage, setCopiedImage] = useState(null);
+  const [copiedName, setCopiedName] = useState(null);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('الكل');
@@ -204,22 +205,16 @@ export default function AffiliateProducts() {
   };
 
   const copyImageAndText = async (product) => {
-    // تدوير السعر في النص المنسوخ
-    const roundedPrice = Math.ceil(product.suggested_price / 10) * 10;
-    // حساب الربح الفعلي بناءً على السعر المدور
-    const priceIncrease = roundedPrice - product.suggested_price;
-    const actualProfit = product.affiliate_profit + priceIncrease;
-    
-    // نسخ النص مع رابط الصورة (الطريقة الأسهل والأكثر توافقاً)
-    const productText = `🔥 ${product.name}\n\n💰 السعر: ${roundedPrice} دج\n📦 توصيل مجاني في غرداية 🏜️\n💵 ربحك: ${actualProfit.toLocaleString('fr-DZ')} دج\n\n📷 صورة المنتج:\n${product.image}\n\n🛒 اطلب الآن:\n${product.affiliateLink}`;
+    // نسخ رابط الصورة فقط
+    const imageUrl = product.image;
     
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(productText);
+        await navigator.clipboard.writeText(imageUrl);
       } else {
         // طريقة بديلة
         const textArea = document.createElement('textarea');
-        textArea.value = productText;
+        textArea.value = imageUrl;
         textArea.style.position = 'fixed';
         textArea.style.left = '-999999px';
         textArea.style.top = '-999999px';
@@ -234,7 +229,39 @@ export default function AffiliateProducts() {
       setTimeout(() => setCopiedImage(null), 2000);
     } catch (error) {
       console.error('فشل النسخ:', error);
-      prompt('انسخ هذا النص:', productText);
+      prompt('انسخ رابط الصورة:', imageUrl);
+    }
+  };
+
+  const copyProductName = async (product) => {
+    // نسخ اسم المنتج والوصف إذا كان موجود
+    let text = product.name;
+    if (product.description && product.description.trim()) {
+      text += `\n\n${product.description}`;
+    }
+    
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        // طريقة بديلة
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        textArea.remove();
+      }
+      
+      setCopiedName(product._id);
+      setTimeout(() => setCopiedName(null), 2000);
+    } catch (error) {
+      console.error('فشل النسخ:', error);
+      prompt('انسخ هذا النص:', text);
     }
   };
 
@@ -501,9 +528,11 @@ export default function AffiliateProducts() {
                         copiedLink={copiedLink}
                         copiedText={copiedText}
                         copiedImage={copiedImage}
+                        copiedName={copiedName}
                         onCopyLink={() => copyToClipboard(product.affiliateLink, 'link', product._id)}
                         onCopyText={() => copyToClipboard(product.shareText, 'text', product._id)}
-                        onCopyAll={() => copyImageAndText(product)}
+                        onCopyImage={() => copyImageAndText(product)}
+                        onCopyName={() => copyProductName(product)}
                       />
                     ))}
                   </div>
@@ -541,7 +570,7 @@ export default function AffiliateProducts() {
 }
 
 // بطاقة المنتج
-function ProductCard({ product, copiedLink, copiedText, copiedImage, onCopyLink, onCopyText, onCopyAll }) {
+function ProductCard({ product, copiedLink, copiedText, copiedImage, copiedName, onCopyLink, onCopyText, onCopyImage, onCopyName }) {
   // دالة لتدوير السعر
   const formatPrice = (price) => {
     const rounded = Math.ceil(price / 10) * 10;
@@ -609,28 +638,10 @@ function ProductCard({ product, copiedLink, copiedText, copiedImage, onCopyLink,
             )}
           </button>
 
-          {/* نسخ نص جاهز */}
+          {/* نسخ رابط الصورة */}
           <button
-            onClick={onCopyText}
+            onClick={onCopyImage}
             className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 rounded-xl hover:from-purple-700 hover:to-purple-800 transition-all text-sm font-bold shadow-md hover:shadow-lg"
-          >
-            {copiedText === product._id ? (
-              <>
-                <Check className="w-4 h-4" />
-                <span>تم النسخ! ✅</span>
-              </>
-            ) : (
-              <>
-                <Share2 className="w-4 h-4" />
-                <span>نسخ نص جاهز</span>
-              </>
-            )}
-          </button>
-
-          {/* نسخ المنتج كاملاً (صورة + نص) */}
-          <button
-            onClick={onCopyAll}
-            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-green-700 text-white py-2.5 rounded-xl hover:from-green-700 hover:to-green-800 transition-all text-sm font-bold shadow-md hover:shadow-lg"
           >
             {copiedImage === product._id ? (
               <>
@@ -640,7 +651,25 @@ function ProductCard({ product, copiedLink, copiedText, copiedImage, onCopyLink,
             ) : (
               <>
                 <ImageIcon className="w-4 h-4" />
-                <span>نسخ المنتج كاملاً</span>
+                <span>نسخ رابط الصورة</span>
+              </>
+            )}
+          </button>
+
+          {/* نسخ اسم المنتج والوصف */}
+          <button
+            onClick={onCopyName}
+            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-green-700 text-white py-2.5 rounded-xl hover:from-green-700 hover:to-green-800 transition-all text-sm font-bold shadow-md hover:shadow-lg"
+          >
+            {copiedName === product._id ? (
+              <>
+                <Check className="w-4 h-4" />
+                <span>تم النسخ! ✅</span>
+              </>
+            ) : (
+              <>
+                <FileText className="w-4 h-4" />
+                <span>نسخ الاسم والوصف</span>
               </>
             )}
           </button>
