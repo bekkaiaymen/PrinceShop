@@ -65,8 +65,10 @@ export default function AffiliateProducts() {
   // البحث الذكي عند تغيير searchTerm
   useEffect(() => {
     const doSearch = async () => {
-      if (searchTerm) {
+      if (searchTerm && allProducts.length > 0) {
+        console.log('🔎 تفعيل البحث عن:', searchTerm);
         const results = await performSmartSearch(searchTerm, allProducts);
+        console.log('📊 النتائج:', results.length, 'من أصل', allProducts.length);
         setFilteredProducts(results);
       } else {
         setFilteredProducts(allProducts);
@@ -137,23 +139,31 @@ export default function AffiliateProducts() {
     return { original: query, translated: translatedKeywords };
   };
 
-  // دالة البحث الذكي المنفصلة
+  // دالة البحث الذكي المنفصلة - محسّنة
   const performSmartSearch = async (query, products) => {
     if (!query) return products;
+    
+    console.log('🔍 بدء البحث:', query);
+    console.log('🤖 AI مفعّل؟', useAI);
     
     if (useAI) {
       try {
         setAiSearching(true);
+        console.log('⏳ جاري الاتصال بـ DeepSeek AI...');
         const results = await aiService.searchProducts(query, products);
+        console.log('✅ AI أنهى البحث:', results.length, 'منتج');
         setAiSearching(false);
         return results;
       } catch (error) {
-        console.error('AI search failed, using fallback:', error);
+        console.error('❌ AI فشل، استخدام البحث الاحتياطي:', error);
         setAiSearching(false);
+        // استخدام البحث الاحتياطي
+        return arabicSearch(products, query);
       }
     }
     
-    // البحث العادي (احتياطي) - استخدام البحث العربي الذكي
+    // البحث العادي (احتياطي)
+    console.log('📝 استخدام البحث المحلي');
     return arabicSearch(products, query);
   };
 
