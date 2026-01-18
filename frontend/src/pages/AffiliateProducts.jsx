@@ -671,7 +671,7 @@ function ProductCard({ product, copiedLink, copiedText, copiedImage, copiedName,
             )}
           </button>
 
-          {/* نسخ رابط الصورة */}
+          {/* نسخ الصورة */}
           <button
             onClick={onCopyImage}
             className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 rounded-xl hover:from-purple-700 hover:to-purple-800 transition-all text-sm font-bold shadow-md hover:shadow-lg"
@@ -684,7 +684,7 @@ function ProductCard({ product, copiedLink, copiedText, copiedImage, copiedName,
             ) : (
               <>
                 <ImageIcon className="w-4 h-4" />
-                <span>نسخ رابط الصورة</span>
+                <span>نسخ الصورة</span>
               </>
             )}
           </button>
