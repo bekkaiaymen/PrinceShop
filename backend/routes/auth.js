@@ -92,6 +92,13 @@ router.post('/login', async (req, res) => {
 router.get('/me', protect, async (req, res) => {
   // إعادة جلب المستخدم للتأكد من الحصول على أحدث البيانات
   const user = await User.findById(req.user._id);
+  
+  if (user && user.paymentInfo) {
+      console.log('GET /me - User Payment Info for ' + user.name, user.paymentInfo);
+  } else {
+      console.log('GET /me - No Payment Info for ' + user?.name);
+  }
+
   res.json({
     success: true,
     user

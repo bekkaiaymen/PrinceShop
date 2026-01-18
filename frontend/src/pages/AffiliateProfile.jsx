@@ -30,22 +30,28 @@ export default function AffiliateProfile() {
   // Update state when user data changes
   useEffect(() => {
     if (user) {
+      console.log('User data in Profile useEffect:', user);
+      
+      const newPaymentData = {
+        baridimob: {
+          rip: user.paymentInfo?.baridimob?.rip || user.paymentInfo?.rip || '', 
+          accountHolder: user.paymentInfo?.baridimob?.accountHolder || user.paymentInfo?.accountHolder || ''
+        },
+        cash: {
+          location: user.paymentInfo?.cash?.location || user.paymentInfo?.location || '',
+          details: user.paymentInfo?.cash?.details || user.paymentInfo?.details || ''
+        }
+      };
+      
+      console.log('Setting payment data to:', newPaymentData);
+      
       setProfileData({
         name: user.name || '',
         phone: user.phone || '',
         city: user.city || ''
       });
       
-      setPaymentData({
-        baridimob: {
-          rip: user.paymentInfo?.baridimob?.rip || '',
-          accountHolder: user.paymentInfo?.baridimob?.accountHolder || ''
-        },
-        cash: {
-          location: user.paymentInfo?.cash?.location || '',
-          details: user.paymentInfo?.cash?.details || ''
-        }
-      });
+      setPaymentData(newPaymentData);
     }
   }, [user]);
 
