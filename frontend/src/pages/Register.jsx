@@ -24,7 +24,12 @@ export default function Register() {
       await register(formData);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'حدث خطأ أثناء التسجيل');
+      console.error('Registration error:', err);
+      // عرض رسالة الخطأ القادمة من الباك إند
+      const serverMessage = err.response?.data?.message;
+      const serverError = err.response?.data?.error; // أحيانًا يكون في error
+      
+      setError(serverMessage || serverError || 'فشل التسجيل. تأكد من البيانات أو حاول برقم هاتف آخر.');
     } finally {
       setLoading(false);
     }
