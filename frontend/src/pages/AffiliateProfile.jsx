@@ -84,6 +84,36 @@ export default function AffiliateProfile() {
     setError('');
     setSuccess('');
 
+    // التحقق من صحة بيانات بريدي موب
+    const hasBaridimobRip = !!paymentData.baridimob.rip;
+    const hasBaridimobHolder = !!paymentData.baridimob.accountHolder;
+
+    if (hasBaridimobRip && !hasBaridimobHolder) {
+      setError('الرجاء إدخال اسم صاحب الحساب لبريدي موب');
+      setLoading(false);
+      return;
+    }
+    if (!hasBaridimobRip && hasBaridimobHolder) {
+      setError('الرجاء إدخال رقم RIP لبريدي موب');
+      setLoading(false);
+      return;
+    }
+
+    // التحقق من صحة بيانات الدفع النقدي
+    const hasCashLocation = !!paymentData.cash.location;
+    const hasCashDetails = !!paymentData.cash.details;
+
+    if (hasCashLocation && !hasCashDetails) {
+      setError('الرجاء إدخال التفاصيل الإضافية للدفع النقدي');
+      setLoading(false);
+      return;
+    }
+    if (!hasCashLocation && hasCashDetails) {
+      setError('الرجاء إدخال مكان الاستلام للدفع النقدي');
+      setLoading(false);
+      return;
+    }
+
     console.log('Payment data being sent:', paymentData);
 
     try {
