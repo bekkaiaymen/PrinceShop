@@ -29,6 +29,33 @@ function CustomerHome() {
   // حالة عرض المزيد لكل فئة
   const [expandedCategories, setExpandedCategories] = useState({});
 
+  // استعادة حالة التمرير والفئات المفتوحة عند العودة للصفحة
+  useEffect(() => {
+    const savedExpanded = sessionStorage.getItem('customerHome_expanded');
+    if (savedExpanded) {
+      try {
+        setExpandedCategories(JSON.parse(savedExpanded));
+      } catch (e) {}
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!loading && allProducts.length > 0) {
+      const savedScroll = sessionStorage.getItem('customerHome_scroll');
+      if (savedScroll) {
+        setTimeout(() => {
+          window.scrollTo({
+            top: parseInt(savedScroll),
+            behavior: 'instant'
+          });
+          // تنظيف التخزين بعد الاستعادة لضمان عدم حدوثها عند التحديث العادي
+          sessionStorage.removeItem('customerHome_scroll');
+          sessionStorage.removeItem('customerHome_expanded');
+        }, 100);
+      }
+    }
+  }, [loading, allProducts]);
+
   // الفئات
   const categoryOrder = [
     { name: 'إيربودز', icon: '🎧', keywords: ['AIR PODS', 'AIRPODS'] },
@@ -206,6 +233,14 @@ function CustomerHome() {
   };
 
   const categorizedProducts = !searchTerm ? categorizeProducts() : null;
+
+  const handleProductClick = (productId) => {
+    sessionStorage.setItem('customerHome_scroll', window.scrollY.toString());
+    sessionStorage.setItem('customerHome_expanded', JSON.stringify(expandedCategories));
+    
+    const url = `/landing/${productId}${affiliateCode ? `?ref=${affiliateCode}` : ''}`;
+    navigate(url);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white" dir="rtl">
@@ -501,7 +536,11 @@ function CustomerHome() {
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
               {filteredProducts.map(product => (
-                <ProductCard key={product._id} product={product} />
+                <ProductCard 
+                  key={product._id} 
+                  product={product} 
+                  onBuyClick={() => handleProductClick(product._id)}
+                />
               ))}
             </div>
           )}
@@ -541,10 +580,7 @@ function CustomerHome() {
                     <ProductCard 
                       key={product._id} 
                       product={product}
-                      onBuyClick={() => {
-                        const url = `/landing/${product._id}${affiliateCode ? `?ref=${affiliateCode}` : ''}`;
-                        navigate(url);
-                      }}
+                      onBuyClick={() => handleProductClick(product._id)}
                     />
                   ))}
                 </div>
