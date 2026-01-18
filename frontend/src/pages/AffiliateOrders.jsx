@@ -32,6 +32,12 @@ export default function AffiliateOrders() {
     }
   };
 
+  const formatPrice = (price) => {
+    // تدوير السعر إلى أقرب 10 دج
+    const rounded = Math.ceil(price / 10) * 10;
+    return rounded.toLocaleString('fr-DZ');
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -164,7 +170,7 @@ export default function AffiliateOrders() {
                     <div className="flex flex-wrap gap-4 sm:gap-6">
                       <div>
                         <p className="text-xs text-gray-500 mb-1">سعر البيع</p>
-                        <p className="font-semibold text-gray-900 text-sm sm:text-base">{order.pricing.sellingPrice} دج</p>
+                        <p className="font-semibold text-gray-900 text-sm sm:text-base">{formatPrice(order.pricing.sellingPrice)} دج</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-500 mb-1">التوصيل</p>
@@ -172,11 +178,11 @@ export default function AffiliateOrders() {
                       </div>
                       <div>
                         <p className="text-xs text-gray-500 mb-1">الإجمالي</p>
-                        <p className="font-semibold text-blue-600 text-sm sm:text-base">{(order.pricing.sellingPrice || 0) + (order.deliveryFee || 0)} دج</p>
+                        <p className="font-semibold text-blue-600 text-sm sm:text-base">{formatPrice((order.pricing.sellingPrice || 0) + (order.deliveryFee || 0))} دج</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-500 mb-1">ربحك</p>
-                        <p className="font-bold text-green-600 text-sm sm:text-base">{order.pricing.affiliateProfit} دج</p>
+                        <p className="font-bold text-green-600 text-sm sm:text-base">{(order.pricing.affiliateProfit || 0).toLocaleString('fr-DZ')} دج</p>
                       </div>
                     </div>
                     {order.notes && (

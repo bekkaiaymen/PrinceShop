@@ -120,7 +120,7 @@ export default function AffiliateWithdrawals() {
             <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
             <h3 className="text-xs sm:text-sm text-gray-600">رصيد متاح</h3>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold text-green-700">{availableBalance} دج</p>
+          <p className="text-2xl sm:text-3xl font-bold text-green-700">{availableBalance.toLocaleString('fr-DZ')} دج</p>
           <p className="text-xs text-gray-500 mt-1 sm:mt-2">يمكنك سحبه الآن</p>
         </div>
 
@@ -129,7 +129,7 @@ export default function AffiliateWithdrawals() {
             <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
             <h3 className="text-xs sm:text-sm text-gray-600">رصيد معلق</h3>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold text-yellow-700">{user?.earnings?.pending || 0} دج</p>
+          <p className="text-2xl sm:text-3xl font-bold text-yellow-700">{(user?.earnings?.pending || 0).toLocaleString('fr-DZ')} دج</p>
           <p className="text-xs text-gray-500 mt-1 sm:mt-2">في انتظار التسليم</p>
         </div>
 
@@ -138,7 +138,7 @@ export default function AffiliateWithdrawals() {
             <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
             <h3 className="text-xs sm:text-sm text-gray-600">تم سحبه</h3>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold text-blue-700">{user?.earnings?.withdrawn || 0} دج</p>
+          <p className="text-2xl sm:text-3xl font-bold text-blue-700">{(user?.earnings?.withdrawn || 0).toLocaleString('fr-DZ')} دج</p>
           <p className="text-xs text-gray-500 mt-1 sm:mt-2">إجمالي ما سحبته</p>
         </div>
       </div>
@@ -308,7 +308,7 @@ export default function AffiliateWithdrawals() {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-2xl font-bold text-gray-900">
-                        {withdrawal.amount} دج
+                        {withdrawal.amount.toLocaleString('fr-DZ')} دج
                       </span>
                       <span className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${status.color}`}>
                         <StatusIcon className="w-4 h-4" />

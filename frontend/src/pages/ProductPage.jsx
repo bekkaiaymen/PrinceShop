@@ -28,11 +28,14 @@ function ProductPage() {
   };
 
   const copyProductInfo = () => {
+    const roundedPrice = Math.ceil(product.suggested_price / 10) * 10;
+    const priceIncrease = roundedPrice - product.suggested_price;
+    const actualProfit = product.affiliate_profit + priceIncrease;
     const text = `
 🔥 ${product.name}
 
-💰 السعر: ${product.suggested_price.toFixed(2)} دج
-🎁 عمولتك: ${product.affiliate_profit.toFixed(2)} دج
+💰 السعر: ${roundedPrice} دج
+🎁 عمولتك: ${actualProfit.toLocaleString('fr-DZ')} دج
 📦 SKU: ${product.sku}
 
 📲 للطلب والاستفسار تواصل معنا
@@ -44,7 +47,10 @@ function ProductPage() {
   };
 
   const shareOnWhatsApp = () => {
-    const text = `🔥 ${product.name}\n\n💰 السعر: ${product.suggested_price.toFixed(2)} دج\n🎁 عمولتك: ${product.affiliate_profit.toFixed(2)} دج\n📦 SKU: ${product.sku}`;
+    const roundedPrice = Math.ceil(product.suggested_price / 10) * 10;
+    const priceIncrease = roundedPrice - product.suggested_price;
+    const actualProfit = product.affiliate_profit + priceIncrease;
+    const text = `🔥 ${product.name}\n\n💰 السعر: ${roundedPrice} دج\n🎁 عمولتك: ${actualProfit.toLocaleString('fr-DZ')} دج\n📦 SKU: ${product.sku}`;
     const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };
@@ -145,7 +151,7 @@ function ProductPage() {
                       <Package size={22} />
                       السعر المقترح
                     </span>
-                    <span className="text-2xl font-bold text-indigo-600">{product.suggested_price.toFixed(2)} دج</span>
+                    <span className="text-2xl font-bold text-indigo-600">{Math.ceil(product.suggested_price / 10) * 10} دج</span>
                   </div>
 
                   <div className="flex items-center justify-between p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border-2 border-green-300 shadow-lg">
@@ -153,14 +159,23 @@ function ProductPage() {
                       <TrendingUp size={26} />
                       عمولتك (الربح)
                     </span>
-                    <span className="text-4xl font-extrabold text-green-600">+{product.affiliate_profit.toFixed(2)} دج</span>
+                    <span className="text-4xl font-extrabold text-green-600">+{(() => {
+                      const roundedPrice = Math.ceil(product.suggested_price / 10) * 10;
+                      const priceIncrease = roundedPrice - product.suggested_price;
+                      return (product.affiliate_profit + priceIncrease).toLocaleString('fr-DZ');
+                    })()} دج</span>
                   </div>
                 </div>
 
                 {/* Profit Percentage */}
                 <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-5 rounded-xl text-center mb-6 shadow-lg">
                   <p className="text-xl font-extrabold">
-                    🎯 نسبة الربح: {((product.affiliate_profit / product.wholesale_price) * 100).toFixed(1)}%
+                    🎯 نسبة الربح: {(() => {
+                      const roundedPrice = Math.ceil(product.suggested_price / 10) * 10;
+                      const priceIncrease = roundedPrice - product.suggested_price;
+                      const actualProfit = product.affiliate_profit + priceIncrease;
+                      return ((actualProfit / product.wholesale_price) * 100).toFixed(1);
+                    })()}%
                   </p>
                 </div>
               </div>

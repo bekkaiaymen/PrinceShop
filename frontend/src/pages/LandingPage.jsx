@@ -695,7 +695,7 @@ function LandingPage() {
                 
                 // رسالة للموقع الجديد إذا كان قريباً واختار مساءً
                 if (isNearNew && formData.deliveryTime === 'evening' && !isNearOld) {
-                  const productPrice = product?.customerPrice || product?.suggested_price || 0;
+                  const productPrice = formatPrice(product?.customerPrice || product?.suggested_price || 0);
                   const productTotal = productPrice * formData.quantity;
                   const morningFee = getNearbyDeliveryFee(productTotal);
                   const savedAmount = DELIVERY_FEE - morningFee;
@@ -997,15 +997,16 @@ function LandingPage() {
                     
                     let deliveryFee = DELIVERY_FEE;
                     let hasDiscount = false;
-                    
+                    const prodPrice = formatPrice(product.customerPrice || product.suggested_price || 0);
+
                     // الأولوية للموقع القديم
                     if (isNearOld) {
-                      deliveryFee = getNearbyDeliveryFee(productTotal);
+                      deliveryFee = getNearbyDeliveryFee(prodPrice);
                       hasDiscount = true;
                     }
                     // إذا لم يكن قريباً من القديم، نتحقق من الجديد
                     else if (isNearNew && isMorning) {
-                      deliveryFee = getNearbyDeliveryFee(productTotal);
+                      deliveryFee = getNearbyDeliveryFee(prodPrice);
                       hasDiscount = true;
                     }
                     

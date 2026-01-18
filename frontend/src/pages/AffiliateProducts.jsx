@@ -204,8 +204,14 @@ export default function AffiliateProducts() {
   };
 
   const copyImageAndText = async (product) => {
+    // تدوير السعر في النص المنسوخ
+    const roundedPrice = Math.ceil(product.suggested_price / 10) * 10;
+    // حساب الربح الفعلي بناءً على السعر المدور
+    const priceIncrease = roundedPrice - product.suggested_price;
+    const actualProfit = product.affiliate_profit + priceIncrease;
+    
     // نسخ النص مع رابط الصورة (الطريقة الأسهل والأكثر توافقاً)
-    const productText = `🔥 ${product.name}\n\n💰 السعر: ${product.suggested_price} دج\n📦 توصيل مجاني في غرداية 🏜️\n💵 ربحك: ${product.affiliate_profit} دج\n\n📷 صورة المنتج:\n${product.image}\n\n🛒 اطلب الآن:\n${product.affiliateLink}`;
+    const productText = `🔥 ${product.name}\n\n💰 السعر: ${roundedPrice} دج\n📦 توصيل مجاني في غرداية 🏜️\n💵 ربحك: ${actualProfit.toLocaleString('fr-DZ')} دج\n\n📷 صورة المنتج:\n${product.image}\n\n🛒 اطلب الآن:\n${product.affiliateLink}`;
     
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -536,20 +542,33 @@ export default function AffiliateProducts() {
 
 // بطاقة المنتج
 function ProductCard({ product, copiedLink, copiedText, copiedImage, onCopyLink, onCopyText, onCopyAll }) {
+  // دالة لتدوير السعر
+  const formatPrice = (price) => {
+    const rounded = Math.ceil(price / 10) * 10;
+    return rounded.toLocaleString('fr-DZ');
+  };
+
+  // حساب الربح الفعلي بناءً على السعر المدور
+  const roundedPrice = Math.ceil(product.suggested_price / 10) * 10;
+  const priceIncrease = roundedPrice - product.suggested_price;
+  const actualProfit = product.affiliate_profit + priceIncrease;
+
   return (
     <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all overflow-hidden group border-2 border-gray-100 hover:border-blue-200">
       {/* Product Image */}
       <div className="relative h-48 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
         <img
-          src={product.image}
+          src={product.image || '/placeholder.png'}
           alt={product.name}
+          loading="lazy"
           className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300"
           onError={(e) => {
+            e.target.onerror = null;
             e.target.src = '/placeholder.png';
           }}
         />
         <div className="absolute top-2 right-2 bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
-          💰 ربح: {product.affiliate_profit} دج
+          💰 ربح: {actualProfit.toLocaleString('fr-DZ')} دج
         </div>
       </div>
 
@@ -562,11 +581,11 @@ function ProductCard({ product, copiedLink, copiedText, copiedImage, onCopyLink,
         <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
           <div>
             <p className="text-xs text-gray-500">سعر البيع</p>
-            <p className="text-xl font-bold text-blue-600">{product.suggested_price} دج</p>
+            <p className="text-xl font-bold text-blue-600">{formatPrice(product.suggested_price)} دج</p>
           </div>
           <div className="text-right">
             <p className="text-xs text-gray-500">ربحك</p>
-            <p className="text-xl font-bold text-green-600">{product.affiliate_profit} دج</p>
+            <p className="text-xl font-bold text-green-600">{actualProfit.toLocaleString('fr-DZ')} دج</p>
           </div>
         </div>
 

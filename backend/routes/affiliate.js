@@ -68,11 +68,14 @@ router.get('/products', async (req, res) => {
     console.log(`Found ${products.length} products for affiliate ${req.user.affiliateCode}`);
     
     // إضافة رابط التسويق لكل منتج (صفحة الهبوط)
-    const productsWithLinks = products.map(product => ({
-      ...product.toObject(),
-      affiliateLink: `${process.env.FRONTEND_URL}/landing/${product._id}?ref=${req.user.affiliateCode}`,
-      shareText: `🔥 ${product.name}\n💰 السعر: ${product.suggested_price} دج\n📦 توصيل مجاني في غرداية 🏜️\n\n🛒 اطلب الآن:\n${process.env.FRONTEND_URL}/landing/${product._id}?ref=${req.user.affiliateCode}`
-    }));
+    const productsWithLinks = products.map(product => {
+      const roundedPrice = Math.ceil(product.suggested_price / 10) * 10;
+      return {
+        ...product.toObject(),
+        affiliateLink: `${process.env.FRONTEND_URL}/landing/${product._id}?ref=${req.user.affiliateCode}`,
+        shareText: `🔥 ${product.name}\n💰 السعر: ${roundedPrice} دج\n📦 توصيل مجاني في غرداية 🏜️\n\n🛒 اطلب الآن:\n${process.env.FRONTEND_URL}/landing/${product._id}?ref=${req.user.affiliateCode}`
+      };
+    });
     
     res.json({
       success: true,

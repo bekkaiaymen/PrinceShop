@@ -53,7 +53,7 @@ export default function Dashboard() {
   const stats = [
     {
       title: 'إجمالي الأرباح',
-      value: `${user?.earnings?.total || 0} دج`,
+      value: `${(user?.earnings?.total || 0).toLocaleString('fr-DZ')} دج`,
       icon: DollarSign,
       color: 'bg-green-500',
       textColor: 'text-green-600',
@@ -61,7 +61,7 @@ export default function Dashboard() {
     },
     {
       title: 'رصيد متاح',
-      value: `${user?.earnings?.available || 0} دج`,
+      value: `${(user?.earnings?.available || 0).toLocaleString('fr-DZ')} دج`,
       icon: TrendingUp,
       color: 'bg-blue-500',
       textColor: 'text-blue-600',
@@ -69,7 +69,7 @@ export default function Dashboard() {
     },
     {
       title: 'رصيد معلق',
-      value: `${user?.earnings?.pending || 0} دج`,
+      value: `${(user?.earnings?.pending || 0).toLocaleString('fr-DZ')} دج`,
       icon: Clock,
       color: 'bg-yellow-500',
       textColor: 'text-yellow-600',
@@ -77,7 +77,7 @@ export default function Dashboard() {
     },
     {
       title: 'تم سحبه',
-      value: `${user?.earnings?.withdrawn || 0} دج`,
+      value: `${(user?.earnings?.withdrawn || 0).toLocaleString('fr-DZ')} دج`,
       icon: Activity,
       color: 'bg-purple-500',
       textColor: 'text-purple-600',

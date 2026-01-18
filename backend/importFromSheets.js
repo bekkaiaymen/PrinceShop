@@ -131,11 +131,15 @@ async function importProducts() {
       console.log(`[${index + 1}/${rows.length}] ${name.substring(0, 40)}...`);
       const image = await fetchImageForProduct(name, detectedCategory);
 
+      // Calculate affiliate profit: 75% of (Suggested Price - Wholesale Price)
+      const calculatedProfit = Math.round((Number(suggested_price) - Number(wholesale_price)) * 0.75);
+
       const product = new Product({
         name: name.trim(),
         wholesale_price: Number(wholesale_price) || 0,
         suggested_price: Number(suggested_price) || 0,
-        affiliate_profit: Number(affiliate_profit) || 0,
+        // Use calculated profit, fallback to sheet value or 0
+        affiliate_profit: calculatedProfit > 0 ? calculatedProfit : (Number(affiliate_profit) || 0),
         sku: sku.trim(),
         packaging: packaging || '',
         category: detectedCategory,
