@@ -322,7 +322,7 @@ function CustomerHome() {
           default:
             return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
         }
-      }).slice(0, 50)
+      }) // إزالة الحد الأقصى - عرض كل النتائج
     : null;
   
   // حساب عدد الفلاتر النشطة
