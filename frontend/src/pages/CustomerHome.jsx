@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Search, ShoppingCart, User, Menu, X, MapPin, Phone, ChevronDown } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, X, MapPin, Phone, ChevronDown, Sparkles } from 'lucide-react';
 import api from '../services/api';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { smartSearch } from '../utils/arabicSearch';
+import aiService from '../services/ai';
 
 // عدد المنتجات المعروضة مبدئياً لكل فئة
 const INITIAL_PRODUCTS_PER_CATEGORY = 8;
@@ -26,6 +27,8 @@ function CustomerHome() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [orderModalOpen, setOrderModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [useAI, setUseAI] = useState(true);
+  const [aiSearching, setAiSearching] = useState(false);
   
   // حالة عرض المزيد لكل فئة
   const [expandedCategories, setExpandedCategories] = useState({});
@@ -72,6 +75,29 @@ function CustomerHome() {
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  // البحث الذكي عند تغيير searchTerm
+  useEffect(() => {
+    const doSearch = async () => {
+      if (searchTerm && allProducts.length > 0) {
+        const results = await performSmartSearch(searchTerm, allProducts);
+        // تطبيق فلتر البحث على النتائج
+        setAllProducts(prevProducts => {
+          // حفظ النسخة الأصلية وتطبيق البحث
+          if (!window.originalProducts) {
+            window.originalProducts = [...prevProducts];
+          }
+          return results;
+        });
+      } else if (!searchTerm && window.originalProducts) {
+        // استعادة المنتجات الأصلية عند مسح البحث
+        setAllProducts([...window.originalProducts]);
+        window.originalProducts = null;
+      }
+    };
+    
+    doSearch();
+  }, [searchTerm, useAI]);
 
   // فتح المنتج تلقائياً إذا كان في الرابط
   useEffect(() => {
@@ -210,16 +236,27 @@ function CustomerHome() {
     'لاسلكي': ['SANS FIL', 'WIRELESS']
   };
 
-  // دالة البحث الذكي
-  const smartSearch = (products, searchQuery) => {
-    if (!searchQuery || searchQuery.trim() === '') return products;
+  // دالة البحث الذكي مع AI
+  const performSmartSearch = async (query, products) => {
+    if (!query) return products;
     
-    const query = searchQuery.toLowerCase().trim();
+    if (useAI) {
+      try {
+        setAiSearching(true);
+        const results = await aiService.searchProducts(query, products);
+        setAiSearching(false);
+        return results;
+      } catch (error) {
+        console.error('AI search failed, using fallback:', error);
+        setAiSearching(false);
+      }
+    }
     
-    // جمع كل الكلمات المترجمة
+    // البحث العادي (احتياطي)
+    const lowerQuery = query.toLowerCase().trim();
     const translatedKeywords = [];
     Object.keys(translationDict).forEach(arabicWord => {
-      if (query.includes(arabicWord)) {
+      if (lowerQuery.includes(arabicWord)) {
         translatedKeywords.push(...translationDict[arabicWord]);
       }
     });
@@ -228,12 +265,10 @@ function CustomerHome() {
       const productName = (p.name || '').toLowerCase();
       const productSku = (p.sku || '').toLowerCase();
       
-      // البحث بالعربية المباشر
-      if (productName.includes(query) || productSku.includes(query)) {
+      if (productName.includes(lowerQuery) || productSku.includes(lowerQuery)) {
         return true;
       }
       
-      // البحث بالكلمات المترجمة
       if (translatedKeywords.some(keyword => 
         productName.toUpperCase().includes(keyword.toUpperCase())
       )) {
@@ -246,13 +281,9 @@ function CustomerHome() {
 
   const filteredProducts = searchTerm || selectedCategory !== 'الكل' || minPrice !== '' || maxPrice !== '' || exactPrice !== ''
     ? allProducts.filter(p => {
-        // فلتر البحث الذكي بالعربية
+        // فلتر البحث الذكي بالعربية (سيتم تطبيقه لاحقاً مع AI)
         let matchSearch = true;
-        if (searchTerm) {
-          // استخدام البحث الذكي
-          const searchResults = smartSearch([p], searchTerm);
-          matchSearch = searchResults.length > 0;
-        }
+        // تطبيق باقي الفلاتر (الفئة، السعر)
         
         // فلتر الفئة
         let matchCategory = selectedCategory === 'الكل';
@@ -435,16 +466,31 @@ function CustomerHome() {
             </a>
           </div>
           
-          {/* Search Box */}
+          {/* Search Box with AI */}
           <div className="max-w-2xl mx-auto relative mb-6">
             <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="ابحث عن منتجك المفضل..."
+              placeholder={useAI ? "ابحث بذكاء باللغة العربية... (AI مفعل 🤖)" : "ابحث عن منتجك المفضل..."}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pr-12 pl-4 py-4 sm:py-5 border-0 rounded-2xl focus:ring-4 focus:ring-white/30 text-base sm:text-lg shadow-2xl text-gray-800"
+              className="w-full pr-12 pl-24 py-4 sm:py-5 border-0 rounded-2xl focus:ring-4 focus:ring-white/30 text-base sm:text-lg shadow-2xl text-gray-800"
             />
+            {aiSearching && (
+              <div className="absolute left-16 top-1/2 transform -translate-y-1/2 flex items-center gap-2 bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">
+                <Sparkles className="w-4 h-4 animate-pulse" />
+                <span>AI يبحث...</span>
+              </div>
+            )}
+            <button
+              onClick={() => setUseAI(!useAI)}
+              className={`absolute left-4 top-1/2 transform -translate-y-1/2 p-2 rounded-lg transition-all ${
+                useAI ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-100 text-gray-400'
+              }`}
+              title={useAI ? 'AI مفعل' : 'AI معطل'}
+            >
+              <Sparkles className="w-5 h-5" />
+            </button>
           </div>
 
           {/* Filter Toggle Button */}

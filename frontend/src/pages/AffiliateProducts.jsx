@@ -16,6 +16,8 @@ export default function AffiliateProducts() {
   const [searchTerm, setSearchTerm] = useState('');
   const [aiSearching, setAiSearching] = useState(false);
   const [useAI, setUseAI] = useState(true);
+  const [aiSuggestions, setAiSuggestions] = useState(null);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('الكل');
   const [minProfit, setMinProfit] = useState('');
   const [maxProfit, setMaxProfit] = useState('');
@@ -39,6 +41,26 @@ export default function AffiliateProducts() {
   useEffect(() => {
     loadProducts();
   }, []);
+
+  // تحميل اقتراحات AI عند تحميل المنتجات
+  useEffect(() => {
+    if (allProducts.length > 0) {
+      loadAISuggestions();
+    }
+  }, [allProducts]);
+
+  const loadAISuggestions = async () => {
+    try {
+      setLoadingSuggestions(true);
+      const userEarnings = 0; // يمكن تمرير الأرباح الحقيقية من السياق
+      const suggestions = await aiService.suggestProducts(allProducts, userEarnings);
+      setAiSuggestions(suggestions);
+    } catch (error) {
+      console.error('Error loading AI suggestions:', error);
+    } finally {
+      setLoadingSuggestions(false);
+    }
+  };
 
   // البحث الذكي عند تغيير searchTerm
   useEffect(() => {
@@ -454,6 +476,38 @@ export default function AffiliateProducts() {
           </button>
         </div>
       </div>
+
+      {/* AI Suggestions Card */}
+      {(aiSuggestions || loadingSuggestions) && (
+        <div className="bg-gradient-to-r from-purple-50 via-pink-50 to-yellow-50 rounded-2xl shadow-xl p-6 border-2 border-purple-200">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="bg-gradient-to-r from-purple-400 to-pink-400 p-3 rounded-xl">
+                <Sparkles className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">اقتراحات AI للمنتجات 🎯</h3>
+                <p className="text-sm text-gray-600">منتجات مختارة بعناية لزيادة أرباحك</p>
+              </div>
+            </div>
+          </div>
+          
+          {loadingSuggestions ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="flex items-center gap-3">
+                <Sparkles className="w-6 h-6 text-purple-600 animate-pulse" />
+                <p className="text-gray-600">AI يختار أفضل المنتجات لك...</p>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white/70 backdrop-blur-sm rounded-xl p-5 border border-purple-200">
+              <p className="text-gray-800 leading-relaxed whitespace-pre-line">
+                {aiSuggestions}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Filters */}
       {showFilters && (

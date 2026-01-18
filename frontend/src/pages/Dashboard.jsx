@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import { affiliate } from '../services/api';
-import { TrendingUp, ShoppingBag, Clock, XCircle, DollarSign, Activity, Copy, Check, Link } from 'lucide-react';
+import { TrendingUp, ShoppingBag, Clock, XCircle, DollarSign, Activity, Copy, Check, Link, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import aiService from '../services/ai';
 
 export default function Dashboard() {
   const { user, updateUser } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copiedCode, setCopiedCode] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState(null);
+  const [loadingAI, setLoadingAI] = useState(false);
 
   useEffect(() => {
     loadDashboard();
@@ -25,10 +28,38 @@ export default function Dashboard() {
           earnings: response.data.earnings
         });
       }
+      
+      // تحليل AI للأرباح
+      if (response.data.earnings && response.data.stats) {
+        loadAIAnalysis(response.data.earnings, response.data.stats);
+      }
     } catch (error) {
       console.error('Error loading dashboard:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadAIAnalysis = async (earnings, stats) => {
+    try {
+      setLoadingAI(true);
+      const conversionRate = stats.total > 0 ? ((stats.delivered / stats.total) * 100).toFixed(1) : 0;
+      const analysis = await aiService.analyzeEarnings({
+        total: earnings.total,
+        available: earnings.available,
+        pending: earnings.pending,
+        withdrawn: earnings.withdrawn,
+        orders: {
+          total: stats.total,
+          delivered: stats.delivered
+        },
+        conversionRate
+      });
+      setAiAnalysis(analysis);
+    } catch (error) {
+      console.error('Error loading AI analysis:', error);
+    } finally {
+      setLoadingAI(false);
     }
   };
 
@@ -188,6 +219,38 @@ export default function Dashboard() {
           </div>
         ))}
       </div>
+
+      {/* AI Analysis Card */}
+      {(aiAnalysis || loadingAI) && (
+        <div className="bg-gradient-to-r from-yellow-50 via-orange-50 to-pink-50 rounded-2xl shadow-xl p-6 border-2 border-yellow-200">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="bg-gradient-to-r from-yellow-400 to-orange-400 p-3 rounded-xl">
+                <Sparkles className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">تحليل AI للأرباح 🤖</h3>
+                <p className="text-sm text-gray-600">نصائح ذكية لزيادة أرباحك</p>
+              </div>
+            </div>
+          </div>
+          
+          {loadingAI ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="flex items-center gap-3">
+                <Sparkles className="w-6 h-6 text-yellow-600 animate-pulse" />
+                <p className="text-gray-600">AI يحلل بياناتك...</p>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white/70 backdrop-blur-sm rounded-xl p-5 border border-yellow-200">
+              <p className="text-gray-800 leading-relaxed whitespace-pre-line">
+                {aiAnalysis}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Earnings Explanation */}
       <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-6">
