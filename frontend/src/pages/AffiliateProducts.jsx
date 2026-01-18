@@ -72,6 +72,8 @@ export default function AffiliateProducts() {
         console.log('🤖 AI مفعّل؟', useAI);
         
         try {
+          // مسح الـ cache لضمان نتائج جديدة
+          aiService.clearCache();
           const results = await performSmartSearch(searchTerm, allProducts);
           console.log('📊 النتائج:', results.length, 'من أصل', allProducts.length);
           setFilteredProducts(results);
