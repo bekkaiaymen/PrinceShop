@@ -37,16 +37,33 @@ self.addEventListener('activate', (event) => {
 
 // استراتيجية Network First مع Cache Fallback
 self.addEventListener('fetch', (event) => {
+  // تجاهل الطلبات غير المدعومة
+  const url = new URL(event.request.url);
+  
+  // فقط HTTP/HTTPS
+  if (!url.protocol.startsWith('http')) {
+    return;
+  }
+  
+  // فقط GET requests
+  if (event.request.method !== 'GET') {
+    return;
+  }
+  
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // استنساخ الاستجابة
-        const responseToCache = response.clone();
-        
-        caches.open(CACHE_NAME)
-          .then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
+        // استنساخ الاستجابة فقط للنجاح
+        if (response && response.status === 200) {
+          const responseToCache = response.clone();
+          
+          caches.open(CACHE_NAME)
+            .then((cache) => {
+              cache.put(event.request, responseToCache).catch(() => {
+                // تجاهل أخطاء التخزين
+              });
+            });
+        }
         
         return response;
       })
