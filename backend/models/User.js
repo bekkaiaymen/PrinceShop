@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    unique: true,
+    // unique: true,  // تم إزالة unique لأنه اختياري ويسبب مشكلة null duplicate
     sparse: true,
     lowercase: true,
     trim: true
