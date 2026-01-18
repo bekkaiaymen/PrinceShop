@@ -29,6 +29,7 @@ function CustomerHome() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [useAI, setUseAI] = useState(true);
   const [aiSearching, setAiSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
   
   // حالة عرض المزيد لكل فئة
   const [expandedCategories, setExpandedCategories] = useState({});
@@ -80,24 +81,17 @@ function CustomerHome() {
   useEffect(() => {
     const doSearch = async () => {
       if (searchTerm && allProducts.length > 0) {
+        setAiSearching(true);
         const results = await performSmartSearch(searchTerm, allProducts);
-        // تطبيق فلتر البحث على النتائج
-        setAllProducts(prevProducts => {
-          // حفظ النسخة الأصلية وتطبيق البحث
-          if (!window.originalProducts) {
-            window.originalProducts = [...prevProducts];
-          }
-          return results;
-        });
-      } else if (!searchTerm && window.originalProducts) {
-        // استعادة المنتجات الأصلية عند مسح البحث
-        setAllProducts([...window.originalProducts]);
-        window.originalProducts = null;
+        setSearchResults(results);
+        setAiSearching(false);
+      } else {
+        setSearchResults([]);
       }
     };
     
     doSearch();
-  }, [searchTerm, useAI]);
+  }, [searchTerm, useAI, allProducts]);
 
   // فتح المنتج تلقائياً إذا كان في الرابط
   useEffect(() => {
@@ -280,10 +274,9 @@ function CustomerHome() {
   };
 
   const filteredProducts = searchTerm || selectedCategory !== 'الكل' || minPrice !== '' || maxPrice !== '' || exactPrice !== ''
-    ? allProducts.filter(p => {
-        // فلتر البحث الذكي بالعربية (سيتم تطبيقه لاحقاً مع AI)
-        let matchSearch = true;
-        // تطبيق باقي الفلاتر (الفئة، السعر)
+    ? (searchTerm ? searchResults : allProducts).filter(p => {
+        // البحث الذكي تم تطبيقه بالفعل في searchResults
+        // هنا نطبق فقط فلاتر الفئة والسعر
         
         // فلتر الفئة
         let matchCategory = selectedCategory === 'الكل';
@@ -310,7 +303,7 @@ function CustomerHome() {
           matchPrice = price >= min && price <= max;
         }
         
-        return matchSearch && matchCategory && matchPrice;
+        return matchCategory && matchPrice;
       }).sort((a, b) => {
         // ترتيب النتائج
         const priceA = a.customerPrice || a.suggested_price || 0;
