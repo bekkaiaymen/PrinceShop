@@ -527,6 +527,7 @@ function LandingPage() {
       // Meta Pixel - Purchase Event
       if (window.fbq) {
         console.log('✅ Facebook Pixel is Active - Firing Purchase Event');
+        alert('🎉 تم إرسال البيكسل لفيسبوك! تحقق الآن.'); // تنبيه مرئي للمستخدم
         window.fbq('track', 'Purchase', {
           value: productTotal,
           currency: 'DZD',
@@ -537,6 +538,7 @@ function LandingPage() {
         });
       } else {
         console.warn('⚠️ Facebook Pixel (fbq) is NOT defined. AdBlock might be active.');
+        alert('❌ البيكسل لا يعمل! يبدو أن AdBlock يمنعه.');
       }
 
       setSuccess(true);
