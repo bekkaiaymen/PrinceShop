@@ -10,6 +10,7 @@ import Owner from './models/Owner.js';
 import authRoutes from './routes/auth.js';
 import affiliateRoutes from './routes/affiliate.js';
 import adminRoutes from './routes/admin.js';
+import { protect, adminOnly } from './middleware/auth.js';
 import jwt from 'jsonwebtoken';
 
 dotenv.config();
@@ -193,7 +194,7 @@ app.post('/api/orders', async (req, res) => {
 });
 
 // جلب جميع الطلبات (للداشبورد)
-app.get('/api/orders', async (req, res) => {
+app.get('/api/orders', protect, adminOnly, async (req, res) => {
   try {
     const { status, page = 1, limit = 50 } = req.query;
     
@@ -224,7 +225,7 @@ app.get('/api/orders', async (req, res) => {
 });
 
 // تحديث حالة الطلب
-app.patch('/api/orders/:id', async (req, res) => {
+app.patch('/api/orders/:id', protect, adminOnly, async (req, res) => {
   try {
     const { status } = req.body;
     

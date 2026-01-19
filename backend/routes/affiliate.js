@@ -1,6 +1,7 @@
 import express from 'express';
 import User from '../models/User.js';
 import Order from '../models/Order.js';
+import CustomerOrder from '../models/CustomerOrder.js';
 import Product from '../models/Product.js';
 import Withdrawal from '../models/Withdrawal.js';
 import { protect, affiliateOnly } from '../middleware/auth.js';
@@ -18,13 +19,13 @@ router.get('/dashboard', async (req, res) => {
     console.log(`📊 Dashboard requested by: ${affiliate.name} (ID: ${affiliate._id}, Code: ${affiliate.affiliateCode})`);
     
     // عدد الطلبات حسب الحالة - فقط للمسوق الحالي
-    const orderStats = await Order.aggregate([
+    const orderStats = await CustomerOrder.aggregate([
       { $match: { affiliate: affiliate._id } },
       { 
         $group: {
           _id: '$status',
           count: { $sum: 1 },
-          totalProfit: { $sum: '$pricing.affiliateProfit' }
+          totalProfit: { $sum: '$affiliateProfit' }
         }
       }
     ]);
@@ -104,13 +105,19 @@ router.get('/orders', async (req, res) => {
       query.status = status;
     }
     
-    const orders = await Order.find(query)
-      .populate('product.productId', 'name image')
+    // Check if we are querying the correct collection
+    // CustomerOrder = orders from customers
+    // Order = (maybe this is deprecated or admin order?)
+    // Let's assume we need to pull from CustomerOrder which has affiliate linking too
+    
+    const orders = await CustomerOrder.find(query)
+      .populate('product', 'name image')
+      // .populate('product.productId', 'name image') // Old population logic
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
     
-    const total = await Order.countDocuments(query);
+    const total = await CustomerOrder.countDocuments(query);
     
     res.json({
       success: true,
