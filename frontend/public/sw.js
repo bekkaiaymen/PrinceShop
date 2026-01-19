@@ -1,30 +1,38 @@
-// Service Worker للـ PWA
-const CACHE_NAME = 'prince-shop-v1';
-const urlsToCache = [
-  '/',
-  '/index.html',
+// Service Worker للـ PWA - مع التحديث التلقائي
+const CACHE_VERSION = 'v' + Date.now(); // نسخة ديناميكية
+const CACHE_NAME = 'prince-shop-' + CACHE_VERSION;
+const STATIC_CACHE = 'prince-shop-static-v1';
+
+// قائمة الملفات الثابتة
+const staticAssets = [
   '/assets/logo.png'
 ];
 
 // تثبيت Service Worker
 self.addEventListener('install', (event) => {
+  console.log('🔄 Installing new Service Worker:', CACHE_NAME);
   event.waitUntil(
-    caches.open(CACHE_NAME)
+    caches.open(STATIC_CACHE)
       .then((cache) => {
-        console.log('✅ Cache opened');
-        return cache.addAll(urlsToCache);
+        console.log('✅ Caching static assets');
+        return cache.addAll(staticAssets).catch(err => {
+          console.warn('⚠️ Failed to cache some assets:', err);
+        });
       })
   );
+  // تجاوز فترة الانتظار وتفعيل فوري
   self.skipWaiting();
 });
 
 // تفعيل Service Worker
 self.addEventListener('activate', (event) => {
+  console.log('✅ Activating new Service Worker:', CACHE_NAME);
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
+          // حذف جميع الكاشات القديمة ما عدا الثابتة
+          if (cacheName !== CACHE_NAME && cacheName !== STATIC_CACHE) {
             console.log('🗑️ Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
@@ -32,15 +40,15 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
-  self.clients.claim();
+  // السيطرة على جميع الصفحات فوراً
+  return self.clients.claim();
 });
 
-// استراتيجية Network First مع Cache Fallback
+// استراتيجية Network First - دائماً جلب الأحدث من الشبكة
 self.addEventListener('fetch', (event) => {
-  // تجاهل الطلبات غير المدعومة
   const url = new URL(event.request.url);
   
-  // فقط HTTP/HTTPS
+  // تجاهل الطلبات غير HTTP/HTTPS
   if (!url.protocol.startsWith('http')) {
     return;
   }
@@ -50,39 +58,47 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // استراتيجية Network First: جرب الشبكة أولاً، ثم Cache
   event.respondWith(
-    caches.match(event.request)
-      .then((cachedResponse) => {
-        // إذا موجود في cache، أرجعه مباشرة
-        if (cachedResponse) {
-          return cachedResponse;
+    fetch(event.request)
+      .then((response) => {
+        // تحقق من صحة الاستجابة
+        if (!response || response.status !== 200 || response.type === 'error') {
+          // إذا فشلت، جرب Cache
+          return caches.match(event.request).then(cached => cached || response);
         }
 
-        // إن لم يكن، اجلبه من الشبكة
-        return fetch(event.request)
-          .then((response) => {
-            // تحقق من صحة الاستجابة
-            if (!response || response.status !== 200 || response.type === 'error') {
-              return response;
-            }
-
-            // استنساخ الاستجابة
-            const responseToCache = response.clone();
-            
-            // حفظ في cache
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache).catch(() => {
-                  // تجاهل أخطاء التخزين
-                });
-              });
-            
-            return response;
-          })
-          .catch(() => {
-            // في حالة الفشل، لا تفعل شيء (دع المتصفح يتعامل معه)
-            return new Response('', { status: 404, statusText: 'Not Found' });
+        // استنساخ الاستجابة للتخزين
+        const responseToCache = response.clone();
+        
+        // تخزين الملفات الثابتة فقط (images, fonts, etc)
+        if (url.pathname.match(/\.(png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot|ico)$/)) {
+          caches.open(STATIC_CACHE).then(cache => {
+            cache.put(event.request, responseToCache).catch(() => {});
           });
+        }
+        
+        return response;
+      })
+      .catch(() => {
+        // في حالة فشل الشبكة، استخدم Cache
+        return caches.match(event.request).then(cached => {
+          if (cached) {
+            return cached;
+          }
+          // رد افتراضي للصفحات HTML
+          if (event.request.headers.get('accept').includes('text/html')) {
+            return caches.match('/index.html');
+          }
+          return new Response('', { status: 404, statusText: 'Not Found' });
+        });
       })
   );
+});
+
+// رسالة للعميل عند وجود تحديث
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });

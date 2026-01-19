@@ -26,12 +26,46 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     
-    <!-- PWA Service Worker Registration -->
+    <!-- PWA Service Worker Registration with Auto-Update -->
     <script>
       if ('serviceWorker' in navigator) {
+        let refreshing = false;
+        
+        // إعادة تحميل الصفحة عند التحديث
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (refreshing) return;
+          refreshing = true;
+          console.log('🔄 New version available - reloading...');
+          window.location.reload();
+        });
+        
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js')
-            .then(registration => console.log('✅ SW registered:', registration.scope))
+            .then(registration => {
+              console.log('✅ SW registered:', registration.scope);
+              
+              // فحص التحديثات كل 60 ثانية
+              setInterval(() => {
+                registration.update();
+              }, 60000);
+              
+              // فحص فوري عند التحميل
+              registration.update();
+              
+              // الاستماع للتحديثات
+              registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                console.log('🔄 Update found - installing...');
+                
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    // يوجد تحديث جديد
+                    console.log('✅ New version installed - activating...');
+                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                  }
+                });
+              });
+            })
             .catch(err => console.log('❌ SW registration failed:', err));
         });
       }
