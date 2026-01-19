@@ -229,6 +229,7 @@ app.patch('/api/orders/:id', async (req, res) => {
   // Check auth manually or use middleware flexibly to allow both Token types (User/Affiliate) and OwnerToken
   
   let isAuthorized = false;
+  let authSource = 'none';
 
   // 1. Check Standard Token (Admin)
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -236,13 +237,16 @@ app.patch('/api/orders/:id', async (req, res) => {
     try {
         // Try verifying as User/Admin
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        console.log('🔐 Token decoded:', decoded);
+        
         const user = await User.findById(decoded.id);
         if (user && (user.role === 'admin' || user.isAdmin)) {
             isAuthorized = true;
+            authSource = 'admin';
+            console.log('✅ Authorized as Admin:', user.name);
         }
     } catch (e) {
-        // Token might be valid but not for User, or invalid. 
-        // We will check OwnerToken next.
+        console.log('⚠️ Admin token verification failed:', e.message);
     }
   }
 
@@ -251,20 +255,35 @@ app.patch('/api/orders/:id', async (req, res) => {
       const token = req.headers.authorization.split(' ')[1];
       try {
            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+           console.log('🔐 Trying Owner token, decoded:', decoded);
+           
            // Owner token payload uses 'ownerId', while User token uses 'id'
-           const ownerId = decoded.ownerId || decoded.id;
+           const ownerId = decoded.ownerId;
+           console.log('👤 Looking for Owner with ID:', ownerId);
+           
            if (ownerId) {
              const owner = await Owner.findById(ownerId);
-             if (owner) isAuthorized = true;
+             if (owner) {
+               isAuthorized = true;
+               authSource = 'owner';
+               console.log('✅ Authorized as Owner:', owner.username);
+             } else {
+               console.log('❌ Owner not found in database');
+             }
+           } else {
+             console.log('❌ No ownerId in token payload');
            }
       } catch (e) {
-         // Invalid token
+         console.log('⚠️ Owner token verification failed:', e.message);
       }
   }
 
   if (!isAuthorized) {
-       return res.status(401).json({ message: 'Not authorized to update orders' });
+       console.log('❌ Authorization failed - returning 401');
+       return res.status(401).json({ message: 'Not authorized to update orders', authSource });
   }
+
+  console.log(`✅ Order update authorized via ${authSource}`);
 
   try {
     const { status } = req.body;
