@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { affiliate } from '../services/api';
-import { Copy, Check, Share2, Package, Image as ImageIcon, Download, FileText, Sparkles } from 'lucide-react';
+import { Copy, Check, Share2, Package, Image as ImageIcon, Download, FileText, Sparkles, ExternalLink } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import aiService from '../services/ai';
 import { smartSearch as arabicSearch } from '../utils/arabicSearch';
 
 export default function AffiliateProducts() {
+  const { user } = useAuth();
   const [allProducts, setAllProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -545,6 +547,48 @@ export default function AffiliateProducts() {
               )}
             </div>
             <p className="text-blue-100 mb-4">اختر منتج، انسخ رابطك الخاص، وابدأ الربح!</p>
+            
+            {/* رابط الصفحة الرئيسية للعملاء */}
+            <div className="mb-4 p-4 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
+              <div className="flex items-start gap-3">
+                <ExternalLink className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <h3 className="font-bold mb-1">🛍️ رابط المتجر الكامل</h3>
+                  <p className="text-sm text-blue-100 mb-2">
+                    شارك هذا الرابط مع عملائك لعرض جميع المنتجات في صفحة واحدة
+                  </p>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      readOnly
+                      value={`${window.location.origin}/?ref=${user?.affiliateCode}`}
+                      className="flex-1 px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-white font-mono text-sm"
+                    />
+                    <button
+                      onClick={() => {
+                        const shopLink = `${window.location.origin}/?ref=${user?.affiliateCode}`;
+                        navigator.clipboard.writeText(shopLink);
+                        setCopiedLink('shop');
+                        setTimeout(() => setCopiedLink(null), 2000);
+                      }}
+                      className="px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-semibold flex items-center gap-2"
+                    >
+                      {copiedLink === 'shop' ? (
+                        <>
+                          <Check className="w-4 h-4" />
+                          تم النسخ!
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          نسخ
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
             
             {/* إحصائيات الفلترة */}
             <div className="flex flex-wrap gap-3">
