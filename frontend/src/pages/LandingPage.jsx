@@ -48,6 +48,24 @@ function LandingPage() {
   const [mapLayer, setMapLayer] = useState('roadmap'); // 'roadmap' or 'satellite'
   const [isMapLoading, setIsMapLoading] = useState(false); // تعطيل loading مؤقتاً
   
+  // تفعيل البيكسل بالقوة عبر الرابط
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('force_pixel') === 'true') {
+      console.log('⚡ Force Pixel Activation Triggered');
+      if (window.fbq) {
+        window.fbq('track', 'Purchase', {
+          value: 1000,
+          currency: 'DZD',
+          content_name: 'Activation Test',
+          content_ids: ['TEST_ACTIVATE'],
+          content_type: 'product'
+        });
+        alert('🚀 تم إرسال حدث التنشيط لفيسبوك! \nارجع الآن لمدير الإعلانات وحدث الصفحة.');
+      }
+    }
+  }, []);
+
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markerRef = useRef(null);
