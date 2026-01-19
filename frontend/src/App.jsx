@@ -37,7 +37,7 @@ function App() {
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="products" element={<AffiliateProducts />} />
-            <Route path="orders" element={<AffiliateOrders />} />
+            <Route path="customer-orders" element={<AffiliateOrders />} />
             <Route path="withdrawals" element={<AffiliateWithdrawals />} />
             <Route path="profile" element={<AffiliateProfile />} />
           </Route>
