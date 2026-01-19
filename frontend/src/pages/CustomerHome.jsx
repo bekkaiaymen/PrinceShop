@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Search, ShoppingCart, User, Menu, X, MapPin, Phone, ChevronDown, Sparkles } from 'lucide-react';
 import api from '../services/api';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
@@ -94,7 +94,7 @@ function CustomerHome() {
     };
     
     doSearch();
-  }, [searchTerm, useAI, allProducts]);
+  }, [searchTerm, useAI, allProducts, performSmartSearch]);
 
   // فتح المنتج تلقائياً إذا كان في الرابط
   useEffect(() => {
@@ -234,7 +234,7 @@ function CustomerHome() {
   };
 
   // دالة البحث الذكي مع AI
-  const performSmartSearch = async (query, products) => {
+  const performSmartSearch = useCallback(async (query, products) => {
     if (!query) return products;
     
     if (useAI) {
@@ -274,7 +274,7 @@ function CustomerHome() {
       
       return false;
     });
-  };
+  }, [useAI]);
 
   const filteredProducts = searchTerm || selectedCategory !== 'الكل' || minPrice !== '' || maxPrice !== '' || exactPrice !== ''
     ? (searchTerm ? searchResults : allProducts).filter(p => {
