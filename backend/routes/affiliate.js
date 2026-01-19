@@ -15,7 +15,9 @@ router.get('/dashboard', async (req, res) => {
   try {
     const affiliate = req.user;
     
-    // عدد الطلبات حسب الحالة
+    console.log(`📊 Dashboard requested by: ${affiliate.name} (ID: ${affiliate._id}, Code: ${affiliate.affiliateCode})`);
+    
+    // عدد الطلبات حسب الحالة - فقط للمسوق الحالي
     const orderStats = await Order.aggregate([
       { $match: { affiliate: affiliate._id } },
       { 
@@ -26,6 +28,8 @@ router.get('/dashboard', async (req, res) => {
         }
       }
     ]);
+    
+    console.log(`📦 Orders for ${affiliate.affiliateCode}:`, orderStats);
     
     // تحويل النتائج لشكل أسهل
     const stats = {
@@ -43,6 +47,8 @@ router.get('/dashboard', async (req, res) => {
       stats.total += stat.count;
     });
     
+    console.log(`💰 Earnings for ${affiliate.affiliateCode}:`, affiliate.earnings);
+    
     res.json({
       success: true,
       data: {
@@ -54,6 +60,7 @@ router.get('/dashboard', async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('❌ Dashboard error:', error);
     res.status(400).json({ message: error.message });
   }
 });
