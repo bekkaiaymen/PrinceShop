@@ -19,6 +19,13 @@ export default function AffiliateOrders() {
 
   useEffect(() => {
     loadOrders();
+    
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      loadOrders();
+    }, 30000);
+    
+    return () => clearInterval(interval);
   }, [filter]);
 
   const loadOrders = async () => {

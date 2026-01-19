@@ -249,6 +249,18 @@ function CustomerHome() {
     }
   };
 
+  // Initial load and auto-refresh setup
+  useEffect(() => {
+    fetchProducts();
+    
+    // Auto-refresh every 60 seconds
+    const interval = setInterval(() => {
+      fetchProducts();
+    }, 60000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   // تصنيف المنتجات
   const categorizeProducts = () => {
     const categorized = {};

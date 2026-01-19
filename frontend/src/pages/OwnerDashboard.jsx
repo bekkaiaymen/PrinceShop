@@ -53,6 +53,18 @@ export default function OwnerDashboard() {
     }
     
     fetchStatistics();
+    
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      if (activeTab === 'orders') {
+        fetchOrders();
+      } else if (activeTab === 'withdrawals') {
+        fetchWithdrawals();
+      }
+      fetchStatistics();
+    }, 30000);
+    
+    return () => clearInterval(interval);
   }, [page, filters, activeTab, withdrawalFilter]);
 
   const fetchOrders = async () => {

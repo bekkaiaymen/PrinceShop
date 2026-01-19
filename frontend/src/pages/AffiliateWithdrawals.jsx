@@ -24,6 +24,14 @@ export default function AffiliateWithdrawals() {
   useEffect(() => {
     loadWithdrawals();
     loadUserData();
+    
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      loadWithdrawals();
+      loadUserData();
+    }, 30000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   const loadUserData = async () => {

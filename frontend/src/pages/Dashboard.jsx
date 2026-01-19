@@ -16,6 +16,13 @@ export default function Dashboard() {
 
   useEffect(() => {
     loadDashboard();
+    
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      loadDashboard();
+    }, 30000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   // PWA Install Prompt - يظهر للمسوقين على الجوال

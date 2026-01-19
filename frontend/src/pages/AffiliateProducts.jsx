@@ -42,6 +42,13 @@ export default function AffiliateProducts() {
 
   useEffect(() => {
     loadProducts();
+    
+    // Auto-refresh every 60 seconds (products don't change as frequently)
+    const interval = setInterval(() => {
+      loadProducts();
+    }, 60000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   // PWA Install Prompt
