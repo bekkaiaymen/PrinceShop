@@ -30,7 +30,6 @@ function CustomerHome() {
   const [useAI, setUseAI] = useState(true);
   const [aiSearching, setAiSearching] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
-  const [loadedImages, setLoadedImages] = useState(new Set());
   
   // حالة عرض المزيد لكل فئة
   const [expandedCategories, setExpandedCategories] = useState({});
@@ -818,6 +817,7 @@ function CustomerHome() {
 
 // بطاقة المنتج للعملاء (بدون معلومات الربح)
 function ProductCard({ product, onBuyClick }) {
+  const [loadedImages, setLoadedImages] = useState(new Set());
   // دالة لتدوير السعر إلى أقرب 10 دج (زيادة)
   const formatPrice = (price) => {
     return Math.ceil(price / 10) * 10;
