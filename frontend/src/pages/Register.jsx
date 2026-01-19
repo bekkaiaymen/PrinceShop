@@ -22,6 +22,14 @@ export default function Register() {
 
     try {
       await register(formData);
+
+      // Meta Pixel - CompleteRegistration Event
+      if (window.fbq) {
+        window.fbq('track', 'CompleteRegistration', {
+          content_name: 'Affiliate Registration'
+        });
+      }
+
       navigate('/dashboard');
     } catch (err) {
       console.error('Registration error:', err);

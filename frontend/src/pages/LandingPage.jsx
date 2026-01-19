@@ -475,6 +475,18 @@ function LandingPage() {
 
       await api.post('/orders', orderData);
       
+      // Meta Pixel - Purchase Event
+      if (window.fbq) {
+        window.fbq('track', 'Purchase', {
+          value: productTotal,
+          currency: 'DZD',
+          content_name: product.name,
+          content_ids: [product._id],
+          content_type: 'product',
+          num_items: formData.quantity
+        });
+      }
+
       setSuccess(true);
       
       // إعادة تعيين النموذج بعد 3 ثواني
