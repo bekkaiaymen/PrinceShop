@@ -6,6 +6,8 @@ function PixelTest() {
   const addLog = (msg) => {
     const time = new Date().toLocaleTimeString();
     setLogs(prev => [`[${time}] ${msg}`, ...prev]);
+    // Log to browser console as well so user can copy-paste to AI
+    console.log(`PIXEL_TEST: ${msg}`);
   };
 
   useEffect(() => {
