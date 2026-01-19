@@ -161,7 +161,7 @@ export default function OwnerDashboard() {
     try {
       const token = localStorage.getItem('ownerToken');
       await axios.patch(
-        `${API_URL}/orders/${orderId}`,
+        `${API_URL}/owner/orders/${orderId}`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );

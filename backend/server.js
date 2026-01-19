@@ -615,6 +615,87 @@ app.get('/api/owner/orders', async (req, res) => {
   }
 });
 
+// تحديث حالة الطلب - خاص بصاحب الموقع (Owner)
+app.patch('/api/owner/orders/:id', async (req, res) => {
+  try {
+    // Verify Owner token
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ error: 'Token مفقود' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const owner = await Owner.findById(decoded.ownerId);
+    
+    if (!owner) {
+      return res.status(401).json({ error: 'غير مصرح - Owner فقط' });
+    }
+
+    const { status } = req.body;
+    
+    // جلب الطلب القديم لمعرفة الحالة السابقة
+    const oldOrder = await CustomerOrder.findById(req.params.id);
+    if (!oldOrder) {
+      return res.status(404).json({ error: 'الطلب غير موجود' });
+    }
+    
+    const oldStatus = oldOrder.status;
+    const affiliateProfit = oldOrder.affiliateProfit || 0;
+    const affiliateId = oldOrder.affiliate;
+    
+    // تحديث الطلب
+    const order = await CustomerOrder.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    ).populate('product').populate('affiliate');
+    
+    console.log(`Order ${order._id} status changed: ${oldStatus} -> ${status}`);
+    
+    // إذا كان هناك مسوق وربح، تحديث أرباحه
+    if (affiliateId && affiliateProfit > 0) {
+      const affiliate = await User.findById(affiliateId);
+      
+      if (affiliate) {
+        console.log(`Updating earnings for affiliate ${affiliate.affiliateCode}`);
+        console.log(`Before: available=${affiliate.earnings.available}, pending=${affiliate.earnings.pending}, total=${affiliate.earnings.total}`);
+        
+        // الحالة الجديدة: delivered (نقل من معلق إلى متاح)
+        if (status === 'delivered' && oldStatus !== 'delivered') {
+          affiliate.earnings.pending = Math.max(0, affiliate.earnings.pending - affiliateProfit);
+          affiliate.earnings.available += affiliateProfit;
+          affiliate.earnings.total += affiliateProfit;
+          affiliate.stats.deliveredOrders += 1;
+          console.log(`Moved ${affiliateProfit} from pending to available (order delivered)`);
+        }
+        
+        // الحالة الجديدة: cancelled من حالة غير delivered
+        else if (status === 'cancelled' && oldStatus !== 'delivered') {
+          // إزالة من معلق
+          affiliate.earnings.pending = Math.max(0, affiliate.earnings.pending - affiliateProfit);
+          console.log(`Removed ${affiliateProfit} from pending (order cancelled)`);
+        }
+        
+        // إلغاء بعد التوصيل (نادر)
+        else if (status === 'cancelled' && oldStatus === 'delivered') {
+          affiliate.earnings.available = Math.max(0, affiliate.earnings.available - affiliateProfit);
+          affiliate.earnings.total = Math.max(0, affiliate.earnings.total - affiliateProfit);
+          affiliate.stats.deliveredOrders = Math.max(0, affiliate.stats.deliveredOrders - 1);
+          console.log(`Reversed delivery: removed ${affiliateProfit} from available (order cancelled after delivery)`);
+        }
+        
+        console.log(`After: available=${affiliate.earnings.available}, pending=${affiliate.earnings.pending}, total=${affiliate.earnings.total}`);
+        await affiliate.save();
+      }
+    }
+    
+    res.json({ success: true, order });
+  } catch (error) {
+    console.error('Error updating order:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // جلب إحصائيات صاحب الموقع
 app.get('/api/owner/statistics', async (req, res) => {
   try {
