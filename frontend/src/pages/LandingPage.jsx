@@ -492,6 +492,7 @@ function LandingPage() {
       
       // Meta Pixel - Purchase Event
       if (window.fbq) {
+        console.log('✅ Facebook Pixel is Active - Firing Purchase Event');
         window.fbq('track', 'Purchase', {
           value: productTotal,
           currency: 'DZD',
@@ -500,6 +501,8 @@ function LandingPage() {
           content_type: 'product',
           num_items: formData.quantity
         });
+      } else {
+        console.warn('⚠️ Facebook Pixel (fbq) is NOT defined. AdBlock might be active.');
       }
 
       setSuccess(true);
