@@ -534,86 +534,87 @@ export default function AffiliateProducts() {
       )}
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-lg p-6 text-white">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-3xl font-bold">منتجاتك للتسويق 🚀</h1>
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-lg p-4 sm:p-6 text-white">
+        <div className="space-y-4">
+          {/* Title Section */}
+          <div>
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">منتجاتك للتسويق 🚀</h1>
               {useAI && (
-                <div className="bg-gradient-to-r from-yellow-400 to-orange-400 px-3 py-1 rounded-full flex items-center gap-1 text-sm font-bold text-gray-900">
-                  <Sparkles className="w-4 h-4" />
+                <div className="bg-gradient-to-r from-yellow-400 to-orange-400 px-2 sm:px-3 py-1 rounded-full flex items-center gap-1 text-xs sm:text-sm font-bold text-gray-900">
+                  <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span>AI مفعل</span>
                 </div>
               )}
             </div>
-            <p className="text-blue-100 mb-4">اختر منتج، انسخ رابطك الخاص، وابدأ الربح!</p>
-            
-            {/* رابط الصفحة الرئيسية للعملاء */}
-            <div className="mb-4 p-4 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
-              <div className="flex items-start gap-3">
-                <ExternalLink className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <h3 className="font-bold mb-1">🛍️ رابط المتجر الكامل</h3>
-                  <p className="text-sm text-blue-100 mb-2">
-                    شارك هذا الرابط مع عملائك لعرض جميع المنتجات في صفحة واحدة
-                  </p>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      readOnly
-                      value={`${window.location.origin}/?ref=${user?.affiliateCode}`}
-                      className="flex-1 px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-white font-mono text-sm"
-                    />
-                    <button
-                      onClick={() => {
-                        const shopLink = `${window.location.origin}/?ref=${user?.affiliateCode}`;
-                        navigator.clipboard.writeText(shopLink);
-                        setCopiedLink('shop');
-                        setTimeout(() => setCopiedLink(null), 2000);
-                      }}
-                      className="px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-semibold flex items-center gap-2"
-                    >
-                      {copiedLink === 'shop' ? (
-                        <>
-                          <Check className="w-4 h-4" />
-                          تم النسخ!
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-4 h-4" />
-                          نسخ
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
+            <p className="text-sm sm:text-base text-blue-100">اختر منتج، انسخ رابطك الخاص، وابدأ الربح!</p>
+          </div>
+          
+          {/* رابط الصفحة الرئيسية للعملاء */}
+          <div className="p-3 sm:p-4 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
+            <div className="flex items-start gap-2 sm:gap-3 mb-3">
+              <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-sm sm:text-base mb-1">🛍️ رابط المتجر الكامل</h3>
+                <p className="text-xs sm:text-sm text-blue-100">
+                  شارك هذا الرابط مع عملائك لعرض جميع المنتجات
+                </p>
               </div>
             </div>
-            
-            {/* إحصائيات الفلترة */}
-            <div className="flex flex-wrap gap-3">
-              <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
-                <div className="text-xs text-blue-100">إجمالي المنتجات</div>
-                <div className="text-2xl font-bold">{allProducts.length}</div>
-              </div>
-              {activeFiltersCount > 0 && (
-                <div className="bg-green-500/30 backdrop-blur-sm rounded-lg px-4 py-2 border-2 border-green-300">
-                  <div className="text-xs text-green-100">نتائج الفلترة</div>
-                  <div className="text-2xl font-bold">{totalFilteredProducts}</div>
-                </div>
-              )}
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                type="text"
+                readOnly
+                value={`${window.location.origin}/?ref=${user?.affiliateCode}`}
+                className="flex-1 px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-white font-mono text-xs sm:text-sm min-w-0"
+              />
+              <button
+                onClick={() => {
+                  const shopLink = `${window.location.origin}/?ref=${user?.affiliateCode}`;
+                  navigator.clipboard.writeText(shopLink);
+                  setCopiedLink('shop');
+                  setTimeout(() => setCopiedLink(null), 2000);
+                }}
+                className="px-3 sm:px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-semibold flex items-center justify-center gap-2 text-sm sm:text-base whitespace-nowrap"
+              >
+                {copiedLink === 'shop' ? (
+                  <>
+                    <Check className="w-4 h-4" />
+                    <span>تم النسخ!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4" />
+                    <span>نسخ</span>
+                  </>
+                )}
+              </button>
             </div>
+          </div>
+          
+          {/* إحصائيات الفلترة */}
+          <div className="flex flex-wrap gap-2 sm:gap-3">
+            <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 sm:px-4 py-2">
+              <div className="text-xs text-blue-100">إجمالي المنتجات</div>
+              <div className="text-xl sm:text-2xl font-bold">{allProducts.length}</div>
+            </div>
+            {activeFiltersCount > 0 && (
+              <div className="bg-green-500/30 backdrop-blur-sm rounded-lg px-3 sm:px-4 py-2 border-2 border-green-300">
+                <div className="text-xs text-green-100">نتائج الفلترة</div>
+                <div className="text-xl sm:text-2xl font-bold">{totalFilteredProducts}</div>
+              </div>
+            )}
           </div>
           
           {/* زر التحكم بالفلاتر */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-xl px-4 py-2 transition-all flex items-center gap-2"
+            className="w-full sm:w-auto bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-xl px-3 sm:px-4 py-2 transition-all flex items-center justify-center gap-2 text-sm sm:text-base"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
             </svg>
-            {showFilters ? 'إخفاء الفلاتر' : 'إظهار الفلاتر'}
+            <span>{showFilters ? 'إخفاء الفلاتر' : 'إظهار الفلاتر'}</span>
           </button>
         </div>
       </div>
