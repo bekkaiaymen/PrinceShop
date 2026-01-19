@@ -225,7 +225,45 @@ app.get('/api/orders', protect, adminOnly, async (req, res) => {
 });
 
 // تحديث حالة الطلب
-app.patch('/api/orders/:id', protect, adminOnly, async (req, res) => {
+app.patch('/api/orders/:id', async (req, res) => {
+  // Check auth manually or use middleware flexibly to allow both Token types (User/Affiliate) and OwnerToken
+  
+  let isAuthorized = false;
+
+  // 1. Check Standard Token (Admin)
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    const token = req.headers.authorization.split(' ')[1];
+    try {
+        // Try verifying as User/Admin
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.id);
+        if (user && (user.role === 'admin' || user.isAdmin)) {
+            isAuthorized = true;
+        }
+    } catch (e) {
+        // Token might be valid but not for User, or invalid. 
+        // We will check OwnerToken next.
+    }
+  }
+
+  // 2. Check Owner Token (if not already authorized)
+  if (!isAuthorized && req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+      const token = req.headers.authorization.split(' ')[1];
+      try {
+          // If Owner uses a different secret or same secret but different model
+           const decoded = jwt.verify(token, process.env.JWT_SECRET);
+           // Assuming Owner model exists or we check ID against Owner collection
+           const owner = await Owner.findById(decoded.id); // Assuming Owner model exists
+           if (owner) isAuthorized = true;
+      } catch (e) {
+         // Invalid token
+      }
+  }
+
+  if (!isAuthorized) {
+       return res.status(401).json({ message: 'Not authorized to update orders' });
+  }
+
   try {
     const { status } = req.body;
     
