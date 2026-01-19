@@ -193,6 +193,9 @@ function LandingPage() {
     const maxAttempts = 50;
     
     const tryInit = () => {
+      // If map is already initialized, stop
+      if (mapInstanceRef.current) return;
+
       attempts++;
       console.log(`🔄 Attempt ${attempts} to initialize Google Maps...`);
       
@@ -206,7 +209,10 @@ function LandingPage() {
       }
     };
     
-    tryInit();
+    // Only try to init if we haven't already (prevents loop)
+    if (!mapInstanceRef.current) {
+      tryInit();
+    }
 
     return () => {
       if (mapInstanceRef.current) {
