@@ -223,6 +223,21 @@ function LandingPage() {
     fetchProduct();
   }, [productId]);
 
+  // Meta Pixel - ViewContent Event
+  useEffect(() => {
+    if (product) {
+      if (window.fbq) {
+        window.fbq('track', 'ViewContent', {
+          content_name: product.name,
+          content_ids: [product._id],
+          content_type: 'product',
+          value: formatPrice(product.customerPrice || product.suggested_price || 0),
+          currency: 'DZD'
+        });
+      }
+    }
+  }, [product]);
+
   // تحديث العنوان عند تغيير الموقع مع debounce
   useEffect(() => {
     if (locationCoords.lat && locationCoords.lng) {
