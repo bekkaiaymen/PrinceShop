@@ -431,14 +431,24 @@ function LandingPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('🟢 بدء عملية إرسال الطلب (handleSubmit)...');
     
-    if (!formData.customerName || !formData.customerPhone || !deliveryAddress) {
-      alert('الرجاء ملء جميع الحقول المطلوبة');
+    // التحقق من الحقول
+    if (!formData.customerName || !formData.customerPhone) {
+      console.warn('⚠️ الحقول ناقصة: الاسم أو الهاتف');
+      alert('الرجاء ملء الاسم ورقم الهاتف');
+      return;
+    }
+    
+    if (!deliveryAddress) {
+      console.warn('⚠️ العنوان ناقص');
+      alert('الرجاء تحديد الموقع على الخريطة');
       return;
     }
 
     try {
       setSubmitting(true);
+      console.log('🚀 جاري إرسال الطلب للسيرفر...');
       
       // حساب سعر التوصيل حسب الموقعين (الأولوية للموقع القديم)
       const productTotal = (product.suggested_price || product.customerPrice) * formData.quantity;
@@ -1179,6 +1189,28 @@ function LandingPage() {
       <footer className="bg-gray-900 text-white py-8 mt-12">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <p className="text-gray-400">© 2026 جميع الحقوق محفوظة</p>
+          
+          {/* زر فحص البيكسل (مخفي للعامة، يظهر للمطورين) */}
+          <button
+            onClick={() => {
+              if (window.fbq) {
+                console.log('🧪 مفحوص يدوي: إرسال حدث شراء تجريبي');
+                window.fbq('track', 'Purchase', {
+                  value: 1000,
+                  currency: 'DZD',
+                  content_name: 'Test Product',
+                  content_ids: ['TEST_123'],
+                  content_type: 'product'
+                });
+                alert('✅ تم إرسال حدث "شراء تجريبي" للفيسبوك.\nتحقق الآن من صفحة Test Events.');
+              } else {
+                alert('❌ البيكسل غير موجود! تأكد من إيقاف AdBlock.');
+              }
+            }}
+            className="mt-4 text-xs text-gray-700 hover:text-gray-500 underline"
+          >
+            فحص اتصال البيكسل (Test Pixel)
+          </button>
         </div>
       </footer>
     </div>
