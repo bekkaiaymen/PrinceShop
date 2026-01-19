@@ -49,27 +49,40 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') {
     return;
   }
-  
+
   event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        // استنساخ الاستجابة فقط للنجاح
-        if (response && response.status === 200) {
-          const responseToCache = response.clone();
-          
-          caches.open(CACHE_NAME)
-            .then((cache) => {
-              cache.put(event.request, responseToCache).catch(() => {
-                // تجاهل أخطاء التخزين
-              });
-            });
+    caches.match(event.request)
+      .then((cachedResponse) => {
+        // إذا موجود في cache، أرجعه مباشرة
+        if (cachedResponse) {
+          return cachedResponse;
         }
-        
-        return response;
-      })
-      .catch(() => {
-        // إذا فشل الاتصال، استخدم الـ Cache
-        return caches.match(event.request);
+
+        // إن لم يكن، اجلبه من الشبكة
+        return fetch(event.request)
+          .then((response) => {
+            // تحقق من صحة الاستجابة
+            if (!response || response.status !== 200 || response.type === 'error') {
+              return response;
+            }
+
+            // استنساخ الاستجابة
+            const responseToCache = response.clone();
+            
+            // حفظ في cache
+            caches.open(CACHE_NAME)
+              .then((cache) => {
+                cache.put(event.request, responseToCache).catch(() => {
+                  // تجاهل أخطاء التخزين
+                });
+              });
+            
+            return response;
+          })
+          .catch(() => {
+            // في حالة الفشل، لا تفعل شيء (دع المتصفح يتعامل معه)
+            return new Response('', { status: 404, statusText: 'Not Found' });
+          });
       })
   );
 });
