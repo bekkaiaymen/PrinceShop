@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import { ShoppingCart, MapPin, Phone, User, Package, MessageSquare, DollarSign, CheckCircle, Clock } from 'lucide-react';
+import { ShoppingCart, MapPin, Phone, User, Package, MessageSquare, DollarSign, CheckCircle, Clock, ArrowRight, Home } from 'lucide-react';
 
 function LandingPage() {
   const { productId } = useParams();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const affiliateCode = searchParams.get('ref');
   
   // دالة تدوير السعر
@@ -537,15 +538,37 @@ function LandingPage() {
       {/* Header */}
       <header className="bg-white shadow-lg sticky top-0 z-40 border-b-2 border-blue-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-              <ShoppingCart className="w-6 h-6 text-white" />
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                <ShoppingCart className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  عرض خاص
+                </h1>
+                <p className="text-xs sm:text-sm text-gray-600">اطلب الآن واحصل على التوصيل السريع</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                عرض خاص
-              </h1>
-              <p className="text-xs sm:text-sm text-gray-600">اطلب الآن واحصل على التوصيل السريع</p>
+            
+            {/* أزرار التنقل */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => navigate(-1)}
+                className="p-2 sm:px-4 sm:py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2 text-gray-700"
+                title="رجوع"
+              >
+                <ArrowRight className="w-5 h-5" />
+                <span className="hidden sm:inline font-medium">رجوع</span>
+              </button>
+              <button
+                onClick={() => navigate(affiliateCode ? `/?ref=${affiliateCode}` : '/')}
+                className="p-2 sm:px-4 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2"
+                title="جميع المنتجات"
+              >
+                <Home className="w-5 h-5" />
+                <span className="hidden sm:inline font-medium">جميع المنتجات</span>
+              </button>
             </div>
           </div>
         </div>
