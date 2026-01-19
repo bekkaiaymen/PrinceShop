@@ -250,11 +250,13 @@ app.patch('/api/orders/:id', async (req, res) => {
   if (!isAuthorized && req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       const token = req.headers.authorization.split(' ')[1];
       try {
-          // If Owner uses a different secret or same secret but different model
            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-           // Assuming Owner model exists or we check ID against Owner collection
-           const owner = await Owner.findById(decoded.id); // Assuming Owner model exists
-           if (owner) isAuthorized = true;
+           // Owner token payload uses 'ownerId', while User token uses 'id'
+           const ownerId = decoded.ownerId || decoded.id;
+           if (ownerId) {
+             const owner = await Owner.findById(ownerId);
+             if (owner) isAuthorized = true;
+           }
       } catch (e) {
          // Invalid token
       }
