@@ -118,8 +118,8 @@ export default function AffiliateOrders() {
                 {/* Product Image */}
                 <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                   <img
-                    src={order.product.image}
-                    alt={order.product.name}
+                    src={order.productImage || order.product?.image || '/placeholder.png'}
+                    alt={order.productName || order.product?.name}
                     className="w-full h-full object-contain p-1 sm:p-2"
                     onError={(e) => e.target.src = '/placeholder.png'}
                   />
@@ -130,16 +130,16 @@ export default function AffiliateOrders() {
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 gap-2">
                     <div className="flex-1">
                       <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">
-                        {order.product.name}
+                        {order.productName || order.product?.name || 'منتج محذوف'}
                       </h3>
                       <p className="text-xs sm:text-sm text-gray-500">
                         <Calendar className="w-3 h-3 sm:w-4 sm:h-4 inline ml-1" />
                         {new Date(order.createdAt).toLocaleDateString('ar-DZ')}
                       </p>
                     </div>
-                    <span className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${status.color} w-fit`}>
+                    <span className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${status?.color || 'bg-gray-100 text-gray-700'} w-fit`}>
                       <StatusIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-                      {status.label}
+                      {status?.label || order.status}
                     </span>
                   </div>
 
@@ -148,20 +148,17 @@ export default function AffiliateOrders() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                       <div>
                         <p className="text-xs text-gray-500 mb-1">الزبون</p>
-                        <p className="font-medium text-sm sm:text-base">{order.customer.name}</p>
+                        <p className="font-medium text-sm sm:text-base">{order.customerName}</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-500 mb-1">الهاتف</p>
-                        <p className="font-medium text-sm sm:text-base">{order.customer.phone}</p>
+                        <p className="font-medium text-sm sm:text-base">{order.customerPhone}</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-500 mb-1">العنوان</p>
-                        <p className="font-medium text-sm sm:text-base">{order.customer.address}</p>
+                        <p className="font-medium text-sm sm:text-base">{order.deliveryLocation}</p>
                       </div>
-                      <div>
-                        <p className="text-xs text-gray-500 mb-1">المدينة</p>
-                        <p className="font-medium text-sm sm:text-base">{order.customer.city}</p>
-                      </div>
+                      {/* Removed City as it is not in the schema */}
                     </div>
                   </div>
 
@@ -170,7 +167,7 @@ export default function AffiliateOrders() {
                     <div className="flex flex-wrap gap-4 sm:gap-6">
                       <div>
                         <p className="text-xs text-gray-500 mb-1">سعر البيع</p>
-                        <p className="font-semibold text-gray-900 text-sm sm:text-base">{formatPrice(order.pricing.sellingPrice)} دج</p>
+                        <p className="font-semibold text-gray-900 text-sm sm:text-base">{formatPrice(order.productPrice)} دج</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-500 mb-1">التوصيل</p>
@@ -178,11 +175,11 @@ export default function AffiliateOrders() {
                       </div>
                       <div>
                         <p className="text-xs text-gray-500 mb-1">الإجمالي</p>
-                        <p className="font-semibold text-blue-600 text-sm sm:text-base">{formatPrice((order.pricing.sellingPrice || 0) + (order.deliveryFee || 0))} دج</p>
+                        <p className="font-semibold text-blue-600 text-sm sm:text-base">{formatPrice(order.totalAmount)} دج</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-500 mb-1">ربحك</p>
-                        <p className="font-bold text-green-600 text-sm sm:text-base">{(order.pricing.affiliateProfit || 0).toLocaleString('fr-DZ')} دج</p>
+                        <p className="font-bold text-green-600 text-sm sm:text-base">{(order.affiliateProfit || 0).toLocaleString('fr-DZ')} دج</p>
                       </div>
                     </div>
                     {order.notes && (
