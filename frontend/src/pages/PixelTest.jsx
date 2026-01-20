@@ -2,23 +2,66 @@ import React, { useState, useEffect } from 'react';
 
 function PixelTest() {
   const [logs, setLogs] = useState([]);
+  const [status, setStatus] = useState('loading'); // loading, success, error
 
   const addLog = (msg) => {
     const time = new Date().toLocaleTimeString();
     setLogs(prev => [`[${time}] ${msg}`, ...prev]);
-    // Log to browser console as well so user can copy-paste to AI
-    console.log(`PIXEL_TEST: ${msg}`);
+    console.log(`%c[PixelTest] ${msg}`, 'background: #222; color: #bada55; padding: 4px; border-radius: 4px;');
+  };
+
+  // Function to inject pixel manually if missing
+  const forceInjectPixel = () => {
+    if (document.getElementById('fb-pixel-script')) return;
+    
+    addLog('⚠️ جاري محاولة حقن كود البيكسل يدوياً...');
+    
+    const script = document.createElement('script');
+    script.id = 'fb-pixel-script';
+    script.innerHTML = `
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src='https://connect.facebook.net/en_US/fbevents.js';
+      s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script');
+      fbq('init', '874112828663649');
+      fbq('track', 'PageView');
+    `;
+    document.head.appendChild(script);
+    addLog('💉 تم حقن الكود. انتظر قليلاً...');
   };
 
   useEffect(() => {
-    // Check if FBQ exists on mount
-    setTimeout(() => {
+    addLog('🔄 بدء فحص النظام...');
+    
+    let attempts = 0;
+    const interval = setInterval(() => {
+      attempts++;
+      
       if (window.fbq) {
-        addLog('✅ البيكسل (fbq) محمل بنجاح.');
+        addLog('✅ تم اكتشاف البيكسل (window.fbq) بنجاح!');
+        setStatus('success');
+        clearInterval(interval);
       } else {
-        addLog('❌ البيكسل (fbq) غير موجود! (تأكد من إيقاف AdBlock)');
+        addLog(`⏳ محاولة العثور على البيكسل (${attempts}/10)...`);
+        
+        // If not found after 3 attempts, force inject
+        if (attempts === 3) {
+          forceInjectPixel();
+        }
+        
+        if (attempts >= 10) {
+          addLog('❌ فشل العثور على البيكسل نهائياً. (AdBlock نشط جداً)');
+          setStatus('error');
+          clearInterval(interval);
+        }
       }
     }, 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const sendViewContent = () => {
@@ -31,8 +74,10 @@ function PixelTest() {
         currency: 'DZD'
       });
       addLog('🚀 تم إرسال حدث: ViewContent');
+      alert('تم الإرسال! تحقق من فيسبوك الآن.');
     } else {
       addLog('❌ خطأ: البيكسل غير موجود.');
+      alert('البيكسل غير موجود! انتظر التحميل أو أوقف مانع الإعلانات.');
     }
   };
 
