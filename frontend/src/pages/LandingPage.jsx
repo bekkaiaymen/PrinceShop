@@ -48,24 +48,6 @@ function LandingPage() {
   const [mapLayer, setMapLayer] = useState('roadmap'); // 'roadmap' or 'satellite'
   const [isMapLoading, setIsMapLoading] = useState(false); // تعطيل loading مؤقتاً
   
-  // تفعيل البيكسل بالقوة عبر الرابط
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('force_pixel') === 'true') {
-      console.log('⚡ Force Pixel Activation Triggered');
-      if (window.fbq) {
-        window.fbq('track', 'Purchase', {
-          value: 1000,
-          currency: 'DZD',
-          content_name: 'Activation Test',
-          content_ids: ['TEST_ACTIVATE'],
-          content_type: 'product'
-        });
-        alert('🚀 تم إرسال حدث التنشيط لفيسبوك! \nارجع الآن لمدير الإعلانات وحدث الصفحة.');
-      }
-    }
-  }, []);
-
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markerRef = useRef(null);
@@ -526,19 +508,14 @@ function LandingPage() {
       
       // Meta Pixel - Purchase Event
       if (window.fbq) {
-        console.log('✅ Facebook Pixel is Active - Firing Purchase Event');
-        alert('🎉 تم إرسال البيكسل لفيسبوك! تحقق الآن.'); // تنبيه مرئي للمستخدم
         window.fbq('track', 'Purchase', {
           value: productTotal,
-          currency: 'DZD',
+          currency: 'USD',
           content_name: product.name,
           content_ids: [product._id],
           content_type: 'product',
           num_items: formData.quantity
         });
-      } else {
-        console.warn('⚠️ Facebook Pixel (fbq) is NOT defined. AdBlock might be active.');
-        alert('❌ البيكسل لا يعمل! يبدو أن AdBlock يمنعه.');
       }
 
       setSuccess(true);
@@ -1215,28 +1192,6 @@ function LandingPage() {
       <footer className="bg-gray-900 text-white py-8 mt-12">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <p className="text-gray-400">© 2026 جميع الحقوق محفوظة</p>
-          
-          {/* زر فحص البيكسل (مخفي للعامة، يظهر للمطورين) */}
-          <button
-            onClick={() => {
-              if (window.fbq) {
-                console.log('🧪 مفحوص يدوي: إرسال حدث شراء تجريبي');
-                window.fbq('track', 'Purchase', {
-                  value: 1000,
-                  currency: 'DZD',
-                  content_name: 'Test Product',
-                  content_ids: ['TEST_123'],
-                  content_type: 'product'
-                });
-                alert('✅ تم إرسال حدث "شراء تجريبي" للفيسبوك.\nتحقق الآن من صفحة Test Events.');
-              } else {
-                alert('❌ البيكسل غير موجود! تأكد من إيقاف AdBlock.');
-              }
-            }}
-            className="mt-4 text-xs text-gray-700 hover:text-gray-500 underline"
-          >
-            فحص اتصال البيكسل (Test Pixel)
-          </button>
         </div>
       </footer>
     </div>
