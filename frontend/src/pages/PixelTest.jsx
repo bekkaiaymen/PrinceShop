@@ -28,8 +28,7 @@ function PixelTest() {
       s=b.getElementsByTagName(e)[0];
       s.parentNode.insertBefore(t,s)}(window, document,'script');
       fbq('init', '874112828663649');
-      fbq('set', 'test_event_code', 'TEST34924');
-      fbq('track', 'PageView');
+      fbq('track', 'PageView', {}, {eventID: 'test_' + Date.now()});
     `;
     document.head.appendChild(script);
     addLog('💉 تم حقن الكود. انتظر قليلاً...');
@@ -72,8 +71,8 @@ function PixelTest() {
         content_ids: ['TEST_101'],
         content_type: 'product',
         value: 500,
-        currency: 'DZD'
-      });
+        currency: 'USD'
+      }, {eventID: 'vc_' + Date.now(), test_event_code: 'TEST34924'});
       addLog('🚀 تم إرسال حدث: ViewContent');
       alert('تم الإرسال! تحقق من فيسبوك الآن.');
     } else {
@@ -85,14 +84,14 @@ function PixelTest() {
   const sendPurchase = () => {
     if (window.fbq) {
       window.fbq('track', 'Purchase', {
-        value: 1000,
-        currency: 'DZD',
+        value: 100,
+        currency: 'USD',
         content_name: 'Test Purchase',
         content_ids: ['TEST_101'],
         content_type: 'product',
         num_items: 1
-      });
-      addLog('💰 تم إرسال حدث: Purchase (1000 دج)');
+      }, {eventID: 'pur_' + Date.now(), test_event_code: 'TEST34924'});
+      addLog('💰 تم إرسال حدث: Purchase (100 USD)');
     } else {
       addLog('❌ خطأ: البيكسل غير موجود.');
     }

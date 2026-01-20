@@ -30,8 +30,7 @@
       s.parentNode.insertBefore(t,s)}(window,document,'script',
       'https://connect.facebook.net/en_US/fbevents.js');
       fbq('init', '874112828663649');
-      fbq('set', 'test_event_code', 'TEST34924');
-      fbq('track', 'PageView');
+      fbq('track', 'PageView', {}, {eventID: 'test_' + Date.now()});
     </script>
     <!-- End Meta Pixel Code -->
     
