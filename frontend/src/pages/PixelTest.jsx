@@ -27,7 +27,7 @@ function PixelTest() {
       t.src='https://connect.facebook.net/en_US/fbevents.js';
       s=b.getElementsByTagName(e)[0];
       s.parentNode.insertBefore(t,s)}(window, document,'script');
-      fbq('init', '874112828663649');
+      fbq('init', '874112828663649', {external_id: 'TEST34924'});
       fbq('track', 'PageView');
     `;
     document.head.appendChild(script);
