@@ -102,6 +102,24 @@ function PixelTest() {
       <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg text-center">
         <h1 className="text-2xl font-bold mb-4 text-gray-800">🛠️ فحص بيكسل فيسبوك (React)</h1>
         
+        {status === 'loading' && (
+          <div className="bg-yellow-100 border-2 border-yellow-500 text-yellow-900 p-4 rounded-xl mb-6 text-lg font-bold animate-pulse">
+            ⏳ جاري فحص البيكسل...
+          </div>
+        )}
+        
+        {status === 'success' && (
+          <div className="bg-green-100 border-2 border-green-600 text-green-900 p-4 rounded-xl mb-6 text-lg font-bold">
+            ✅ البيكسل يعمل بنجاح!
+          </div>
+        )}
+        
+        {status === 'error' && (
+          <div className="bg-red-100 border-2 border-red-600 text-red-900 p-4 rounded-xl mb-6 text-lg font-bold">
+            ❌ فشل تحميل البيكسل (AdBlock؟)
+          </div>
+        )}
+        
         <div className="bg-blue-50 text-blue-800 p-4 rounded-xl mb-6 text-sm">
           استخدم هذه الصفحة للتأكد من أن البيكسل يرسل البيانات بشكل صحيح لفيسبوك.
         </div>
