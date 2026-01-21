@@ -91,57 +91,103 @@ function AnkerSimpleLanding() {
 
   // Google Maps
   useEffect(() => {
+    console.log('🚀 Google Maps useEffect triggered!');
+    
     const initMap = () => {
-      if (!mapContainerRef.current || !window.google) return;
+      if (!mapContainerRef.current) {
+        console.log('⏳ Waiting for container...');
+        return;
+      }
       
-      const map = new window.google.maps.Map(mapContainerRef.current, {
-        center: locationCoords,
-        zoom: 17,
-        mapTypeId: mapLayer,
-        zoomControl: true,
-        mapTypeControl: false,
-        streetViewControl: false,
-        fullscreenControl: false,
-        gestureHandling: 'greedy'
-      });
+      if (!window.google || !window.google.maps) {
+        console.log('⏳ Waiting for Google Maps API...');
+        return;
+      }
+      
+      // إزالة الخريطة القديمة إن وجدت
+      if (mapInstanceRef.current) {
+        console.log('🔄 Removing old map instance');
+        mapInstanceRef.current = null;
+      }
 
-      const marker = new window.google.maps.Marker({
-        position: locationCoords,
-        map: map,
-        draggable: false,
-        icon: {
-          path: window.google.maps.SymbolPath.CIRCLE,
-          scale: 10,
-          fillColor: '#EF4444',
-          fillOpacity: 1,
-          strokeColor: '#FFFFFF',
-          strokeWeight: 3,
-        }
-      });
+      try {
+        console.log('🗺️ Starting Google Maps initialization...');
+        console.log('Container element:', mapContainerRef.current);
+        
+        const map = new window.google.maps.Map(mapContainerRef.current, {
+          center: { lat: locationCoords.lat, lng: locationCoords.lng },
+          zoom: 17,
+          mapTypeId: 'roadmap',
+          zoomControl: true,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+          gestureHandling: 'greedy'
+        });
 
-      map.addListener('dragend', () => {
-        const center = map.getCenter();
-        setLocationCoords({ lat: center.lat(), lng: center.lng() });
-        marker.setPosition({ lat: center.lat(), lng: center.lng() });
-        setLocationConfirmed(false);
-      });
+        console.log('✅ Google Map created');
 
-      mapInstanceRef.current = map;
-      markerRef.current = marker;
+        const marker = new window.google.maps.Marker({
+          position: { lat: locationCoords.lat, lng: locationCoords.lng },
+          map: map,
+          draggable: false,
+          icon: {
+            path: window.google.maps.SymbolPath.CIRCLE,
+            scale: 10,
+            fillColor: '#EF4444',
+            fillOpacity: 1,
+            strokeColor: '#FFFFFF',
+            strokeWeight: 3,
+          }
+        });
+
+        console.log('✅ Marker added');
+
+        map.addListener('dragend', () => {
+          const center = map.getCenter();
+          const lat = center.lat();
+          const lng = center.lng();
+          setLocationCoords({ lat, lng });
+          marker.setPosition({ lat, lng });
+          setLocationConfirmed(false);
+        });
+
+        mapInstanceRef.current = map;
+        markerRef.current = marker;
+        
+        console.log('✅ Google Maps fully initialized');
+      } catch (error) {
+        console.error('❌ Map error:', error);
+      }
     };
 
     let attempts = 0;
+    const maxAttempts = 50;
+    
     const tryInit = () => {
       if (mapInstanceRef.current) return;
+      
       attempts++;
+      console.log(`🔄 Attempt ${attempts} to initialize Google Maps...`);
+      
       if (window.google && window.google.maps && mapContainerRef.current) {
         initMap();
-      } else if (attempts < 50) {
+      } else if (attempts < maxAttempts) {
         setTimeout(tryInit, 100);
+      } else {
+        console.error('❌ Failed to initialize Google Maps after', maxAttempts, 'attempts');
       }
     };
     
-    if (!mapInstanceRef.current) tryInit();
+    if (!mapInstanceRef.current) {
+      tryInit();
+    }
+
+    return () => {
+      if (mapInstanceRef.current) {
+        console.log('🧹 Cleaning up map instance');
+      }
+    };
   }, []);
 
   useEffect(() => {
