@@ -22,6 +22,7 @@ function AnkerSimpleLanding() {
   const productId = '410';
   const upsellProductId = '619'; // الشاحن
   const upsellPrice = 500;
+  const upsellShipping = 50; // توصيل مخفض للشاحن فقط
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,7 +42,7 @@ function AnkerSimpleLanding() {
 
       if (window.fbq) {
         window.fbq('track', 'Purchase', {
-          value: (getPrice() * formData.quantity) + (includeUpsell ? upsellPrice : 0),
+          value: (getPrice() * formData.quantity) + (includeUpsell ? (upsellPrice + upsellShipping) : 0),
           currency: 'DZD',
           content_name: 'AIR PODS ANKER R50i NC',
           content_ids: ['410'],
@@ -133,25 +134,24 @@ function AnkerSimpleLanding() {
                  {/* صورة المنتج الرئيسية */}
                  <div className="col-span-2 relative">
                     <img 
-                      src="https://images.unsplash.com/photo-1606841837239-c5a1a4a07af7?w=500&h=500&fit=crop" 
-                      alt="Anker R50i NC Earbuds"
+                      src="/assets/r50inc.jpg" 
+                      alt="Anker R50i NC Box"
                       className="w-full h-64 object-cover rounded-2xl shadow-lg"
                     />
                     <div className="absolute bottom-2 right-2 bg-black text-white text-xs px-2 py-1 rounded-lg">
-                      أسود فخم 🖤
+                      التغليف الرسمي من Anker
                     </div>
                  </div>
-                 {/* صور جانبية - يرجى استبدال الروابط بالصور الخاصة بك */}
                  <div className="relative">
                     <img 
-                      src="https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=300&h=300&fit=crop" 
-                      alt="Anker Box"
+                      src="/assets/main.jpg" 
+                      alt="Anker R50i NC Buds and Case"
                       className="w-full h-32 object-cover rounded-2xl shadow-md border-2 border-gray-100"
                     />
                  </div>
                   <div className="relative">
                     <img 
-                      src="https://images.unsplash.com/photo-1629367494173-c78a56567877?w=300&h=300&fit=crop" 
+                      src="/assets/Soundcore-R50i-NC-2-in-1.jpg" 
                       alt="Phone Stand Feature"
                       className="w-full h-32 object-cover rounded-2xl shadow-md border-2 border-gray-100"
                     />
@@ -598,7 +598,7 @@ function AnkerSimpleLanding() {
                       <span className="text-gray-400 line-through text-sm">2000 دج</span>
                       <span className="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded font-bold">خصم 75%</span>
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">اشحنه بأمان وسرعة! ⚡</p>
+                    <p className="text-sm text-gray-600 mt-1">توصيل الشاحن مخفض إلى 50 دج فقط + تجربة قبل الدفع.</p>
                   </div>
                   <div className="w-16 h-16 bg-white rounded-lg p-1 flex items-center justify-center border border-gray-200">
                      <span className="text-2xl">🔌</span>
@@ -617,9 +617,9 @@ function AnkerSimpleLanding() {
               <div className="bg-gray-50 border-2 border-gray-300 rounded-xl p-4 text-center space-y-2">
                 <p className="font-bold text-lg text-gray-600">المجموع النهائي:</p>
                 <p className="font-black text-red-600 text-4xl transform scale-110 transition-transform">
-                  {((getPrice() * formData.quantity) + (includeUpsell ? upsellPrice : 0)).toLocaleString()} دج
+                  {((getPrice() * formData.quantity) + (includeUpsell ? (upsellPrice + upsellShipping) : 0)).toLocaleString()} دج
                 </p>
-                <p className="text-xs text-gray-500 mt-2">السعر شامل التوصيل لغرداية</p>
+                <p className="text-xs text-gray-500 mt-2">السعر يشمل التوصيل لغرداية (+50 دج فقط إذا أضفت الشاحن)</p>
               </div>
 
               <button
@@ -631,7 +631,7 @@ function AnkerSimpleLanding() {
               </button>
 
               <p className="text-center text-sm text-gray-500">
-                ✓ دفع عند الاستلام | ✓ توصيل مجاني | ✓ ضمان سنة
+                ضمان أصلي 100% مع تجربة قبل الدفع | دفع عند الاستلام | توصيل سريع لغرداية
               </p>
             </form>
           </div>
