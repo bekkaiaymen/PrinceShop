@@ -50,9 +50,9 @@ function AnkerSimpleLanding() {
   };
 
   const getPrice = () => {
-    if (formData.quantity >= 3) return 3910; // خصم 18%
-    if (formData.quantity >= 2) return 4245; // خصم 11%
-    return 4770;
+    if (formData.quantity >= 3) return 2900; // خصم 17%
+    if (formData.quantity >= 2) return 3150; // خصم 10%
+    return 3500;
   };
 
   const getDiscount = () => {
@@ -92,7 +92,7 @@ function AnkerSimpleLanding() {
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Package className="w-6 h-6 text-red-600" />
-            <span className="font-bold text-lg">AIR PODS ANKER R50iNC</span>
+            <span className="font-bold text-lg">Anker R50i NC</span>
           </div>
           <div className="flex items-center gap-2 bg-red-600 px-4 py-2 rounded-full text-sm font-bold">
             <MapPin className="w-4 h-4" />
@@ -106,18 +106,19 @@ function AnkerSimpleLanding() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-8">
             <div className="inline-block bg-red-600 text-white px-6 py-3 rounded-full font-bold text-lg mb-4">
-              عاش أفضل سماعة بأفضل سعر! 🎧
+              توصيل مجاني بضمان الوكالة الرسمية عين الفهد ✅
             </div>
             <h1 className="text-4xl sm:text-5xl font-black mb-6">
-              AIR PODS ANKER <span className="text-red-600">R50iNC ORIGINAL</span>
+              سماعة أنكر <span className="text-red-600">Anker R50i NC</span>
             </h1>
+            <p className="text-2xl font-bold mb-4 text-gray-800">بسعر 3500 دج فقط! 🔥</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 mb-12">
             {/* المنتج */}
             <div className="bg-white border-4 border-black rounded-3xl p-8 text-center">
-              <div className="bg-red-600 text-white px-4 py-2 rounded-xl font-bold text-2xl mb-6 inline-block">
-                ⚠️ صوت نقي + بطارية 8 ساعات
+              <div className="bg-red-600 text-white px-4 py-2 rounded-xl font-bold text-xl mb-6 inline-block">
+                ⚠️ إلغاء الضوضاء ANC + بطارية 45 ساعة
               </div>
               
               <div className="relative mb-6">
@@ -131,11 +132,11 @@ function AnkerSimpleLanding() {
               <div className="space-y-4">
                 <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl">
                   <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white font-bold">✓</div>
-                  <span className="text-right font-bold">أصلية 100% من Anker</span>
+                  <span className="text-right font-bold">محركات ديناميكية 10 ملم (BassUp™)</span>
                 </div>
                 <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl">
                   <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white font-bold">✓</div>
-                  <span className="text-right font-bold">ضمان سنة كاملة</span>
+                  <span className="text-right font-bold">مريحة وخفيفة وبتصميم جديد</span>
                 </div>
               </div>
             </div>
@@ -143,43 +144,43 @@ function AnkerSimpleLanding() {
             {/* المقارنة */}
             <div className="space-y-6">
               <div className="bg-black text-white rounded-3xl p-6">
-                <h3 className="text-2xl font-bold mb-6 text-center">ANKER R50iNC</h3>
+                <h3 className="text-2xl font-bold mb-6 text-center">ANKER R50i NC</h3>
                 
                 <div className="space-y-4">
                   <div className="flex items-start gap-3 bg-white/10 p-4 rounded-xl">
                     <div className="text-green-400 text-xl">●</div>
-                    <p className="flex-1">صوت نقي HD مع Bass قوي</p>
+                    <p className="flex-1">إلغاء الضوضاء النشط (ANC) - 42 ديسيبل</p>
                   </div>
                   
                   <div className="flex items-start gap-3 bg-white/10 p-4 rounded-xl">
                     <div className="text-green-400 text-xl">●</div>
-                    <p className="flex-1">بطارية تدوم 8 ساعات متواصلة</p>
+                    <p className="flex-1">بطارية 10 ساعات + 45 ساعة مع العلبة</p>
                   </div>
 
                   <div className="flex items-start gap-3 bg-white/10 p-4 rounded-xl">
                     <div className="text-green-400 text-xl">●</div>
-                    <p className="flex-1">مريحة للأذن - ما تسقطش!</p>
+                    <p className="flex-1">4 ميكروفونات مع ذكاء اصطناعي للمكالمات</p>
                   </div>
 
                   <div className="flex items-start gap-3 bg-white/10 p-4 rounded-xl">
                     <div className="text-green-400 text-xl">●</div>
-                    <p className="flex-1">10 مرات أرخص من AirPods!</p>
+                    <p className="flex-1">دعم تطبيق Soundcore + حامل هاتف</p>
                   </div>
 
                   <div className="flex items-start gap-3 bg-white/10 p-4 rounded-xl">
                     <div className="text-green-400 text-xl">●</div>
-                    <p className="flex-1">شحن سريع - 10 دقائق = ساعتين</p>
+                    <p className="flex-1">صوت قوي مع تقنية BassUp™</p>
                   </div>
 
                   <div className="flex items-start gap-3 bg-white/10 p-4 rounded-xl">
                     <div className="text-green-400 text-xl">●</div>
-                    <p className="flex-1">مقاومة للماء IPX5</p>
+                    <p className="flex-1">مقاومة للماء و الغبار (IP54)</p>
                   </div>
                 </div>
               </div>
 
               <div className="bg-black text-white rounded-3xl p-6">
-                <h3 className="text-2xl font-bold mb-4 text-center">السماعات الصينية</h3>
+                <h3 className="text-2xl font-bold mb-4 text-center">السماعات العادية</h3>
                 
                 <div className="space-y-4">
                   <div className="flex items-start gap-3 bg-red-600/20 p-4 rounded-xl border-2 border-red-600">
@@ -286,13 +287,13 @@ function AnkerSimpleLanding() {
 
               <div className="bg-red-600 text-white py-6 px-4 rounded-2xl mb-4">
                 <p className="text-sm mb-2">راح تربح:</p>
-                <p className="text-4xl font-black">تخفيض 11%</p>
+                <p className="text-4xl font-black">تخفيض 10%</p>
               </div>
 
               <p className="text-2xl font-bold">
-                <span className="line-through text-gray-400">9,540 دج</span>
+                <span className="line-through text-gray-400">7,000 دج</span>
                 <br />
-                <span className="text-red-600 text-4xl">8,490 دج</span>
+                <span className="text-red-600 text-4xl">6,300 دج</span>
               </p>
             </div>
 
@@ -318,13 +319,13 @@ function AnkerSimpleLanding() {
 
               <div className="bg-black text-white py-6 px-4 rounded-2xl mb-4">
                 <p className="text-sm mb-2">راح تربح:</p>
-                <p className="text-4xl font-black">تخفيض 18%</p>
+                <p className="text-4xl font-black">تخفيض 17%</p>
               </div>
 
               <p className="text-2xl font-bold">
-                <span className="line-through text-gray-400">14,310 دج</span>
+                <span className="line-through text-gray-400">10,500 دج</span>
                 <br />
-                <span className="text-red-600 text-5xl">11,730 دج</span>
+                <span className="text-red-600 text-5xl">8,700 دج</span>
               </p>
 
               <div className="mt-4 bg-red-600 text-white px-4 py-2 rounded-xl font-bold text-sm">
@@ -446,11 +447,11 @@ function AnkerSimpleLanding() {
                   onChange={(e) => setFormData({...formData, quantity: parseInt(e.target.value)})}
                   className="w-full px-4 py-4 border-2 border-gray-300 rounded-xl focus:border-red-600 focus:outline-none text-lg font-bold"
                 >
-                  <option value={1}>1 قطعة - 4,770 دج</option>
-                  <option value={2}>2 قطعة - 8,490 دج (خصم 11%)</option>
-                  <option value={3}>3 قطع - 11,730 دج (خصم 18%) ⭐</option>
-                  <option value={4}>4 قطع - {(3910 * 4).toLocaleString()} دج (خصم 18%)</option>
-                  <option value={5}>5 قطع - {(3910 * 5).toLocaleString()} دج (خصم 18%)</option>
+                  <option value={1}>1 قطعة - 3,500 دج</option>
+                  <option value={2}>2 قطعة - 6,300 دج (خصم 10%)</option>
+                  <option value={3}>3 قطع - 8,700 دج (خصم 17%) ⭐</option>
+                  <option value={4}>4 قطع - {(2900 * 4).toLocaleString()} دج (خصم 17%)</option>
+                  <option value={5}>5 قطع - {(2900 * 5).toLocaleString()} دج (خصم 17%)</option>
                 </select>
               </div>
 
