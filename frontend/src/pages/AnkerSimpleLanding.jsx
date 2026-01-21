@@ -99,6 +99,15 @@ function AnkerSimpleLanding() {
 
   return (
     <div className="min-h-screen bg-white" dir="rtl">
+      {/* Floating Order Button */}
+      <button
+        onClick={() => document.getElementById('order-form').scrollIntoView({ behavior: 'smooth' })}
+        className="fixed bottom-6 left-6 bg-red-600 text-white px-6 py-4 rounded-full shadow-2xl hover:bg-red-700 transition-all z-50 font-bold text-lg flex items-center gap-2 animate-bounce"
+      >
+        <span>اطلب الآن</span>
+        <span className="text-2xl">🛒</span>
+      </button>
+
       {/* Header */}
       <div className="bg-black text-white py-4 sticky top-0 z-50 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
@@ -136,7 +145,7 @@ function AnkerSimpleLanding() {
                     <img 
                       src="/assets/r50inc.jpg" 
                       alt="Anker R50i NC Box"
-                      className="w-full h-64 object-cover rounded-2xl shadow-lg"
+                      className="w-full h-64 object-contain rounded-2xl shadow-lg bg-white"
                     />
                     <div className="absolute bottom-2 right-2 bg-black text-white text-xs px-2 py-1 rounded-lg">
                       التغليف الرسمي من Anker
@@ -155,7 +164,7 @@ function AnkerSimpleLanding() {
                       alt="Phone Stand Feature"
                       className="w-full h-32 object-cover rounded-2xl shadow-md border-2 border-gray-100"
                     />
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600/90 text-white text-xs px-2 py-1 rounded font-bold">
+                    <div className="absolute top-2 right-2 bg-red-600/90 text-white text-xs px-2 py-1 rounded font-bold whitespace-nowrap">
                        حامل هاتف 📱
                     </div>
                  </div>
