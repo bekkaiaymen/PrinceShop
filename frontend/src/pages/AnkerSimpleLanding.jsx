@@ -10,30 +10,40 @@ function AnkerSimpleLanding() {
     phone: '',
     city: 'غرداية',
     address: '',
-    quantity: 1
+    quantity: 1,
+    deliveryTime: 'morning',
+    notes: ''
   });
+  const [includeUpsell, setIncludeUpsell] = useState(false);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const affiliateCode = searchParams.get('ref');
   const productId = '410';
+  const upsellProductId = '619'; // الشاحن
+  const upsellPrice = 500;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      const finalNotes = includeUpsell 
+        ? (formData.notes + " | + عرض خاص: شاحن سامسونج (500 دج) - كود 619")
+        : formData.notes;
+
       await api.post('/orders', {
         productId,
         affiliateCode: affiliateCode || null,
-        ...formData
+        ...formData,
+        notes: finalNotes
       });
 
       if (window.fbq) {
         window.fbq('track', 'Purchase', {
-          value: getPrice() * formData.quantity,
-          currency: 'USD',
-          content_name: 'AIR PODS ANKER R50INC',
+          value: (getPrice() * formData.quantity) + (includeUpsell ? upsellPrice : 0),
+          currency: 'DZD',
+          content_name: 'AIR PODS ANKER R50i NC',
           content_ids: ['410'],
           content_type: 'product',
           num_items: formData.quantity
@@ -50,14 +60,15 @@ function AnkerSimpleLanding() {
   };
 
   const getPrice = () => {
-    if (formData.quantity >= 3) return 2900; // خصم 17%
-    if (formData.quantity >= 2) return 3150; // خصم 10%
-    return 3500;
+    // السعر الأساسي 4770
+    if (formData.quantity >= 3) return 3910; // خصم 18% تقريباً 
+    if (formData.quantity >= 2) return 4290; // خصم 10% تقريباً
+    return 4770;
   };
 
   const getDiscount = () => {
     if (formData.quantity >= 3) return '18%';
-    if (formData.quantity >= 2) return '11%';
+    if (formData.quantity >= 2) return '10%';
     return '0%';
   };
 
@@ -105,13 +116,10 @@ function AnkerSimpleLanding() {
       <section className="py-12 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-8">
-            <div className="inline-block bg-red-600 text-white px-6 py-3 rounded-full font-bold text-lg mb-4">
-              توصيل مجاني بضمان الوكالة الرسمية عين الفهد ✅
-            </div>
             <h1 className="text-4xl sm:text-5xl font-black mb-6">
               سماعة أنكر <span className="text-red-600">Anker R50i NC</span>
             </h1>
-            <p className="text-2xl font-bold mb-4 text-gray-800">بسعر 3500 دج فقط! 🔥</p>
+            <p className="text-2xl font-bold mb-4 text-gray-800">بسعر 4,770 دج فقط! 🔥</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 mb-12">
@@ -121,22 +129,46 @@ function AnkerSimpleLanding() {
                 ⚠️ إلغاء الضوضاء ANC + بطارية 45 ساعة
               </div>
               
-              <div className="relative mb-6">
-                <img 
-                  src="https://images.unsplash.com/photo-1606841837239-c5a1a4a07af7?w=500&h=500&fit=crop" 
-                  alt="Anker AirPods"
-                  className="w-full max-w-sm mx-auto rounded-2xl shadow-2xl"
-                />
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                 {/* صورة المنتج الرئيسية */}
+                 <div className="col-span-2 relative">
+                    <img 
+                      src="https://images.unsplash.com/photo-1606841837239-c5a1a4a07af7?w=500&h=500&fit=crop" 
+                      alt="Anker R50i NC Earbuds"
+                      className="w-full h-64 object-cover rounded-2xl shadow-lg"
+                    />
+                    <div className="absolute bottom-2 right-2 bg-black text-white text-xs px-2 py-1 rounded-lg">
+                      أسود فخم 🖤
+                    </div>
+                 </div>
+                 {/* صور جانبية - يرجى استبدال الروابط بالصور الخاصة بك */}
+                 <div className="relative">
+                    <img 
+                      src="https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=300&h=300&fit=crop" 
+                      alt="Anker Box"
+                      className="w-full h-32 object-cover rounded-2xl shadow-md border-2 border-gray-100"
+                    />
+                 </div>
+                  <div className="relative">
+                    <img 
+                      src="https://images.unsplash.com/photo-1629367494173-c78a56567877?w=300&h=300&fit=crop" 
+                      alt="Phone Stand Feature"
+                      className="w-full h-32 object-cover rounded-2xl shadow-md border-2 border-gray-100"
+                    />
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600/90 text-white text-xs px-2 py-1 rounded font-bold">
+                       حامل هاتف 📱
+                    </div>
+                 </div>
               </div>
 
               <div className="space-y-4">
                 <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl">
                   <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white font-bold">✓</div>
-                  <span className="text-right font-bold">محركات ديناميكية 10 ملم (BassUp™)</span>
+                  <span className="text-right font-bold">سماعة أصلية تعمل مع تطبيق Soundcore خاص بـ Anker</span>
                 </div>
                 <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl">
                   <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white font-bold">✓</div>
-                  <span className="text-right font-bold">مريحة وخفيفة وبتصميم جديد</span>
+                  <span className="text-right font-bold">تحتوي على حامل الهاتف (2 في 1)</span>
                 </div>
               </div>
             </div>
@@ -209,50 +241,99 @@ function AnkerSimpleLanding() {
         </div>
       </section>
 
-      {/* شهادات العملاء - مثل الصورة 3 */}
-      <section className="py-16 bg-black text-white">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl sm:text-4xl font-black text-center mb-12">
-            ماذا قالوا عن منتجنا؟ ⭐
+      {/* شهادات العملاء - Facebook Style */}
+      <section className="py-16 bg-gray-100">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-3xl sm:text-4xl font-black text-center mb-12 flex items-center justify-center gap-3">
+             <span className="text-blue-600">f</span> آراء زبائننا في غرداية
           </h2>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white text-black rounded-2xl p-6">
-              <div className="flex gap-1 mb-3 justify-center">
-                {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />)}
-              </div>
-              <div className="bg-gray-900 text-white rounded-xl p-4 mb-4">
-                <p className="text-sm mb-2">Mohamed_47</p>
-                <p className="text-sm">الصوت ولا أروع! نفس جودة AirPods بـ 10 مرات أقل. شكراً!</p>
-              </div>
-            </div>
-
-            <div className="bg-white text-black rounded-2xl p-6">
-              <div className="flex gap-1 mb-3 justify-center">
-                {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />)}
-              </div>
-              <div className="bg-gray-900 text-white rounded-xl p-4 mb-4">
-                <p className="text-sm mb-2">Sarah_Alger</p>
-                <p className="text-sm">🔥 البطارية تدوم معايا اليوم كامل. أحسن من الصينية!</p>
-              </div>
-            </div>
-
-            <div className="bg-white text-black rounded-2xl p-6">
-              <div className="flex gap-1 mb-3 justify-center">
-                {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />)}
-              </div>
-              <div className="bg-gray-900 text-white rounded-xl p-4 mb-4">
-                <p className="text-sm mb-2">Youcef_Oran</p>
-                <p className="text-sm">وصلوني في غرداية في 24 ساعة. أصليين 100%. Top qualité!</p>
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Review 1 */}
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
+              <div className="flex gap-3">
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-lg">
+                  M
+                </div>
+                <div className="flex-1">
+                  <div className="bg-gray-100 rounded-2xl px-4 py-3 inline-block">
+                    <p className="font-bold text-sm text-gray-900 mb-1">Mohamed Benali</p>
+                    <p className="text-gray-800 text-sm leading-relaxed">
+                      الصوت ما شاء الله، صافي وفيه الباس قوي. وصلتني لبني يزقن في نهار واحد. يعطيك الصحة خويا على المصداقية.
+                    </p>
+                  </div>
+                  <div className="flex gap-4 mt-1 px-2 text-xs text-gray-500 font-bold">
+                    <span className="cursor-pointer hover:underline">أعجبني</span>
+                    <span className="cursor-pointer hover:underline">رد</span>
+                    <span>منذ 2 ساعة</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="bg-white text-black rounded-2xl p-6">
-              <div className="flex gap-1 mb-3 justify-center">
-                {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />)}
+            {/* Review 2 */}
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
+              <div className="flex gap-3">
+                <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center text-pink-600 font-bold text-lg">
+                  S
+                </div>
+                <div className="flex-1">
+                  <div className="bg-gray-100 rounded-2xl px-4 py-3 inline-block">
+                    <p className="font-bold text-sm text-gray-900 mb-1">Sarah Ghardaia</p>
+                    <p className="text-gray-800 text-sm leading-relaxed">
+                      حامل الهاتف فيها فكرة عبقرية! 😍 نتفرج بيها مسلسل وأنا نطيب، والصوت Top. أحسن كادو شريته.
+                    </p>
+                  </div>
+                  <div className="flex gap-4 mt-1 px-2 text-xs text-gray-500 font-bold">
+                    <span className="cursor-pointer hover:underline text-blue-600">أعجبني</span>
+                    <span className="cursor-pointer hover:underline">رد</span>
+                    <span>منذ 5 ساعات</span>
+                  </div>
+                </div>
               </div>
-              <div className="bg-gray-900 text-white rounded-xl p-4 mb-4">
-                <p className="text-sm">Vous êtes les meilleurs en Algérie! Merci 🙏</p>
+            </div>
+
+            {/* Review 3 */}
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
+              <div className="flex gap-3">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold text-lg">
+                  A
+                </div>
+                <div className="flex-1">
+                  <div className="bg-gray-100 rounded-2xl px-4 py-3 inline-block">
+                    <p className="font-bold text-sm text-gray-900 mb-1">Ahmed Touggourt</p>
+                    <p className="text-gray-800 text-sm leading-relaxed">
+                      جربتها في المكالمات، الصوت صافي بزاف والميكروفون يعزل الحس. ربي يبارك في رزقكم خاوتي.
+                    </p>
+                  </div>
+                  <div className="flex gap-4 mt-1 px-2 text-xs text-gray-500 font-bold">
+                    <span className="cursor-pointer hover:underline text-blue-600">أعجبني</span>
+                    <span className="cursor-pointer hover:underline">رد</span>
+                    <span>منذ يوم</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Review 4 */}
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
+              <div className="flex gap-3">
+                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-bold text-lg">
+                  Y
+                </div>
+                <div className="flex-1">
+                  <div className="bg-gray-100 rounded-2xl px-4 py-3 inline-block">
+                    <p className="font-bold text-sm text-gray-900 mb-1">Yacine Berriane</p>
+                    <p className="text-gray-800 text-sm leading-relaxed">
+                      كنت متردد نشري بصح كي قلتولي جرب قبل ما تخلص ريحت. سلعة أصلية 100%، شكراً على التعامل الراقي.
+                    </p>
+                  </div>
+                  <div className="flex gap-4 mt-1 px-2 text-xs text-gray-500 font-bold">
+                    <span className="cursor-pointer hover:underline text-blue-600">أعجبني</span>
+                    <span className="cursor-pointer hover:underline">رد</span>
+                    <span>منذ يومين</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -269,7 +350,13 @@ function AnkerSimpleLanding() {
           
           <div className="grid md:grid-cols-2 gap-8 mt-12">
             {/* عرض 2 قطع */}
-            <div className="border-4 border-black rounded-3xl p-8 text-center relative bg-gray-50">
+            <div 
+              onClick={() => {
+                setFormData(prev => ({ ...prev, quantity: 2 }));
+                document.getElementById('order-form').scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="border-4 border-black rounded-3xl p-8 text-center relative bg-gray-50 cursor-pointer hover:scale-105 transition-transform"
+            >
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-6 py-2 rounded-full font-bold text-sm">
                 DISCOUNT SPECIAL
               </div>
@@ -291,14 +378,20 @@ function AnkerSimpleLanding() {
               </div>
 
               <p className="text-2xl font-bold">
-                <span className="line-through text-gray-400">7,000 دج</span>
+                <span className="line-through text-gray-400">9,540 دج</span>
                 <br />
-                <span className="text-red-600 text-4xl">6,300 دج</span>
+                <span className="text-red-600 text-4xl">8,580 دج</span>
               </p>
             </div>
 
             {/* عرض 3 قطع */}
-            <div className="border-4 border-red-600 rounded-3xl p-8 text-center relative bg-red-50">
+            <div 
+              onClick={() => {
+                setFormData(prev => ({ ...prev, quantity: 3 }));
+                document.getElementById('order-form').scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="border-4 border-red-600 rounded-3xl p-8 text-center relative bg-red-50 cursor-pointer hover:scale-105 transition-transform"
+            >
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-black text-white px-6 py-2 rounded-full font-bold text-sm animate-pulse">
                 ⚠️ الأكثر طلباً
               </div>
@@ -319,13 +412,13 @@ function AnkerSimpleLanding() {
 
               <div className="bg-black text-white py-6 px-4 rounded-2xl mb-4">
                 <p className="text-sm mb-2">راح تربح:</p>
-                <p className="text-4xl font-black">تخفيض 17%</p>
+                <p className="text-4xl font-black">تخفيض 18%</p>
               </div>
 
               <p className="text-2xl font-bold">
-                <span className="line-through text-gray-400">10,500 دج</span>
+                <span className="line-through text-gray-400">14,310 دج</span>
                 <br />
-                <span className="text-red-600 text-5xl">8,700 دج</span>
+                <span className="text-red-600 text-5xl">11,730 دج</span>
               </p>
 
               <div className="mt-4 bg-red-600 text-white px-4 py-2 rounded-xl font-bold text-sm">
@@ -355,7 +448,7 @@ function AnkerSimpleLanding() {
                 <Shield className="w-10 h-10 text-white" />
               </div>
               <h3 className="text-xl font-bold mb-3">ضمان + مصداقية</h3>
-              <p className="text-gray-600">ضمان رسمي لمدة سنة. آلاف العملاء الراضين في الجزائر!</p>
+              <p className="text-gray-600">ضمان بأن المنتج أصلي 100% (يمكنك تجربته عند الاستلام قبل الدفع)</p>
             </div>
 
             <div className="bg-white border-4 border-black rounded-2xl p-8 text-center">
@@ -370,7 +463,7 @@ function AnkerSimpleLanding() {
       </section>
 
       {/* نموذج الطلب */}
-      <section className="py-16 bg-black text-white">
+      <section id="order-form" className="py-16 bg-black text-white">
         <div className="max-w-2xl mx-auto px-4">
           <div className="bg-white text-black rounded-3xl p-8">
             <h2 className="text-3xl font-black text-center mb-2">اطلب الآن 🚀</h2>
@@ -437,6 +530,39 @@ function AnkerSimpleLanding() {
                 />
               </div>
 
+              {/* وقت التوصيل */}
+              <div>
+                <label className="flex items-center gap-2 font-bold mb-2">
+                  <span className="w-5 h-5 flex items-center justify-center text-red-600">⏰</span>
+                  وقت التوصيل المفضل
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, deliveryTime: 'morning' })}
+                    className={`py-3 px-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${
+                      formData.deliveryTime === 'morning'
+                        ? 'bg-red-600 text-white shadow-lg'
+                        : 'bg-gray-100 text-black hover:bg-gray-200'
+                    }`}
+                  >
+                    صباحاً ☀️
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, deliveryTime: 'evening' })}
+                    className={`py-3 px-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${
+                      formData.deliveryTime === 'evening'
+                        ? 'bg-black text-white shadow-lg'
+                        : 'bg-gray-100 text-black hover:bg-gray-200'
+                    }`}
+                  >
+                    مساءً 🌙
+                  </button>
+                </div>
+              </div>
+
+              {/* الكمية */}
               <div>
                 <label className="flex items-center gap-2 font-bold mb-2">
                   <Package className="w-5 h-5 text-red-600" />
@@ -447,26 +573,53 @@ function AnkerSimpleLanding() {
                   onChange={(e) => setFormData({...formData, quantity: parseInt(e.target.value)})}
                   className="w-full px-4 py-4 border-2 border-gray-300 rounded-xl focus:border-red-600 focus:outline-none text-lg font-bold"
                 >
-                  <option value={1}>1 قطعة - 3,500 دج</option>
-                  <option value={2}>2 قطعة - 6,300 دج (خصم 10%)</option>
-                  <option value={3}>3 قطع - 8,700 دج (خصم 17%) ⭐</option>
-                  <option value={4}>4 قطع - {(2900 * 4).toLocaleString()} دج (خصم 17%)</option>
-                  <option value={5}>5 قطع - {(2900 * 5).toLocaleString()} دج (خصم 17%)</option>
+                  <option value={1}>1 قطعة - 4,770 دج</option>
+                  <option value={2}>2 قطعة - {(4290 * 2).toLocaleString()} دج (وفّر 10%)</option>
+                  <option value={3}>3 قطع - {(3910 * 3).toLocaleString()} دج (وفّر 18%) 🔥</option>
                 </select>
               </div>
 
+              {/* العرض الخاص - Upsell */}
+              <div className="border-2 border-red-600 rounded-xl p-4 bg-red-50 relative overflow-hidden">
+                <div className="absolute top-0 left-0 bg-red-600 text-white text-xs px-2 py-1 rounded-br-lg font-bold">
+                  عرض خاص محدود 🎁
+                </div>
+                <label className="flex items-start gap-4 cursor-pointer mt-2">
+                  <input 
+                    type="checkbox" 
+                    checked={includeUpsell}
+                    onChange={(e) => setIncludeUpsell(e.target.checked)}
+                    className="w-6 h-6 mt-1 text-red-600 rounded focus:ring-red-500 border-gray-300" 
+                  />
+                  <div className="flex-1">
+                    <p className="font-bold text-gray-900">أضف كابل شاحن سامسونج الأصلي (Type-C)</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-red-600 font-black text-lg">500 دج</span>
+                      <span className="text-gray-400 line-through text-sm">2000 دج</span>
+                      <span className="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded font-bold">خصم 75%</span>
+                    </div>
+                    <p className="text-sm text-gray-600 mt-1">اشحنه بأمان وسرعة! ⚡</p>
+                  </div>
+                  <div className="w-16 h-16 bg-white rounded-lg p-1 flex items-center justify-center border border-gray-200">
+                     <span className="text-2xl">🔌</span>
+                  </div>
+                </label>
+              </div>
+
               {formData.quantity >= 2 && (
-                <div className="bg-red-50 border-2 border-red-600 rounded-xl p-4 text-center">
-                  <p className="font-black text-red-600 text-xl">
-                    🎉 توفير {getDiscount()} = {((4770 * formData.quantity) - (getPrice() * formData.quantity)).toLocaleString()} دج!
+                <div className="bg-green-50 border-2 border-green-500 rounded-xl p-4 text-center">
+                  <p className="font-black text-green-600 text-xl">
+                    🎉 مبروك! وفّرت {((4770 * formData.quantity) - (getPrice() * formData.quantity)).toLocaleString()} دج
                   </p>
                 </div>
               )}
 
-              <div className="bg-gray-50 border-2 border-gray-300 rounded-xl p-4 text-center">
-                <p className="font-black text-2xl">
-                  المجموع: <span className="text-red-600 text-4xl">{(getPrice() * formData.quantity).toLocaleString()} دج</span>
+              <div className="bg-gray-50 border-2 border-gray-300 rounded-xl p-4 text-center space-y-2">
+                <p className="font-bold text-lg text-gray-600">المجموع النهائي:</p>
+                <p className="font-black text-red-600 text-4xl transform scale-110 transition-transform">
+                  {((getPrice() * formData.quantity) + (includeUpsell ? upsellPrice : 0)).toLocaleString()} دج
                 </p>
+                <p className="text-xs text-gray-500 mt-2">السعر شامل التوصيل لغرداية</p>
               </div>
 
               <button
