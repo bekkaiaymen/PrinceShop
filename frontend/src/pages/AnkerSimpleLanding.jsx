@@ -92,7 +92,7 @@ function AnkerSimpleLanding() {
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Package className="w-6 h-6 text-red-600" />
-            <span className="font-bold text-lg">AIR PODS ANKER</span>
+            <span className="font-bold text-lg">AIR PODS ANKER R50iNC</span>
           </div>
           <div className="flex items-center gap-2 bg-red-600 px-4 py-2 rounded-full text-sm font-bold">
             <MapPin className="w-4 h-4" />
@@ -101,15 +101,15 @@ function AnkerSimpleLanding() {
         </div>
       </div>
 
-      {/* Hero - مثل الصورة الأولى */}
+      {/* Hero */}
       <section className="py-12 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-8">
             <div className="inline-block bg-red-600 text-white px-6 py-3 rounded-full font-bold text-lg mb-4">
-              عاش أفضل محزية لطفلك! 🎮
+              عاش أفضل سماعة بأفضل سعر! 🎧
             </div>
             <h1 className="text-4xl sm:text-5xl font-black mb-6">
-              جهاز ألعاب <span className="text-red-600">500 لعبة</span>
+              AIR PODS ANKER <span className="text-red-600">R50iNC ORIGINAL</span>
             </h1>
           </div>
 
@@ -117,13 +117,13 @@ function AnkerSimpleLanding() {
             {/* المنتج */}
             <div className="bg-white border-4 border-black rounded-3xl p-8 text-center">
               <div className="bg-red-600 text-white px-4 py-2 rounded-xl font-bold text-2xl mb-6 inline-block">
-                ⚠️ 500 لعبة ممتعة داخل هذا الجهاز
+                ⚠️ صوت نقي + بطارية 8 ساعات
               </div>
               
               <div className="relative mb-6">
                 <img 
-                  src="https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?w=400&h=400&fit=crop" 
-                  alt="Gaming Console"
+                  src="https://images.unsplash.com/photo-1606841837239-c5a1a4a07af7?w=500&h=500&fit=crop" 
+                  alt="Anker AirPods"
                   className="w-full max-w-sm mx-auto rounded-2xl shadow-2xl"
                 />
               </div>
@@ -131,75 +131,75 @@ function AnkerSimpleLanding() {
               <div className="space-y-4">
                 <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl">
                   <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white font-bold">✓</div>
-                  <span className="text-right font-bold">للكبار والصغار</span>
+                  <span className="text-right font-bold">أصلية 100% من Anker</span>
                 </div>
                 <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl">
                   <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white font-bold">✓</div>
-                  <span className="text-right font-bold">راح يخليو بالمرحة وبيسا العاشق!</span>
+                  <span className="text-right font-bold">ضمان سنة كاملة</span>
                 </div>
               </div>
             </div>
 
-            {/* المقارنة - مثل الصورة الأولى */}
+            {/* المقارنة */}
             <div className="space-y-6">
               <div className="bg-black text-white rounded-3xl p-6">
-                <h3 className="text-2xl font-bold mb-6 text-center">المنتج</h3>
+                <h3 className="text-2xl font-bold mb-6 text-center">ANKER R50iNC</h3>
                 
                 <div className="space-y-4">
                   <div className="flex items-start gap-3 bg-white/10 p-4 rounded-xl">
                     <div className="text-green-400 text-xl">●</div>
-                    <p className="flex-1">يتخصص مستوى الذكاء والتركيز</p>
+                    <p className="flex-1">صوت نقي HD مع Bass قوي</p>
                   </div>
                   
                   <div className="flex items-start gap-3 bg-white/10 p-4 rounded-xl">
                     <div className="text-green-400 text-xl">●</div>
-                    <p className="flex-1">ألعاب تنفي التحليل والاستنتاج لذكى طفلك</p>
-                  </div>
-
-                  <div className="flex items-start gap-3 bg-red-600/20 p-4 rounded-xl border-2 border-red-600">
-                    <div className="text-red-400 text-xl">●</div>
-                    <p className="flex-1 text-red-400">شاشة صغيرة و أشعة ضارة</p>
+                    <p className="flex-1">بطارية تدوم 8 ساعات متواصلة</p>
                   </div>
 
                   <div className="flex items-start gap-3 bg-white/10 p-4 rounded-xl">
                     <div className="text-green-400 text-xl">●</div>
-                    <p className="flex-1">10 مرات أرخص من الهاتف</p>
+                    <p className="flex-1">مريحة للأذن - ما تسقطش!</p>
                   </div>
 
                   <div className="flex items-start gap-3 bg-white/10 p-4 rounded-xl">
                     <div className="text-green-400 text-xl">●</div>
-                    <p className="flex-1">يجعله ينشارك اللعب مع الأهل والأصدقاء</p>
+                    <p className="flex-1">10 مرات أرخص من AirPods!</p>
                   </div>
 
                   <div className="flex items-start gap-3 bg-white/10 p-4 rounded-xl">
                     <div className="text-green-400 text-xl">●</div>
-                    <p className="flex-1">سهل الاستعمال</p>
+                    <p className="flex-1">شحن سريع - 10 دقائق = ساعتين</p>
+                  </div>
+
+                  <div className="flex items-start gap-3 bg-white/10 p-4 rounded-xl">
+                    <div className="text-green-400 text-xl">●</div>
+                    <p className="flex-1">مقاومة للماء IPX5</p>
                   </div>
                 </div>
               </div>
 
               <div className="bg-black text-white rounded-3xl p-6">
-                <h3 className="text-2xl font-bold mb-4 text-center">الهاتف</h3>
+                <h3 className="text-2xl font-bold mb-4 text-center">السماعات الصينية</h3>
                 
                 <div className="space-y-4">
                   <div className="flex items-start gap-3 bg-red-600/20 p-4 rounded-xl border-2 border-red-600">
                     <div className="text-red-400 text-xl">●</div>
-                    <p className="flex-1 text-red-400">شبكة مخترة بالحصر</p>
+                    <p className="flex-1 text-red-400">صوت رديء مع تشويش</p>
                   </div>
 
                   <div className="flex items-start gap-3 bg-red-600/20 p-4 rounded-xl border-2 border-red-600">
                     <div className="text-red-400 text-xl">●</div>
-                    <p className="flex-1 text-red-400">غالي الثمن / تضليحة مكلف</p>
+                    <p className="flex-1 text-red-400">بطارية ضعيفة (2 ساعات فقط)</p>
                   </div>
 
                   <div className="flex items-start gap-3 bg-red-600/20 p-4 rounded-xl border-2 border-red-600">
                     <div className="text-red-400 text-xl">●</div>
-                    <p className="flex-1 text-red-400">يخدمه للعزلة و الوحدة</p>
+                    <p className="flex-1 text-red-400">تسقط من الأذن باستمرار</p>
                   </div>
 
                   <div className="flex items-start gap-3 bg-red-600/20 p-4 rounded-xl border-2 border-red-600">
                     <div className="text-red-400 text-xl">●</div>
-                    <p className="flex-1 text-red-400">معقد لا يصلح للصغار</p>
+                    <p className="flex-1 text-red-400">تخرب بسرعة - بلا ضمان</p>
                   </div>
                 </div>
               </div>
@@ -221,8 +221,8 @@ function AnkerSimpleLanding() {
                 {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />)}
               </div>
               <div className="bg-gray-900 text-white rounded-xl p-4 mb-4">
-                <p className="text-sm mb-2">Slm alikom</p>
-                <p className="text-sm">jai bien recu ma cmnd vraiment yaarikoم saha</p>
+                <p className="text-sm mb-2">Mohamed_47</p>
+                <p className="text-sm">الصوت ولا أروع! نفس جودة AirPods بـ 10 مرات أقل. شكراً!</p>
               </div>
             </div>
 
@@ -231,8 +231,8 @@ function AnkerSimpleLanding() {
                 {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />)}
               </div>
               <div className="bg-gray-900 text-white rounded-xl p-4 mb-4">
-                <p className="text-sm mb-2">▶ Video</p>
-                <p className="text-sm">🔥بشكرك الجدية ليوم حديت بيه وتباع وصحاح الله</p>
+                <p className="text-sm mb-2">Sarah_Alger</p>
+                <p className="text-sm">🔥 البطارية تدوم معايا اليوم كامل. أحسن من الصينية!</p>
               </div>
             </div>
 
@@ -241,9 +241,8 @@ function AnkerSimpleLanding() {
                 {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />)}
               </div>
               <div className="bg-gray-900 text-white rounded-xl p-4 mb-4">
-                <p className="text-sm mb-2">Slm I3z2</p>
-                <p className="text-sm">C bon</p>
-                <p className="text-sm">ay hatra la commande qualité top</p>
+                <p className="text-sm mb-2">Youcef_Oran</p>
+                <p className="text-sm">وصلوني في غرداية في 24 ساعة. أصليين 100%. Top qualité!</p>
               </div>
             </div>
 
@@ -252,7 +251,7 @@ function AnkerSimpleLanding() {
                 {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />)}
               </div>
               <div className="bg-gray-900 text-white rounded-xl p-4 mb-4">
-                <p className="text-sm">Vous êtes les meilleurs en Algérie</p>
+                <p className="text-sm">Vous êtes les meilleurs en Algérie! Merci 🙏</p>
               </div>
             </div>
           </div>
@@ -263,8 +262,9 @@ function AnkerSimpleLanding() {
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl sm:text-4xl font-black text-center mb-4">
-            إذا عندك أكثر من طفل... <span className="text-red-600">خفضنا فيك!</span>
+            إذا عندك أكثر من واحد... <span className="text-red-600">خفضنا فيك!</span>
           </h2>
+          <p className="text-center text-gray-600 mb-12">سماعة لكل فرد في العائلة بأقل سعر!</p>
           
           <div className="grid md:grid-cols-2 gap-8 mt-12">
             {/* عرض 2 قطع */}
@@ -273,14 +273,14 @@ function AnkerSimpleLanding() {
                 DISCOUNT SPECIAL
               </div>
               
-              <p className="text-xl font-bold mb-4 mt-4">عند أخذ قطعتين</p>
+              <p className="text-xl font-bold mb-4 mt-4">عند أخذ سماعتين</p>
               
               <div className="flex justify-center gap-4 mb-6">
                 <div className="w-20 h-20 bg-red-600 rounded-2xl flex items-center justify-center">
-                  <Package className="w-10 h-10 text-white" />
+                  <span className="text-white text-3xl">🎧</span>
                 </div>
                 <div className="w-20 h-20 bg-red-600 rounded-2xl flex items-center justify-center">
-                  <Package className="w-10 h-10 text-white" />
+                  <span className="text-white text-3xl">🎧</span>
                 </div>
               </div>
 
@@ -302,17 +302,17 @@ function AnkerSimpleLanding() {
                 ⚠️ الأكثر طلباً
               </div>
               
-              <p className="text-xl font-bold mb-4 mt-4">عند أخذ 3 قطع</p>
+              <p className="text-xl font-bold mb-4 mt-4">عند أخذ 3 سماعات</p>
               
               <div className="flex justify-center gap-2 mb-6">
                 <div className="w-16 h-16 bg-red-600 rounded-2xl flex items-center justify-center">
-                  <Package className="w-8 h-8 text-white" />
+                  <span className="text-white text-2xl">🎧</span>
                 </div>
                 <div className="w-16 h-16 bg-red-600 rounded-2xl flex items-center justify-center">
-                  <Package className="w-8 h-8 text-white" />
+                  <span className="text-white text-2xl">🎧</span>
                 </div>
                 <div className="w-16 h-16 bg-red-600 rounded-2xl flex items-center justify-center">
-                  <Package className="w-8 h-8 text-white" />
+                  <span className="text-white text-2xl">🎧</span>
                 </div>
               </div>
 
