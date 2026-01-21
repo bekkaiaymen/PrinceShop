@@ -7,7 +7,7 @@ function AnkerSimpleLanding() {
   const [searchParams] = useSearchParams();
   const [formData, setFormData] = useState({
     customerName: '',
-    phone: '',
+    customerPhone: '',
     city: 'غرداية',
     address: '',
     quantity: 1,
@@ -254,7 +254,7 @@ function AnkerSimpleLanding() {
       <section className="py-16 bg-gray-100">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl sm:text-4xl font-black text-center mb-8">
-            ماذا قالوا عن منتجنا؟ ⭐
+            ماذا قالوا عنا؟ ⭐
           </h2>
           <p className="text-center text-gray-600 mb-8">آراء حقيقية من عملائنا في غرداية</p>
           
@@ -268,94 +268,7 @@ function AnkerSimpleLanding() {
         </div>
       </section>
 
-      {/* عروض الكمية - مثل الصورة 4 */}
-      <section className="py-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-3xl sm:text-4xl font-black text-center mb-4">
-            إذا عندك أكثر من واحد... <span className="text-red-600">خفضنا فيك!</span>
-          </h2>
-          <p className="text-center text-gray-600 mb-12">سماعة لكل فرد في العائلة بأقل سعر!</p>
-          
-          <div className="grid md:grid-cols-2 gap-8 mt-12">
-            {/* عرض 2 قطع */}
-            <div 
-              onClick={() => {
-                setFormData(prev => ({ ...prev, quantity: 2 }));
-                document.getElementById('order-form').scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="border-4 border-black rounded-3xl p-8 text-center relative bg-gray-50 cursor-pointer hover:scale-105 transition-transform"
-            >
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-6 py-2 rounded-full font-bold text-sm">
-                DISCOUNT SPECIAL
-              </div>
-              
-              <p className="text-xl font-bold mb-4 mt-4">عند أخذ سماعتين</p>
-              
-              <div className="flex justify-center gap-4 mb-6">
-                <div className="w-20 h-20 bg-red-600 rounded-2xl flex items-center justify-center">
-                  <span className="text-white text-3xl">🎧</span>
-                </div>
-                <div className="w-20 h-20 bg-red-600 rounded-2xl flex items-center justify-center">
-                  <span className="text-white text-3xl">🎧</span>
-                </div>
-              </div>
 
-              <div className="bg-red-600 text-white py-6 px-4 rounded-2xl mb-4">
-                <p className="text-sm mb-2">راح تربح:</p>
-                <p className="text-4xl font-black">تخفيض 10%</p>
-              </div>
-
-              <p className="text-2xl font-bold">
-                <span className="line-through text-gray-400">9,540 دج</span>
-                <br />
-                <span className="text-red-600 text-4xl">8,580 دج</span>
-              </p>
-            </div>
-
-            {/* عرض 3 قطع */}
-            <div 
-              onClick={() => {
-                setFormData(prev => ({ ...prev, quantity: 3 }));
-                document.getElementById('order-form').scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="border-4 border-red-600 rounded-3xl p-8 text-center relative bg-red-50 cursor-pointer hover:scale-105 transition-transform"
-            >
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-black text-white px-6 py-2 rounded-full font-bold text-sm animate-pulse">
-                ⚠️ الأكثر طلباً
-              </div>
-              
-              <p className="text-xl font-bold mb-4 mt-4">عند أخذ 3 سماعات</p>
-              
-              <div className="flex justify-center gap-2 mb-6">
-                <div className="w-16 h-16 bg-red-600 rounded-2xl flex items-center justify-center">
-                  <span className="text-white text-2xl">🎧</span>
-                </div>
-                <div className="w-16 h-16 bg-red-600 rounded-2xl flex items-center justify-center">
-                  <span className="text-white text-2xl">🎧</span>
-                </div>
-                <div className="w-16 h-16 bg-red-600 rounded-2xl flex items-center justify-center">
-                  <span className="text-white text-2xl">🎧</span>
-                </div>
-              </div>
-
-              <div className="bg-black text-white py-6 px-4 rounded-2xl mb-4">
-                <p className="text-sm mb-2">راح تربح:</p>
-                <p className="text-4xl font-black">تخفيض 18%</p>
-              </div>
-
-              <p className="text-2xl font-bold">
-                <span className="line-through text-gray-400">14,310 دج</span>
-                <br />
-                <span className="text-red-600 text-5xl">11,730 دج</span>
-              </p>
-
-              <div className="mt-4 bg-red-600 text-white px-4 py-2 rounded-xl font-bold text-sm">
-                عرض يخفر بخلاص في كل لحصة!
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* المصداقية - غرداية */}
       <section className="py-16 bg-gray-50">
@@ -421,8 +334,8 @@ function AnkerSimpleLanding() {
                 <input
                   type="tel"
                   required
-                  value={formData.phone}
-                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                  value={formData.customerPhone}
+                  onChange={(e) => setFormData({...formData, customerPhone: e.target.value})}
                   className="w-full px-4 py-4 border-2 border-gray-300 rounded-xl focus:border-red-600 focus:outline-none text-lg"
                   placeholder="0550123456"
                 />
