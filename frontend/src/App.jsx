@@ -20,6 +20,7 @@ import OwnerLogin from './pages/OwnerLogin';
 import OwnerDashboard from './pages/OwnerDashboard';
 import PixelTest from './pages/PixelTest'; // صفحة فحص البيكسل
 import AnkerAirPodsLanding from './pages/AnkerAirPodsLanding'; // صفحة هبوط Anker
+import AnkerSimpleLanding from './pages/AnkerSimpleLanding'; // صفحة هبوط بسيطة
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
           <Route path="/" element={<CustomerHome />} />
           <Route path="/pixel-test" element={<PixelTest />} /> {/* مسار الفحص الجديد */}
           <Route path="/anker-r50inc" element={<AnkerAirPodsLanding />} /> {/* صفحة Anker المخصصة */}
+          <Route path="/anker-simple" element={<AnkerSimpleLanding />} /> {/* صفحة Anker البسيطة */}
           <Route path="/landing/:productId" element={<LandingPage />} />
           <Route path="/products" element={<HomePage />} />
           <Route path="/product/:id" element={<ProductPage />} />
