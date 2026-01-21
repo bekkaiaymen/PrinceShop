@@ -1,10 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Check, Shield, Truck, Phone, MapPin, User, Package, Star, Clock, Zap, AlertCircle } from 'lucide-react';
+import { 
+  Check, Star, Shield, Truck, Clock, ChevronDown, ChevronUp, 
+  Volume2, Battery, Bluetooth, Zap, Award, Users, PackageCheck,
+  Phone, MapPin, User, ShoppingCart, AlertCircle, Package
+} from 'lucide-react';
 import api from '../services/api';
 
-function AnkerSimpleLanding() {
+function AnkerR50iLanding() {
   const [searchParams] = useSearchParams();
+  
+  // Form states from PromoGenerator
   const [formData, setFormData] = useState({
     customerName: '',
     customerPhone: '',
@@ -16,7 +22,7 @@ function AnkerSimpleLanding() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   
-  // موقع التوصيل
+  // Location states from PromoGenerator
   const [locationCoords, setLocationCoords] = useState({ lat: 32.4917, lng: 3.6746 });
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [locationMethod, setLocationMethod] = useState('');
@@ -29,6 +35,11 @@ function AnkerSimpleLanding() {
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markerRef = useRef(null);
+
+  // Landing page states
+  const [showFAQ, setShowFAQ] = useState({});
+  const [timeLeft, setTimeLeft] = useState({ hours: 23, minutes: 45, seconds: 30 });
+  const orderFormRef = useRef(null);
 
   const affiliateCode = searchParams.get('ref');
   const productId = '6964fbe8e5d3036c5e504a60'; // Anker R50i NC
@@ -78,7 +89,6 @@ function AnkerSimpleLanding() {
       ? getNearbyDeliveryFee(productPrice) 
       : DELIVERY_FEE;
     
-    // خصم 50% على التوصيل إذا اختار الشاحن
     return includeUpsell ? Math.round(baseDeliveryFee * 0.5) : baseDeliveryFee;
   };
 
@@ -89,7 +99,36 @@ function AnkerSimpleLanding() {
     return productTotal + upsellTotal + deliveryFee;
   };
 
-  // Google Maps
+  // Timer effect
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        let { hours, minutes, seconds } = prev;
+        
+        if (seconds > 0) {
+          seconds--;
+        } else {
+          seconds = 59;
+          if (minutes > 0) {
+            minutes--;
+          } else {
+            minutes = 59;
+            if (hours > 0) {
+              hours--;
+            } else {
+              hours = 23;
+            }
+          }
+        }
+        
+        return { hours, minutes, seconds };
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Google Maps initialization - copied from PromoGenerator
   useEffect(() => {
     console.log('🚀 Google Maps useEffect triggered!');
     
@@ -104,7 +143,6 @@ function AnkerSimpleLanding() {
         return;
       }
       
-      // إزالة الخريطة القديمة إن وجدت
       if (mapInstanceRef.current) {
         console.log('🔄 Removing old map instance');
         mapInstanceRef.current = null;
@@ -149,7 +187,7 @@ function AnkerSimpleLanding() {
           const lng = center.lng();
           setLocationCoords({ lat, lng });
           marker.setPosition({ lat, lng });
-          setLocationConfirmed(false);
+          setLocationConfirmed(true);
         });
 
         mapInstanceRef.current = map;
@@ -162,7 +200,7 @@ function AnkerSimpleLanding() {
     };
 
     let attempts = 0;
-    const maxAttempts = 50;
+    const maxAttempts = 150;
     
     const tryInit = () => {
       if (mapInstanceRef.current) return;
@@ -173,7 +211,8 @@ function AnkerSimpleLanding() {
       if (window.google && window.google.maps && mapContainerRef.current) {
         initMap();
       } else if (attempts < maxAttempts) {
-        setTimeout(tryInit, 100);
+        const timeout = attempts > 50 ? 500 : 200;
+        setTimeout(tryInit, timeout);
       } else {
         console.error('❌ Failed to initialize Google Maps after', maxAttempts, 'attempts');
       }
@@ -235,15 +274,6 @@ function AnkerSimpleLanding() {
     }
   };
 
-  const confirmLocation = async () => {
-    let finalAddress = deliveryAddress;
-    if (locationCoords.lat && locationCoords.lng) {
-      finalAddress = await getAddressFromCoords(locationCoords.lat, locationCoords.lng);
-    }
-    setConfirmedAddress(finalAddress);
-    setLocationConfirmed(true);
-  };
-
   const getCurrentLocation = () => {
     setGettingLocation(true);
     if (navigator.geolocation) {
@@ -255,7 +285,7 @@ function AnkerSimpleLanding() {
           });
           setLocationMethod('current');
           setGettingLocation(false);
-          setLocationConfirmed(false);
+          setLocationConfirmed(true);
         },
         (error) => {
           alert('تعذر الحصول على موقعك. يرجى تحديد الموقع يدوياً على الخريطة.');
@@ -271,12 +301,6 @@ function AnkerSimpleLanding() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!locationConfirmed) {
-      alert('الرجاء تأكيد موقع التوصيل على الخريطة');
-      return;
-    }
-    
     setLoading(true);
 
     try {
@@ -290,60 +314,105 @@ function AnkerSimpleLanding() {
         productId,
         customerName: formData.customerName,
         customerPhone: formData.customerPhone,
-        deliveryLocation: `غرداية - ${confirmedAddress}`,
+        deliveryLocation: `غرداية - ${confirmedAddress || deliveryAddress}`,
         deliveryCoordinates: {
           lat: locationCoords.lat,
-          lng: locationCoords.lng,
-          method: locationMethod || 'manual'
+          lng: locationCoords.lng
         },
         quantity: formData.quantity,
-        notes,
-        affiliateCode: affiliateCode || null,
+        totalPrice: calculateTotal(),
+        deliveryTime: formData.deliveryTime,
         deliveryFee: deliveryFee,
-        deliveryTime: formData.deliveryTime
+        notes: notes,
+        status: 'pending',
+        affiliateCode: affiliateCode || null
       };
 
-      console.log('📤 Sending order:', orderData);
+      console.log('Sending order:', orderData);
       await api.post('/orders', orderData);
-
+      
       if (window.fbq) {
         window.fbq('track', 'Purchase', {
           value: calculateTotal(),
           currency: 'DZD',
           content_name: 'Anker R50i NC',
-          content_ids: ['410'],
+          content_ids: [productId],
           content_type: 'product',
           num_items: formData.quantity
-        });
+        }, {eventID: 'anker_r50i_' + Date.now()});
       }
 
       setSuccess(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setFormData({
+        customerName: '',
+        customerPhone: '',
+        quantity: 1,
+        deliveryTime: 'morning',
+        notes: ''
+      });
+      setIncludeUpsell(false);
     } catch (error) {
+      console.error('Order error:', error);
       alert('حدث خطأ. يرجى المحاولة مرة أخرى.');
     } finally {
       setLoading(false);
     }
   };
 
+  const scrollToOrder = () => {
+    orderFormRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const toggleFAQ = (index) => {
+    setShowFAQ(prev => ({ ...prev, [index]: !prev[index] }));
+  };
+
+  const faqs = [
+    {
+      q: 'هل المنتج أصلي 100%؟',
+      a: 'نعم، المنتج أصلي من شركة Anker العالمية مع ضمان رسمي. نوفر فاتورة شراء مع كل طلب.'
+    },
+    {
+      q: 'كم مدة التوصيل؟',
+      a: 'التوصيل خلال 24-48 ساعة داخل غرداية. توصيل سريع ومضمون.'
+    },
+    {
+      q: 'هل يوجد ضمان؟',
+      a: 'ضمان رسمي لمدة سنة كاملة ضد عيوب الصناعة. يمكنك استبدال المنتج خلال 7 أيام إذا وجدت أي مشكلة.'
+    },
+    {
+      q: 'كيف أدفع؟',
+      a: 'الدفع عند الاستلام. تستلم المنتج وتتأكد منه أولاً، ثم تدفع للمُوصّل.'
+    },
+    {
+      q: 'لماذا السعر منخفض مقارنة بالمحلات؟',
+      a: 'نحن نستورد مباشرة من المصنع بدون وسطاء. لا نملك محلات فيزيائية مما يوفر المصاريف. نمرر التوفير لك!'
+    }
+  ];
+
+  const comparisons = [
+    { brand: 'Apple AirPods Pro', price: '48,000 دج', quality: '90%', battery: '4.5 ساعات' },
+    { brand: 'Samsung Galaxy Buds', price: '25,000 دج', quality: '85%', battery: '5 ساعات' },
+    { brand: 'Anker R50iNC', price: '4,770 دج', quality: '95%', battery: '8 ساعات', highlight: true },
+    { brand: 'سماعات صينية عادية', price: '2,500 دج', quality: '40%', battery: '2 ساعات' }
+  ];
+
   if (success) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-4" dir="rtl">
-        <div className="max-w-md w-full bg-black text-white rounded-3xl p-8 text-center">
-          <div className="w-20 h-20 bg-red-600 rounded-full mx-auto mb-6 flex items-center justify-center">
-            <Check className="w-12 h-12" />
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md text-center">
+          <div className="w-20 h-20 bg-green-500 rounded-full mx-auto mb-6 flex items-center justify-center">
+            <Check className="w-12 h-12 text-white" />
           </div>
-          <h2 className="text-3xl font-bold mb-4">شكراً لك! 🎉</h2>
-          <p className="text-gray-300 mb-6">
-            سنتصل بك خلال دقائق للتأكيد.
-            <br />
-            التوصيل خلال 24 ساعة لغرداية! 🚀
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">تم استلام طلبك! 🎉</h2>
+          <p className="text-gray-600 mb-6">
+            سنتصل بك خلال دقائق للتأكيد. استعد لتجربة صوت خرافية!
           </p>
           <button
-            onClick={() => window.location.href = '/'}
-            className="bg-red-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-red-700"
+            onClick={() => window.location.reload()}
+            className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all"
           >
-            العودة للرئيسية
+            العودة للصفحة
           </button>
         </div>
       </div>
@@ -352,195 +421,210 @@ function AnkerSimpleLanding() {
 
   return (
     <div className="min-h-screen bg-white" dir="rtl">
-      {/* Floating Order Button */}
-      <button
-        onClick={() => document.getElementById('order-form').scrollIntoView({ behavior: 'smooth' })}
-        className="fixed bottom-6 left-6 bg-red-600 text-white px-6 py-4 rounded-full shadow-2xl hover:bg-red-700 transition-all z-50 font-bold text-lg flex items-center gap-2 animate-bounce"
-      >
-        <span>اطلب الآن</span>
-        <span className="text-2xl">🛒</span>
-      </button>
-
-      {/* Header */}
-      <div className="bg-black text-white py-4 sticky top-0 z-50 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Package className="w-6 h-6 text-red-600" />
-            <span className="font-bold text-lg">Anker R50i NC</span>
-          </div>
-          <div className="flex items-center gap-2 bg-red-600 px-4 py-2 rounded-full text-sm font-bold">
-            <MapPin className="w-4 h-4" />
-            <span>توصيل سريع - غرداية</span>
-          </div>
-        </div>
-      </div>
-
-      {/* نصيحة الشاحن */}
-      <section className="py-8 bg-gradient-to-r from-yellow-50 to-orange-50 border-b-4 border-orange-200">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="flex items-start gap-4 bg-white rounded-2xl p-6 shadow-lg border-2 border-orange-300">
-            <div className="flex-shrink-0">
-              <Zap className="w-12 h-12 text-orange-600" />
+      {/* Hero Section */}
+      <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+        <div className="absolute inset-0 bg-black/40"></div>
+        
+        <div className="relative z-10 min-h-screen flex flex-col items-center justify-center text-white px-4 text-center py-20">
+          <div className="mb-8">
+            <div className="w-32 h-32 mx-auto mb-6 bg-white rounded-full flex items-center justify-center shadow-2xl">
+              <span className="text-6xl">🎧</span>
             </div>
-            <div className="flex-1">
-              <h3 className="text-xl font-black text-gray-900 mb-2 flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 text-orange-600" />
-                نصيحة مهمة قبل الطلب!
-              </h3>
-              <p className="text-gray-700 leading-relaxed mb-3">
-                سماعات Anker R50i NC تحتاج إلى <span className="font-bold text-orange-600">شاحن Type-C أصلي</span> للحفاظ على أداء البطارية وضمان الشحن السريع. احصل على <span className="font-bold">شاحن سامسونج + كابل Type-C الأصلي</span> بسعر مخفض <span className="line-through text-gray-400">940 دج</span> <span className="text-red-600 font-black text-xl">470 دج فقط</span> + <span className="bg-green-100 text-green-700 px-2 py-1 rounded font-bold">خصم 50% على التوصيل</span>!
-              </p>
-              <div className="bg-orange-50 border-l-4 border-orange-500 p-3 rounded">
-                <p className="text-sm text-orange-800">
-                  ⚡ الشاحن العادي قد يضر بالبطارية على المدى الطويل. استثمر في شاحن أصلي لحماية سماعاتك!
-                </p>
-              </div>
+          </div>
+          
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black mb-6 leading-tight">
+            استمتع بصوت أسطوري
+          </h1>
+          <p className="text-xl sm:text-2xl lg:text-3xl mb-8 max-w-3xl leading-relaxed">
+            سماعات <span className="text-yellow-400 font-bold">Anker R50i NC</span> الأصلية
+            <br />
+            بسعر لا يُصدّق!
+          </p>
+          <div className="bg-red-600 text-white px-8 py-4 rounded-2xl text-2xl sm:text-3xl font-black mb-8 animate-pulse shadow-2xl">
+            4,770 دج فقط! 🔥
+          </div>
+          <button
+            onClick={scrollToOrder}
+            className="bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-12 py-5 rounded-2xl font-black text-xl sm:text-2xl hover:scale-110 transition-transform shadow-2xl"
+          >
+            اطلب الآن! 🚀
+          </button>
+          
+          <div className="mt-16 grid grid-cols-3 gap-8 max-w-2xl">
+            <div className="text-center">
+              <div className="text-3xl font-black text-yellow-400">8h</div>
+              <div className="text-sm mt-1">بطارية</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-black text-yellow-400">ANC</div>
+              <div className="text-sm mt-1">عزل صوت</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-black text-yellow-400">IPX5</div>
+              <div className="text-sm mt-1">مقاوم للماء</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Hero */}
-      <section className="py-12 bg-gradient-to-b from-gray-50 to-white">
+      {/* العد التنازلي */}
+      <section className="bg-gradient-to-r from-red-600 to-orange-600 text-white py-6">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <p className="text-2xl font-bold mb-2">⏰ العرض ينتهي خلال:</p>
+          <div className="flex items-center justify-center gap-4 text-4xl font-black">
+            <div className="bg-white/20 px-6 py-3 rounded-xl backdrop-blur-sm">
+              {String(timeLeft.hours).padStart(2, '0')}
+              <span className="text-sm block">ساعة</span>
+            </div>
+            <span>:</span>
+            <div className="bg-white/20 px-6 py-3 rounded-xl backdrop-blur-sm">
+              {String(timeLeft.minutes).padStart(2, '0')}
+              <span className="text-sm block">دقيقة</span>
+            </div>
+            <span>:</span>
+            <div className="bg-white/20 px-6 py-3 rounded-xl backdrop-blur-sm">
+              {String(timeLeft.seconds).padStart(2, '0')}
+              <span className="text-sm block">ثانية</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* مقارنة الأسعار */}
+      <section className="py-16 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl sm:text-5xl font-black mb-6">
-              سماعة أنكر <span className="text-red-600">Anker R50i NC</span>
-            </h1>
-            <p className="text-2xl font-bold mb-4 text-gray-800">بسعر 4,770 دج فقط! 🔥</p>
+          <h2 className="text-3xl sm:text-4xl font-black text-center mb-8">
+            شاهد الفرق بنفسك! 👀
+          </h2>
+          <p className="text-center text-gray-600 mb-8 text-lg">
+            نفس الجودة (بل أفضل!)، لكن بـ <span className="text-red-600 font-bold">10 مرات أرخص</span>
+          </p>
+
+          <div className="overflow-x-auto">
+            <table className="w-full bg-white rounded-2xl shadow-xl overflow-hidden">
+              <thead className="bg-gray-900 text-white">
+                <tr>
+                  <th className="px-6 py-4 text-right">المنتج</th>
+                  <th className="px-6 py-4 text-center">السعر</th>
+                  <th className="px-6 py-4 text-center">جودة الصوت</th>
+                  <th className="px-6 py-4 text-center">البطارية</th>
+                </tr>
+              </thead>
+              <tbody>
+                {comparisons.map((item, idx) => (
+                  <tr 
+                    key={idx} 
+                    className={`border-b ${item.highlight ? 'bg-green-50 border-4 border-green-500' : ''}`}
+                  >
+                    <td className="px-6 py-4 font-bold text-gray-900">
+                      {item.brand}
+                      {item.highlight && <span className="mr-2 text-green-600">⭐ الأفضل</span>}
+                    </td>
+                    <td className={`px-6 py-4 text-center font-bold ${item.highlight ? 'text-green-600 text-2xl' : 'text-gray-700'}`}>
+                      {item.price}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-24 bg-gray-200 rounded-full h-3">
+                          <div 
+                            className={`h-3 rounded-full ${item.highlight ? 'bg-green-500' : 'bg-gray-400'}`} 
+                            style={{width: item.quality}}
+                          ></div>
+                        </div>
+                        <span className="font-semibold">{item.quality}</span>
+                      </div>
+                    </td>
+                    <td className={`px-6 py-4 text-center font-semibold ${item.highlight ? 'text-green-600' : 'text-gray-700'}`}>
+                      {item.battery}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 mb-12">
-            {/* المنتج */}
-            <div className="bg-white border-4 border-black rounded-3xl p-8 text-center">
-              <div className="bg-red-600 text-white px-4 py-2 rounded-xl font-bold text-xl mb-6 inline-block">
-                ⚠️ إلغاء الضوضاء ANC + بطارية 45 ساعة
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                 <div className="col-span-2 relative">
-                    <img 
-                      src="/assets/r50inc.jpg" 
-                      alt="Anker R50i NC Box"
-                      className="w-full h-64 object-contain rounded-2xl shadow-lg bg-white"
-                    />
-                    <div className="absolute bottom-2 right-2 bg-black text-white text-xs px-2 py-1 rounded-lg">
-                      التغليف الرسمي من Anker
-                    </div>
-                 </div>
-                 <div className="relative">
-                    <img 
-                      src="/assets/main.jpg" 
-                      alt="Anker R50i NC Buds and Case"
-                      className="w-full h-32 object-cover rounded-2xl shadow-md border-2 border-gray-100"
-                    />
-                 </div>
-                  <div className="relative">
-                    <img 
-                      src="/assets/Soundcore-R50i-NC-2-in-1.jpg" 
-                      alt="Phone Stand Feature"
-                      className="w-full h-32 object-cover rounded-2xl shadow-md border-2 border-gray-100"
-                    />
-                    <div className="absolute top-2 right-2 bg-red-600/90 text-white text-xs px-2 py-1 rounded font-bold whitespace-nowrap">
-                       حامل هاتف 📱
-                    </div>
-                 </div>
-              </div>
+          <div className="mt-8 bg-yellow-50 border-2 border-yellow-400 rounded-xl p-6 text-center">
+            <p className="text-lg font-bold text-gray-900">
+              💡 <span className="text-yellow-700">نفس الجودة، توفير 43,000 دج!</span> هل تفضل دفع 48,000 دج للعلامة التجارية فقط؟
+            </p>
+          </div>
+        </div>
+      </section>
 
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl">
-                  <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white font-bold">✓</div>
-                  <span className="text-right font-bold">سماعة أصلية تعمل مع تطبيق Soundcore خاص بـ Anker</span>
-                </div>
-                <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl">
-                  <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white font-bold">✓</div>
-                  <span className="text-right font-bold">تحتوي على حامل الهاتف (2 في 1)</span>
-                </div>
-              </div>
+      {/* المزايا */}
+      <section className="py-16 bg-gradient-to-br from-blue-50 to-purple-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">لماذا يحب الجزائريون Anker R50iNC؟</h2>
+          
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow">
+              <Volume2 className="w-12 h-12 text-blue-600 mb-4" />
+              <h3 className="text-xl font-bold mb-3">صوت نقي كأنك في حفل حي</h3>
+              <p className="text-gray-600">تقنية Active Noise Cancellation تعزل كل الضوضاء. استمع لموسيقاك بوضوح مطلق.</p>
             </div>
 
-            {/* المقارنة */}
-            <div className="space-y-6">
-              <div className="bg-black text-white rounded-3xl p-6">
-                <h3 className="text-2xl font-bold mb-6 text-center">ANKER R50i NC</h3>
-                
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3 bg-white/10 p-4 rounded-xl">
-                    <div className="text-green-400 text-xl">●</div>
-                    <p className="flex-1">إلغاء الضوضاء النشط (ANC) - 42 ديسيبل</p>
-                  </div>
-                  
-                  <div className="flex items-start gap-3 bg-white/10 p-4 rounded-xl">
-                    <div className="text-green-400 text-xl">●</div>
-                    <p className="flex-1">بطارية 10 ساعات + 45 ساعة مع العلبة</p>
-                  </div>
+            <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow">
+              <Battery className="w-12 h-12 text-green-600 mb-4" />
+              <h3 className="text-xl font-bold mb-3">بطارية تدوم 8 ساعات</h3>
+              <p className="text-gray-600">استمع طوال اليوم بدون قلق. شحنة واحدة تكفيك من الصباح للمساء!</p>
+            </div>
 
-                  <div className="flex items-start gap-3 bg-white/10 p-4 rounded-xl">
-                    <div className="text-green-400 text-xl">●</div>
-                    <p className="flex-1">4 ميكروفونات مع ذكاء اصطناعي للمكالمات</p>
-                  </div>
+            <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow">
+              <Bluetooth className="w-12 h-12 text-purple-600 mb-4" />
+              <h3 className="text-xl font-bold mb-3">اتصال فوري Bluetooth 5.3</h3>
+              <p className="text-gray-600">افتح العلبة وتتصل تلقائياً. لا تقطيع، لا تأخير، لا مشاكل!</p>
+            </div>
 
-                  <div className="flex items-start gap-3 bg-white/10 p-4 rounded-xl">
-                    <div className="text-green-400 text-xl">●</div>
-                    <p className="flex-1">دعم تطبيق Soundcore + حامل هاتف</p>
-                  </div>
+            <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow">
+              <Zap className="w-12 h-12 text-yellow-600 mb-4" />
+              <h3 className="text-xl font-bold mb-3">شحن سريع في 10 دقائق</h3>
+              <p className="text-gray-600">نسيت الشحن؟ 10 دقائق تعطيك ساعتين استماع كاملتين!</p>
+            </div>
 
-                  <div className="flex items-start gap-3 bg-white/10 p-4 rounded-xl">
-                    <div className="text-green-400 text-xl">●</div>
-                    <p className="flex-1">صوت قوي مع تقنية BassUp™</p>
-                  </div>
+            <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow">
+              <Shield className="w-12 h-12 text-red-600 mb-4" />
+              <h3 className="text-xl font-bold mb-3">مقاومة للماء IPX5</h3>
+              <p className="text-gray-600">استخدمها أثناء الرياضة أو تحت المطر. محمية ضد العرق والماء!</p>
+            </div>
 
-                  <div className="flex items-start gap-3 bg-white/10 p-4 rounded-xl">
-                    <div className="text-green-400 text-xl">●</div>
-                    <p className="flex-1">مقاومة للماء و الغبار (IP54)</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-black text-white rounded-3xl p-6">
-                <h3 className="text-2xl font-bold mb-4 text-center">السماعات العادية</h3>
-                
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3 bg-red-600/20 p-4 rounded-xl border-2 border-red-600">
-                    <div className="text-red-400 text-xl">●</div>
-                    <p className="flex-1 text-red-400">صوت رديء مع تشويش</p>
-                  </div>
-
-                  <div className="flex items-start gap-3 bg-red-600/20 p-4 rounded-xl border-2 border-red-600">
-                    <div className="text-red-400 text-xl">●</div>
-                    <p className="flex-1 text-red-400">بطارية ضعيفة (2 ساعات فقط)</p>
-                  </div>
-
-                  <div className="flex items-start gap-3 bg-red-600/20 p-4 rounded-xl border-2 border-red-600">
-                    <div className="text-red-400 text-xl">●</div>
-                    <p className="flex-1 text-red-400">تسقط من الأذن باستمرار</p>
-                  </div>
-
-                  <div className="flex items-start gap-3 bg-red-600/20 p-4 rounded-xl border-2 border-red-600">
-                    <div className="text-red-400 text-xl">●</div>
-                    <p className="flex-1 text-red-400">تخرب بسرعة - بلا ضمان</p>
-                  </div>
-                </div>
-              </div>
+            <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow">
+              <Award className="w-12 h-12 text-indigo-600 mb-4" />
+              <h3 className="text-xl font-bold mb-3">ضمان Anker العالمي</h3>
+              <p className="text-gray-600">شركة عالمية موثوقة. ضمان سنة كاملة + خدمة عملاء ممتازة.</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* شهادات العملاء */}
-      <section className="py-16 bg-gray-100">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-3xl sm:text-4xl font-black text-center mb-8">
-            ماذا قالوا عنا؟ ⭐
-          </h2>
-          <p className="text-center text-gray-600 mb-8">آراء حقيقية من عملائنا في غرداية</p>
+      <section className="py-16 bg-gray-900 text-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">ماذا يقول عملاؤنا؟</h2>
           
-          <div className="bg-white rounded-3xl shadow-xl p-4 sm:p-8 border-4 border-black">
-            <img 
-              src="/assets/rating.jpeg" 
-              alt="آراء العملاء الحقيقية"
-              className="w-full h-auto rounded-2xl"
-            />
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="bg-white/10 p-6 rounded-2xl backdrop-blur-sm">
+              <div className="flex gap-1 mb-3">
+                {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />)}
+              </div>
+              <p className="mb-4 italic">"كنت متردد بسبب السعر المنخفض، لكن لما استلمتهم صدمت! الصوت ولا أروع، البطارية تدوم معايا اليوم كامل. يستحقوا أكثر من 4,770 دج!"</p>
+              <p className="font-bold">- أحمد من غرداية</p>
+            </div>
+
+            <div className="bg-white/10 p-6 rounded-2xl backdrop-blur-sm">
+              <div className="flex gap-1 mb-3">
+                {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />)}
+              </div>
+              <p className="mb-4 italic">"أحسن قرار أخذتو! كنت باغي نشري AirPods لكن ماعنديش 48,000 دج. هادو نفس الجودة بـ 10 مرات أقل! شكراً لكم 🙏"</p>
+              <p className="font-bold">- فاطمة من غرداية</p>
+            </div>
+
+            <div className="bg-white/10 p-6 rounded-2xl backdrop-blur-sm">
+              <div className="flex gap-1 mb-3">
+                {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />)}
+              </div>
+              <p className="mb-4 italic">"الشحن وصل في 24 ساعة بالضبط. المنتج أصلي 100%، جربتهم في القاعة الرياضية وما وقعوش ولو مرة. توب!"</p>
+              <p className="font-bold">- يوسف من غرداية</p>
+            </div>
           </div>
         </div>
       </section>
@@ -578,8 +662,34 @@ function AnkerSimpleLanding() {
         </div>
       </section>
 
-      {/* نموذج الطلب */}
-      <section id="order-form" className="py-16 bg-black text-white">
+      {/* الأسئلة الشائعة */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">أسئلة شائعة (لإزالة أي شك)</h2>
+          
+          <div className="space-y-4">
+            {faqs.map((faq, idx) => (
+              <div key={idx} className="border border-gray-200 rounded-xl overflow-hidden">
+                <button
+                  onClick={() => toggleFAQ(idx)}
+                  className="w-full flex items-center justify-between p-5 bg-gray-50 hover:bg-gray-100 transition-colors"
+                >
+                  <span className="font-bold text-gray-900 text-right">{faq.q}</span>
+                  {showFAQ[idx] ? <ChevronUp className="w-5 h-5 flex-shrink-0" /> : <ChevronDown className="w-5 h-5 flex-shrink-0" />}
+                </button>
+                {showFAQ[idx] && (
+                  <div className="p-5 bg-white border-t">
+                    <p className="text-gray-700">{faq.a}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* نموذج الطلب - مع الخريطة من PromoGenerator */}
+      <section ref={orderFormRef} id="order-form" className="py-16 bg-black text-white">
         <div className="max-w-2xl mx-auto px-4">
           <div className="bg-white text-black rounded-3xl p-8">
             <h2 className="text-3xl font-black text-center mb-2">اطلب الآن 🚀</h2>
@@ -723,20 +833,10 @@ function AnkerSimpleLanding() {
                     )}
                   </div>
                   
-                  {!locationConfirmed && deliveryAddress && (
-                    <button
-                      type="button"
-                      onClick={confirmLocation}
-                      className="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-md"
-                    >
-                      ✓ تأكيد الموقع
-                    </button>
-                  )}
-                  
                   {locationConfirmed && (
                     <div className="mt-3 bg-green-50 border-2 border-green-500 rounded-lg p-3 flex items-center gap-2">
                       <Check className="w-5 h-5 text-green-600" />
-                      <span className="text-sm font-semibold text-green-700">تم تأكيد الموقع ✓</span>
+                      <span className="text-sm font-semibold text-green-700">الموقع محدّد وجاهز ✓</span>
                     </div>
                   )}
                 </div>
@@ -826,7 +926,7 @@ function AnkerSimpleLanding() {
 
               <button
                 type="submit"
-                disabled={loading || !locationConfirmed}
+                disabled={loading}
                 className="w-full bg-red-600 text-white py-5 rounded-2xl font-black text-2xl hover:bg-red-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-xl"
               >
                 {loading ? 'جاري الإرسال...' : 'أطلب الآن 🚀'}
@@ -840,6 +940,24 @@ function AnkerSimpleLanding() {
         </div>
       </section>
 
+      {/* CTA نهائي */}
+      <section className="bg-gray-900 text-white py-16 text-center">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-3xl sm:text-5xl font-bold mb-6">
+            لا تفوت هذه الفرصة الذهبية!
+          </h2>
+          <p className="text-xl mb-8 text-gray-300">
+            آلاف الجزائريين استفادوا من العرض. انضم إليهم الآن قبل نفاذ الكمية!
+          </p>
+          <button
+            onClick={scrollToOrder}
+            className="bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-12 py-5 rounded-2xl font-black text-xl hover:scale-105 transition-transform shadow-2xl"
+          >
+            اطلب الآن بـ 4,770 دج فقط! 🎉
+          </button>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="bg-white py-8 border-t-4 border-black">
         <div className="max-w-7xl mx-auto px-4 text-center">
@@ -850,4 +968,4 @@ function AnkerSimpleLanding() {
   );
 }
 
-export default AnkerSimpleLanding;
+export default AnkerR50iLanding;

@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { 
   Check, Star, Shield, Truck, Clock, ChevronDown, ChevronUp, 
   Volume2, Battery, Bluetooth, Zap, Award, Users, PackageCheck,
-  Phone, MapPin, User, ShoppingCart, AlertCircle
+  Phone, MapPin, User, ShoppingCart, AlertCircle, Package
 } from 'lucide-react';
 import api from '../services/api';
 
-function AnkerAirPodsLanding() {
+function AnkerPromoLanding() {
   const [searchParams] = useSearchParams();
   const [formData, setFormData] = useState({
     customerName: '',
@@ -24,6 +24,7 @@ function AnkerAirPodsLanding() {
 
   const affiliateCode = searchParams.get('ref');
   const productId = '6964fbe8e5d3036c5e504a60'; // Anker R50i NC
+  const basePrice = 4770;
 
   // عداد تنازلي للعرض المحدود
   useEffect(() => {
@@ -66,20 +67,25 @@ function AnkerAirPodsLanding() {
       const orderData = {
         productId,
         affiliateCode: affiliateCode || null,
-        ...formData
+        customerName: formData.customerName,
+        customerPhone: formData.phone,
+        deliveryLocation: `${formData.city} - ${formData.address}`,
+        quantity: formData.quantity,
+        totalPrice: basePrice * formData.quantity,
+        status: 'pending'
       };
 
       await api.post('/orders', orderData);
       
       if (window.fbq) {
         window.fbq('track', 'Purchase', {
-          value: 4770 * formData.quantity,
-          currency: 'USD',
+          value: basePrice * formData.quantity,
+          currency: 'DZD',
           content_name: 'AIR PODS ANKER R50INC',
-          content_ids: ['410'],
+          content_ids: [productId],
           content_type: 'product',
           num_items: formData.quantity
-        }, {eventID: 'anker_' + Date.now()});
+        }, {eventID: 'anker_promo_' + Date.now()});
       }
 
       setOrderSuccess(true);
@@ -91,6 +97,7 @@ function AnkerAirPodsLanding() {
         quantity: 1
       });
     } catch (error) {
+      console.error('Order error:', error);
       alert('حدث خطأ. يرجى المحاولة مرة أخرى.');
     } finally {
       setLoading(false);
@@ -108,7 +115,7 @@ function AnkerAirPodsLanding() {
     },
     {
       q: 'كم مدة التوصيل؟',
-      a: 'التوصيل خلال 24-48 ساعة داخل الجزائر العاصمة ووهران وقسنطينة. 2-4 أيام للولايات الأخرى.'
+      a: 'التوصيل خلال 24-48 ساعة داخل غرداية. توصيل سريع ومضمون.'
     },
     {
       q: 'هل يوجد ضمان؟',
@@ -155,147 +162,122 @@ function AnkerAirPodsLanding() {
 
   return (
     <div className="min-h-screen bg-white" dir="rtl">
-      {/* Header Sticky */}
-      <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 shadow-lg z-50">
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Award className="w-5 h-5" />
-            <span className="font-bold text-sm sm:text-base">عرض محدود!</span>
-          </div>
-          <div className="flex gap-2 sm:gap-4 text-sm sm:text-base">
-            <div className="bg-white/20 px-2 sm:px-3 py-1 rounded-lg">
-              <span className="font-mono font-bold">{String(timeLeft.hours).padStart(2, '0')}</span>
-            </div>
-            <div className="bg-white/20 px-2 sm:px-3 py-1 rounded-lg">
-              <span className="font-mono font-bold">{String(timeLeft.minutes).padStart(2, '0')}</span>
-            </div>
-            <div className="bg-white/20 px-2 sm:px-3 py-1 rounded-lg">
-              <span className="font-mono font-bold">{String(timeLeft.seconds).padStart(2, '0')}</span>
+      {/* Hero Section - صورة خلفية بدل الفيديو */}
+      <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+        <div className="absolute inset-0 bg-black/40"></div>
+        
+        <div className="relative z-10 min-h-screen flex flex-col items-center justify-center text-white px-4 text-center py-20">
+          <div className="mb-8">
+            <div className="w-32 h-32 mx-auto mb-6 bg-white rounded-full flex items-center justify-center shadow-2xl">
+              <span className="text-6xl">🎧</span>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white py-12 sm:py-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div>
-              <div className="inline-block bg-yellow-400 text-gray-900 px-4 py-2 rounded-full font-bold mb-4 text-sm animate-pulse">
-                🔥 توفير 43,230 دج مقارنة بـ Apple!
-              </div>
-              <h1 className="text-3xl sm:text-5xl font-extrabold mb-6 leading-tight">
-                AIR PODS ANKER R50iNC
-                <span className="block text-yellow-400 mt-2">الجودة الأصلية بسعر لا يُصدق!</span>
-              </h1>
-              <p className="text-lg sm:text-xl mb-8 text-gray-200">
-                نفس تقنية العلامات العالمية، لكن بسعر يناسب الجزائريين. صوت نقي، بطارية طويلة، راحة مطلقة.
-              </p>
-              
-              <div className="flex flex-wrap gap-4 mb-8">
-                <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg">
-                  <Shield className="w-5 h-5 text-green-400" />
-                  <span className="font-semibold">ضمان سنة</span>
-                </div>
-                <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg">
-                  <Truck className="w-5 h-5 text-blue-400" />
-                  <span className="font-semibold">توصيل مجاني</span>
-                </div>
-                <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg">
-                  <PackageCheck className="w-5 h-5 text-yellow-400" />
-                  <span className="font-semibold">دفع عند الاستلام</span>
-                </div>
-              </div>
-
-              <div className="flex items-baseline gap-3 mb-8">
-                <span className="text-5xl sm:text-6xl font-black text-yellow-400">4,770 دج</span>
-                <span className="text-2xl text-gray-400 line-through">48,000 دج</span>
-                <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">-90%</span>
-              </div>
-
-              <button
-                onClick={scrollToOrder}
-                className="bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-8 sm:px-12 py-4 sm:py-5 rounded-2xl font-black text-lg sm:text-xl hover:scale-105 transition-transform shadow-2xl w-full sm:w-auto"
-              >
-                اطلب الآن 🎧
-              </button>
-            </div>
-
-            <div className="relative">
-              <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl p-8 shadow-2xl transform hover:scale-105 transition-transform">
-                <img 
-                  src="https://images.unsplash.com/photo-1606841837239-c5a1a4a07af7?w=600&h=600&fit=crop" 
-                  alt="Anker AirPods"
-                  className="w-full h-auto rounded-2xl shadow-xl"
-                />
-                <div className="absolute -top-4 -right-4 bg-red-500 text-white px-6 py-3 rounded-full font-bold shadow-lg rotate-12">
-                  مخزون محدود!
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Social Proof */}
-      <section className="bg-gray-50 py-8">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div>
-              <Users className="w-8 h-8 mx-auto mb-2 text-blue-600" />
-              <div className="text-3xl font-bold text-gray-900">12,450+</div>
-              <div className="text-gray-600 text-sm">عميل راضٍ</div>
-            </div>
-            <div>
-              <Star className="w-8 h-8 mx-auto mb-2 text-yellow-500" />
-              <div className="text-3xl font-bold text-gray-900">4.9/5</div>
-              <div className="text-gray-600 text-sm">تقييم العملاء</div>
-            </div>
-            <div>
-              <Truck className="w-8 h-8 mx-auto mb-2 text-green-600" />
-              <div className="text-3xl font-bold text-gray-900">24-48 ساعة</div>
-              <div className="text-gray-600 text-sm">مدة التوصيل</div>
-            </div>
-            <div>
-              <Shield className="w-8 h-8 mx-auto mb-2 text-purple-600" />
-              <div className="text-3xl font-bold text-gray-900">سنة كاملة</div>
-              <div className="text-gray-600 text-sm">ضمان رسمي</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Comparison Table */}
-      <section className="py-16 bg-white">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4">لماذا Anker R50iNC أفضل خيار؟</h2>
-          <p className="text-center text-gray-600 mb-12">مقارنة صادقة وشفافة مع المنافسين</p>
           
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black mb-6 leading-tight">
+            استمتع بصوت أسطوري
+          </h1>
+          <p className="text-xl sm:text-2xl lg:text-3xl mb-8 max-w-3xl leading-relaxed">
+            سماعات <span className="text-yellow-400 font-bold">Anker R50i NC</span> الأصلية
+            <br />
+            بسعر لا يُصدّق!
+          </p>
+          <div className="bg-red-600 text-white px-8 py-4 rounded-2xl text-2xl sm:text-3xl font-black mb-8 animate-pulse shadow-2xl">
+            4,770 دج فقط! 🔥
+          </div>
+          <button
+            onClick={scrollToOrder}
+            className="bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-12 py-5 rounded-2xl font-black text-xl sm:text-2xl hover:scale-110 transition-transform shadow-2xl"
+          >
+            اطلب الآن! 🚀
+          </button>
+          
+          <div className="mt-16 grid grid-cols-3 gap-8 max-w-2xl">
+            <div className="text-center">
+              <div className="text-3xl font-black text-yellow-400">8h</div>
+              <div className="text-sm mt-1">بطارية</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-black text-yellow-400">ANC</div>
+              <div className="text-sm mt-1">عزل صوت</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-black text-yellow-400">IPX5</div>
+              <div className="text-sm mt-1">مقاوم للماء</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* العد التنازلي */}
+      <section className="bg-gradient-to-r from-red-600 to-orange-600 text-white py-6">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <p className="text-2xl font-bold mb-2">⏰ العرض ينتهي خلال:</p>
+          <div className="flex items-center justify-center gap-4 text-4xl font-black">
+            <div className="bg-white/20 px-6 py-3 rounded-xl backdrop-blur-sm">
+              {String(timeLeft.hours).padStart(2, '0')}
+              <span className="text-sm block">ساعة</span>
+            </div>
+            <span>:</span>
+            <div className="bg-white/20 px-6 py-3 rounded-xl backdrop-blur-sm">
+              {String(timeLeft.minutes).padStart(2, '0')}
+              <span className="text-sm block">دقيقة</span>
+            </div>
+            <span>:</span>
+            <div className="bg-white/20 px-6 py-3 rounded-xl backdrop-blur-sm">
+              {String(timeLeft.seconds).padStart(2, '0')}
+              <span className="text-sm block">ثانية</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* مقارنة الأسعار */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-3xl sm:text-4xl font-black text-center mb-8">
+            شاهد الفرق بنفسك! 👀
+          </h2>
+          <p className="text-center text-gray-600 mb-8 text-lg">
+            نفس الجودة (بل أفضل!)، لكن بـ <span className="text-red-600 font-bold">10 مرات أرخص</span>
+          </p>
+
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="p-4 text-right font-bold">المنتج</th>
-                  <th className="p-4 text-center font-bold">السعر</th>
-                  <th className="p-4 text-center font-bold">جودة الصوت</th>
-                  <th className="p-4 text-center font-bold">عمر البطارية</th>
+            <table className="w-full bg-white rounded-2xl shadow-xl overflow-hidden">
+              <thead className="bg-gray-900 text-white">
+                <tr>
+                  <th className="px-6 py-4 text-right">المنتج</th>
+                  <th className="px-6 py-4 text-center">السعر</th>
+                  <th className="px-6 py-4 text-center">جودة الصوت</th>
+                  <th className="px-6 py-4 text-center">البطارية</th>
                 </tr>
               </thead>
               <tbody>
                 {comparisons.map((item, idx) => (
                   <tr 
-                    key={idx}
-                    className={`border-b ${item.highlight ? 'bg-green-50 border-green-500 border-2' : 'hover:bg-gray-50'}`}
+                    key={idx} 
+                    className={`border-b ${item.highlight ? 'bg-green-50 border-4 border-green-500' : ''}`}
                   >
-                    <td className="p-4 font-semibold">
-                      {item.highlight && <span className="text-green-600 mr-2">👑</span>}
+                    <td className="px-6 py-4 font-bold text-gray-900">
                       {item.brand}
+                      {item.highlight && <span className="mr-2 text-green-600">⭐ الأفضل</span>}
                     </td>
-                    <td className={`p-4 text-center font-bold ${item.highlight ? 'text-green-600 text-xl' : ''}`}>
+                    <td className={`px-6 py-4 text-center font-bold ${item.highlight ? 'text-green-600 text-2xl' : 'text-gray-700'}`}>
                       {item.price}
                     </td>
-                    <td className="p-4 text-center">{item.quality}</td>
-                    <td className="p-4 text-center">{item.battery}</td>
+                    <td className="px-6 py-4 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-24 bg-gray-200 rounded-full h-3">
+                          <div 
+                            className={`h-3 rounded-full ${item.highlight ? 'bg-green-500' : 'bg-gray-400'}`} 
+                            style={{width: item.quality}}
+                          ></div>
+                        </div>
+                        <span className="font-semibold">{item.quality}</span>
+                      </div>
+                    </td>
+                    <td className={`px-6 py-4 text-center font-semibold ${item.highlight ? 'text-green-600' : 'text-gray-700'}`}>
+                      {item.battery}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -310,7 +292,7 @@ function AnkerAirPodsLanding() {
         </div>
       </section>
 
-      {/* Features */}
+      {/* المزايا */}
       <section className="py-16 bg-gradient-to-br from-blue-50 to-purple-50">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">لماذا يحب الجزائريون Anker R50iNC؟</h2>
@@ -355,7 +337,7 @@ function AnkerAirPodsLanding() {
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* شهادات العملاء */}
       <section className="py-16 bg-gray-900 text-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">ماذا يقول عملاؤنا؟</h2>
@@ -366,7 +348,7 @@ function AnkerAirPodsLanding() {
                 {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />)}
               </div>
               <p className="mb-4 italic">"كنت متردد بسبب السعر المنخفض، لكن لما استلمتهم صدمت! الصوت ولا أروع، البطارية تدوم معايا اليوم كامل. يستحقوا أكثر من 4,770 دج!"</p>
-              <p className="font-bold">- أحمد من الجزائر العاصمة</p>
+              <p className="font-bold">- أحمد من غرداية</p>
             </div>
 
             <div className="bg-white/10 p-6 rounded-2xl backdrop-blur-sm">
@@ -374,21 +356,54 @@ function AnkerAirPodsLanding() {
                 {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />)}
               </div>
               <p className="mb-4 italic">"أحسن قرار أخذتو! كنت باغي نشري AirPods لكن ماعنديش 48,000 دج. هادو نفس الجودة بـ 10 مرات أقل! شكراً لكم 🙏"</p>
-              <p className="font-bold">- فاطمة من وهران</p>
+              <p className="font-bold">- فاطمة من غرداية</p>
             </div>
 
             <div className="bg-white/10 p-6 rounded-2xl backdrop-blur-sm">
               <div className="flex gap-1 mb-3">
                 {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />)}
               </div>
-              <p className="mb-4 italic">"الشحن وصل في 48 ساعة بالضبط. المنتج أصلي 100%، جربتهم في القاعة الرياضية وما وقعوش ولو مرة. توب!"</p>
-              <p className="font-bold">- يوسف من قسنطينة</p>
+              <p className="mb-4 italic">"الشحن وصل في 24 ساعة بالضبط. المنتج أصلي 100%، جربتهم في القاعة الرياضية وما وقعوش ولو مرة. توب!"</p>
+              <p className="font-bold">- يوسف من غرداية</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* FAQ */}
+      {/* المصداقية */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-3xl font-black text-center mb-12">لماذا تختارنا؟</h2>
+          
+          <div className="grid sm:grid-cols-3 gap-8">
+            <div className="bg-white border-4 border-black rounded-2xl p-8 text-center">
+              <div className="w-20 h-20 bg-red-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <Truck className="w-10 h-10 text-white" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">توصيل سريع</h3>
+              <p className="text-gray-600">نحن في <span className="font-bold text-red-600">غرداية</span> - التوصيل خلال 24 ساعة فقط!</p>
+            </div>
+
+            <div className="bg-white border-4 border-black rounded-2xl p-8 text-center">
+              <div className="w-20 h-20 bg-red-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <Shield className="w-10 h-10 text-white" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">ضمان + مصداقية</h3>
+              <p className="text-gray-600">ضمان بأن المنتج أصلي 100% (يمكنك تجربته عند الاستلام قبل الدفع)</p>
+            </div>
+
+            <div className="bg-white border-4 border-black rounded-2xl p-8 text-center">
+              <div className="w-20 h-20 bg-red-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <Package className="w-10 h-10 text-white" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">دفع عند الاستلام</h3>
+              <p className="text-gray-600">استلم المنتج، تأكد منه، ثم ادفع. بسيطة!</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* الأسئلة الشائعة */}
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">أسئلة شائعة (لإزالة أي شك)</h2>
@@ -398,13 +413,13 @@ function AnkerAirPodsLanding() {
               <div key={idx} className="border border-gray-200 rounded-xl overflow-hidden">
                 <button
                   onClick={() => toggleFAQ(idx)}
-                  className="w-full p-6 flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors"
+                  className="w-full flex items-center justify-between p-5 bg-gray-50 hover:bg-gray-100 transition-colors"
                 >
-                  <span className="font-bold text-right flex-1">{faq.q}</span>
-                  {showFAQ[idx] ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                  <span className="font-bold text-gray-900 text-right">{faq.q}</span>
+                  {showFAQ[idx] ? <ChevronUp className="w-5 h-5 flex-shrink-0" /> : <ChevronDown className="w-5 h-5 flex-shrink-0" />}
                 </button>
                 {showFAQ[idx] && (
-                  <div className="p-6 bg-white">
+                  <div className="p-5 bg-white border-t">
                     <p className="text-gray-700">{faq.a}</p>
                   </div>
                 )}
@@ -414,8 +429,8 @@ function AnkerAirPodsLanding() {
         </div>
       </section>
 
-      {/* Order Form */}
-      <section ref={orderFormRef} className="py-16 bg-gradient-to-br from-blue-600 to-purple-600">
+      {/* نموذج الطلب - بسيط مثل الصفحات الأخرى */}
+      <section ref={orderFormRef} className="py-16 bg-gradient-to-br from-yellow-50 to-orange-50">
         <div className="max-w-2xl mx-auto px-4">
           <div className="bg-white rounded-3xl shadow-2xl p-8">
             <div className="text-center mb-8">
@@ -472,7 +487,7 @@ function AnkerAirPodsLanding() {
                   value={formData.city}
                   onChange={(e) => setFormData({...formData, city: e.target.value})}
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:outline-none"
-                  placeholder="مثال: الجزائر العاصمة"
+                  placeholder="مثال: غرداية"
                 />
               </div>
 
@@ -503,7 +518,7 @@ function AnkerAirPodsLanding() {
                 >
                   {[1,2,3,4,5].map(n => (
                     <option key={n} value={n}>
-                      {n} {n === 1 ? 'قطعة' : 'قطع'} - {(4770 * n).toLocaleString()} دج
+                      {n} {n === 1 ? 'قطعة' : 'قطع'} - {(basePrice * n).toLocaleString()} دج
                     </option>
                   ))}
                 </select>
@@ -526,7 +541,7 @@ function AnkerAirPodsLanding() {
                 disabled={loading}
                 className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 py-5 rounded-2xl font-black text-xl hover:scale-105 transition-transform shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'جاري الإرسال...' : `أطلب الآن مقابل ${(4770 * formData.quantity).toLocaleString()} دج 🚀`}
+                {loading ? 'جاري الإرسال...' : `أطلب الآن مقابل ${(basePrice * formData.quantity).toLocaleString()} دج 🚀`}
               </button>
 
               <p className="text-center text-sm text-gray-500">
@@ -537,7 +552,7 @@ function AnkerAirPodsLanding() {
         </div>
       </section>
 
-      {/* Final CTA */}
+      {/* CTA نهائي */}
       <section className="bg-gray-900 text-white py-16 text-center">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl sm:text-5xl font-bold mb-6">
@@ -565,4 +580,4 @@ function AnkerAirPodsLanding() {
   );
 }
 
-export default AnkerAirPodsLanding;
+export default AnkerPromoLanding;

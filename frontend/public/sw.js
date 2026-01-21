@@ -1,5 +1,5 @@
-// Service Worker للـ PWA - مع التحديث التلقائي
-const CACHE_VERSION = 'v' + Date.now(); // نسخة ديناميكية
+// Service Worker للـ PWA - نسخة إصلاح الكاش 4
+const CACHE_VERSION = 'v4-fix-' + Date.now(); // نسخة جديدة لإجبار التحديث
 const CACHE_NAME = 'prince-shop-' + CACHE_VERSION;
 const STATIC_CACHE = 'prince-shop-static-v1';
 
