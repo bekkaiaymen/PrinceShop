@@ -286,18 +286,25 @@ function AnkerSimpleLanding() {
         notes += ` | + شاحن سامسونج Type-C (${upsellPrice} دج) - كود ${upsellProductId} | خصم توصيل 50%`;
       }
 
-      await api.post('/orders', {
+      const orderData = {
         productId,
-        affiliateCode: affiliateCode || null,
         customerName: formData.customerName,
         customerPhone: formData.customerPhone,
+        deliveryLocation: `غرداية - ${confirmedAddress}`,
+        deliveryCoordinates: {
+          lat: locationCoords.lat,
+          lng: locationCoords.lng,
+          method: locationMethod || 'manual'
+        },
         quantity: formData.quantity,
         notes,
-        deliveryTime: formData.deliveryTime,
-        deliveryFee,
-        deliveryCoords: locationCoords,
-        deliveryAddress: confirmedAddress
-      });
+        affiliateCode: affiliateCode || null,
+        deliveryFee: deliveryFee,
+        deliveryTime: formData.deliveryTime
+      };
+
+      console.log('📤 Sending order:', orderData);
+      await api.post('/orders', orderData);
 
       if (window.fbq) {
         window.fbq('track', 'Purchase', {
