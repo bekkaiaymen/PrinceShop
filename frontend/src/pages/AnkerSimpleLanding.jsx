@@ -250,101 +250,20 @@ function AnkerSimpleLanding() {
         </div>
       </section>
 
-      {/* شهادات العملاء - Facebook Style */}
+      {/* شهادات العملاء - صورة الآراء الحقيقية */}
       <section className="py-16 bg-gray-100">
         <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-3xl sm:text-4xl font-black text-center mb-12 flex items-center justify-center gap-3">
-             <span className="text-blue-600">f</span> آراء زبائننا في غرداية
+          <h2 className="text-3xl sm:text-4xl font-black text-center mb-8">
+            ماذا قالوا عن منتجنا؟ ⭐
           </h2>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Review 1 */}
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-              <div className="flex gap-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-lg">
-                  M
-                </div>
-                <div className="flex-1">
-                  <div className="bg-gray-100 rounded-2xl px-4 py-3 inline-block">
-                    <p className="font-bold text-sm text-gray-900 mb-1">Mohamed Benali</p>
-                    <p className="text-gray-800 text-sm leading-relaxed">
-                      الصوت ما شاء الله، صافي وفيه الباس قوي. وصلتني لبني يزقن في نهار واحد. يعطيك الصحة خويا على المصداقية.
-                    </p>
-                  </div>
-                  <div className="flex gap-4 mt-1 px-2 text-xs text-gray-500 font-bold">
-                    <span className="cursor-pointer hover:underline">أعجبني</span>
-                    <span className="cursor-pointer hover:underline">رد</span>
-                    <span>منذ 2 ساعة</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Review 2 */}
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-              <div className="flex gap-3">
-                <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center text-pink-600 font-bold text-lg">
-                  S
-                </div>
-                <div className="flex-1">
-                  <div className="bg-gray-100 rounded-2xl px-4 py-3 inline-block">
-                    <p className="font-bold text-sm text-gray-900 mb-1">Sarah Ghardaia</p>
-                    <p className="text-gray-800 text-sm leading-relaxed">
-                      حامل الهاتف فيها فكرة عبقرية! 😍 نتفرج بيها مسلسل وأنا نطيب، والصوت Top. أحسن كادو شريته.
-                    </p>
-                  </div>
-                  <div className="flex gap-4 mt-1 px-2 text-xs text-gray-500 font-bold">
-                    <span className="cursor-pointer hover:underline text-blue-600">أعجبني</span>
-                    <span className="cursor-pointer hover:underline">رد</span>
-                    <span>منذ 5 ساعات</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Review 3 */}
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-              <div className="flex gap-3">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold text-lg">
-                  A
-                </div>
-                <div className="flex-1">
-                  <div className="bg-gray-100 rounded-2xl px-4 py-3 inline-block">
-                    <p className="font-bold text-sm text-gray-900 mb-1">Ahmed Touggourt</p>
-                    <p className="text-gray-800 text-sm leading-relaxed">
-                      جربتها في المكالمات، الصوت صافي بزاف والميكروفون يعزل الحس. ربي يبارك في رزقكم خاوتي.
-                    </p>
-                  </div>
-                  <div className="flex gap-4 mt-1 px-2 text-xs text-gray-500 font-bold">
-                    <span className="cursor-pointer hover:underline text-blue-600">أعجبني</span>
-                    <span className="cursor-pointer hover:underline">رد</span>
-                    <span>منذ يوم</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Review 4 */}
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-              <div className="flex gap-3">
-                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-bold text-lg">
-                  Y
-                </div>
-                <div className="flex-1">
-                  <div className="bg-gray-100 rounded-2xl px-4 py-3 inline-block">
-                    <p className="font-bold text-sm text-gray-900 mb-1">Yacine Berriane</p>
-                    <p className="text-gray-800 text-sm leading-relaxed">
-                      كنت متردد نشري بصح كي قلتولي جرب قبل ما تخلص ريحت. سلعة أصلية 100%، شكراً على التعامل الراقي.
-                    </p>
-                  </div>
-                  <div className="flex gap-4 mt-1 px-2 text-xs text-gray-500 font-bold">
-                    <span className="cursor-pointer hover:underline text-blue-600">أعجبني</span>
-                    <span className="cursor-pointer hover:underline">رد</span>
-                    <span>منذ يومين</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <p className="text-center text-gray-600 mb-8">آراء حقيقية من عملائنا في غرداية</p>
+          
+          <div className="bg-white rounded-3xl shadow-xl p-4 sm:p-8 border-4 border-black">
+            <img 
+              src="/assets/rating.jpeg" 
+              alt="آراء العملاء الحقيقية"
+              className="w-full h-auto rounded-2xl"
+            />
           </div>
         </div>
       </section>
