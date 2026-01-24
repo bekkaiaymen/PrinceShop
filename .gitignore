@@ -1,0 +1,10 @@
+node_modules/
+input_ads/
+winning_ads_*.csv
+.env
+.DS_Store
+__pycache__/
+*.log
+fb_user_data/
+ad_screenshots/
+winning_ads_screenshots/

@@ -1,0 +1,36 @@
+{
+  "_comment_1": "النسبة المطلوبة: التعليقات / الإعجابات (0.1 = 10%)",
+  "success_ratio": 0.1,
+  "_comment_login": "معلومات تسجيل الدخول للفيسبوك - يتم استخدامها تلقائياً",
+  "facebook_email": "aymenbekkai17@gmail.com",
+  "facebook_password": "0664021599",
+  "search_terms": [
+    "dropshipping products",
+    "trending products 2026",
+    "viral products",
+    "winning products"
+  ],
+  "facebook_pages": [
+    "https://www.facebook.com/page_example1",
+    "https://www.facebook.com/page_example2"
+  ],
+  "instagram_accounts": [
+    "https://www.instagram.com/account1",
+    "https://www.instagram.com/account2"
+  ],
+  "countries": [
+    "US",
+    "UK",
+    "AE",
+    "SA"
+  ],
+  "max_ads_per_search": 50,
+  "_comment_2": "الحد الأدنى للإعجابات لاعتبار الإعلان",
+  "min_likes": 100,
+  "_comment_3": "csv أو json أو excel",
+  "output_format": "csv",
+  "_comment_4": "اختياري: للحصول على Access Token: https://developers.facebook.com/tools/explorer/",
+  "facebook_access_token": "EAAUg7zZAZBxBcBQpteIqy9GssVo6jqwFPhPgrQdqP8BlV9FO1DCUdAYBvfaPDJVpD7qlobSAirZA8cfMqtZAivYFu22N3oEfO5jYzuleGCDYyf0JzgXlwelZACtLhWmt3Yh2PQXkvptBEUrLmsaULIgJ0s0cj2rzYVZCTq4cZAJif2AXSZB7IXFzRsZAfDhbeptSV",
+  "auto_save": true,
+  "report_frequency": "daily"
+}

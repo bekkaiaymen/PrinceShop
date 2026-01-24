@@ -1,0 +1,24 @@
+{
+    "facebook_api": {
+        "access_token": "EAAUg7zZAZBxBcBQgZByQ5mihxchjuL80PQMosl34uyAfcBneZA8yDBZAY09EBJkx47Eb97IKa9EwmIqZCAuk21CZAinsEL0Gr5vHOhnyQEIWpw0iU71RpLwmUldtPhaOLbZACF8bGCH3kZCZBVHzlbgMzPWgc9plxtEbT1zPPlewzYS0KBIdfCM1wVypGvXvvJgMJKuM683gXv7DSAOSUFShQgjotl6XdlxF0oNupUFv8s6z7cZA6Rj434Uv0uXTSiS7fO3YvC2YXEZBgjQPdy4xxTj4qTNOYAZDZD",
+        "token_expires": "",
+        "comment": "احصل على التوكن من: https://developers.facebook.com/tools/explorer/"
+    },
+    "search_settings": {
+        "default_country": "DZ",
+        "default_limit": 100,
+        "success_criteria": {
+            "min_impressions_per_dollar": 1000,
+            "min_total_impressions": 10000
+        }
+    },
+    "facebook_credentials": {
+        "email": "aymenbekkai17@gmail.com",
+        "password": "aymenbekkai@protection#"
+    },
+    "scanner_settings": {
+        "success_ratio": 0.1,
+        "scroll_pause_time": 2,
+        "max_scrolls": 50
+    }
+}
