@@ -1,0 +1,26 @@
+# المكتبات الأساسية لأداة تتبع الإعلانات
+
+# Web Scraping
+selenium>=4.16.0
+webdriver-manager>=4.0.1
+beautifulsoup4>=4.12.2
+requests>=2.31.0
+
+# Data Processing
+pandas>=2.1.4
+numpy>=1.26.2
+
+# Excel Support (اختياري)
+openpyxl>=3.1.2
+xlsxwriter>=3.1.9
+
+# API Support
+facebook-sdk>=3.1.0
+
+# Utils
+python-dotenv>=1.0.0
+tqdm>=4.66.1
+schedule>=1.2.0
+
+# Browser Automation (بديل)
+playwright>=1.40.0

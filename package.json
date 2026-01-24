@@ -1,0 +1,23 @@
+{
+  "name": "fb-product-analyzer",
+  "version": "1.0.0",
+  "description": "أداة تحليل إعلانات الفيسبوك لإيجاد المنتجات الرابحة",
+  "type": "module",
+  "main": "analyzer.js",
+  "scripts": {
+    "start": "node analyzer-pro.js",
+    "v3": "node analyzer-v3.js",
+    "v2": "node analyzer-v2.js",
+    "old": "node analyzer.js",
+    "dev": "node --watch analyzer-v4.js"
+  },
+  "keywords": ["facebook", "ads", "scraper", "e-commerce"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "puppeteer": "^22.0.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "chalk": "^5.3.0"
+  }
+}

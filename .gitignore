@@ -1,0 +1,8 @@
+node_modules/
+.env
+screenshots/
+fb_user_data/
+*.pdf
+__pycache__/
+chrome-data/
+catalog.pdf
