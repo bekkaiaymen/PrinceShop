@@ -96,7 +96,7 @@ async function startSystem() {
 
 // وضع تحليل سهل: البحث عن أي ملف CSV في مجلد input_ads وتحليله مباشرة
 async function analyzeInputFolder() {
-    const inputDir = './input_ads';
+    const inputDir = require('path').join(__dirname, 'input_ads');
     
     if (!fs.existsSync(inputDir)) {
         console.log('❌ مجلد input_ads غير موجود! سيتم إنشاؤه الآن...');
@@ -127,7 +127,7 @@ async function analyzeInputFolder() {
 
 // وضع المراقبة التلقائية للمجلد
 function startWatchMode() {
-    const inputDir = './input_ads';
+    const inputDir = require('path').join(__dirname, 'input_ads');
     
     // إنشاء المجلد إذا لم يكن موجوداً
     if (!fs.existsSync(inputDir)) {
@@ -356,30 +356,63 @@ function startLocalServer() {
         }
 
         // 🆕 API رفع الملفات (للعمل عبر الويب والهاتف)
-        if (req.method === 'POST' && req.url === '/api/upload') {
-            const fileNameEncoded = req.headers['x-file-name'];
-            if (!fileNameEncoded) {
-                res.writeHead(400); res.end('Missing X-File-Name header'); return;
+                // ROBUST FILE UPLOAD FIX
+        if (req.method === 'POST' && (req.url === '/api/upload' || req.url.startsWith('/api/upload?'))) {
+            try {
+                const fileNameEncoded = req.headers['x-file-name'];
+                if (!fileNameEncoded) {
+                    res.writeHead(400, { 'Content-Type': 'text/plain' });
+                    res.end('Missing X-File-Name header');
+                    return;
+                }
+
+                const fileName = decodeURIComponent(fileNameEncoded).replace(/[^a-zA-Z0-9.\-_]/g, '_');
+                const inputDir = require('path').join(__dirname, 'input_ads');
+                
+                if (!fs.existsSync(inputDir)) {
+                     try {
+                        fs.mkdirSync(inputDir, { recursive: true });
+                     } catch (err) {
+                        console.error('Failed to create directory:', err);
+                        res.writeHead(500, { 'Content-Type': 'text/plain' });
+                        res.end('Server FS Error');
+                        return;
+                     }
+                }
+
+                const filePath = require('path').join(inputDir, fileName);
+                console.log(`Receiving file: ${fileName}`);
+
+                const writeStream = fs.createWriteStream(filePath);
+                
+                writeStream.on('error', (err) => {
+                    console.error('File Write Error:', err);
+                    if (!res.headersSent) {
+                        res.writeHead(500, { 'Content-Type': 'text/plain' });
+                        res.end('File Write Failed');
+                    }
+                });
+
+                writeStream.on('finish', () => {
+                     if (!res.headersSent) {
+                         res.writeHead(200, { 'Content-Type': 'text/plain' });
+                         res.end('Upload Success');
+                     }
+                });
+                
+                req.on('error', (err) => {
+                    console.error('Upload Stream Error:', err);
+                    writeStream.end();
+                });
+
+                req.pipe(writeStream);
+
+            } catch (e) {
+                console.error('Upload Handler Error:', e);
+                if (!res.headersSent) {
+                    res.writeHead(500); res.end('Internal Server Error'); 
+                }
             }
-            
-            const fileName = decodeURIComponent(fileNameEncoded);
-            // التأكد من أن المجلد موجود
-            const inputDir = require('path').join(__dirname, 'input_ads');
-            if (!fs.existsSync(inputDir)) fs.mkdirSync(inputDir, { recursive: true });
-
-            const filePath = require('path').join(inputDir, fileName);
-            console.log(`📥 استلام ملف جديد: ${fileName}`);
-
-            const writeStream = fs.createWriteStream(filePath);
-            req.pipe(writeStream);
-
-            req.on('end', () => {
-                res.writeHead(200); res.end('Upload Success');
-            });
-            req.on('error', (err) => {
-                console.error(err);
-                res.writeHead(500); res.end('Upload Failed');
-            });
             return;
         }
 
