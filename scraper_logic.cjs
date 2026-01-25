@@ -97,35 +97,30 @@ async function startSystem() {
 // وضع تحليل سهل: البحث عن أي ملف CSV في مجلد input_ads وتحليله مباشرة
 async function analyzeInputFolder() {
     const inputDir = require('path').join(__dirname, 'input_ads');
-    
+
     if (!fs.existsSync(inputDir)) {
-        console.log('❌ مجلد input_ads غير موجود! سيتم إنشاؤه الآن...');
-        fs.mkdirSync(inputDir);
-        console.log(`✅ تم إنشاء المجلد: ${inputDir}`);
-        console.log('📂 الآن ضع ملف ads_data.csv داخل هذا المجلد ثم شغل البرنامج مرة أخرى.');
+        console.log('Creating input_ads folder...');
+        fs.mkdirSync(inputDir, { recursive: true });
         return;
     }
 
     const files = fs.readdirSync(inputDir).filter(f => f.endsWith('.csv') || f.endsWith('.xlsx'));
     
     if (files.length === 0) {
-        console.log('❌ لا توجد ملفات CSV/Excel في مجلد input_ads!');
-        console.log(`📂 المسار: ${inputDir}`);
-        console.log('💡 ضع ملف ads_data.csv أو .xlsx في هذا المجلد ثم حاول مجدداً.');
+        console.log('No files found in input_ads');
         return;
     }
 
-    console.log(`✅ وجدنا ${files.length} ملف في المجلد:`);
-    files.forEach((f, i) => console.log(`   ${i+1}. ${f}`));
-
-    // تحليل أول ملف CSV (الأحدث أو الأول)
-    const fileToAnalyze = `${inputDir}/${files[0]}`;
-    console.log(`\n🔍 جاري تحليل: ${fileToAnalyze}...\n`);
+    console.log(`Found ${files.length} files. Analyzing ALL of them (Merging Results)...`);
     
-    await analyzeExternalCSV(fileToAnalyze);
+    // Process ALL files to ensure old and new data is covered
+    for (const file of files) {
+         const fileToAnalyze = require('path').join(inputDir, file);
+         console.log(`Analyzing: ${file}`);
+         await analyzeExternalCSV(fileToAnalyze);
+    }
 }
 
-// وضع المراقبة التلقائية للمجلد
 function startWatchMode() {
     const inputDir = require('path').join(__dirname, 'input_ads');
     
@@ -435,50 +430,51 @@ function startLocalServer() {
         // 2. API لجلب النتائج وعرضها في الداشبورد
         if (req.method === 'GET' && req.url === '/api/results') {
             try {
-                // البحث عن أحدث ملف winning_ads
+                // Find all winning_ads CSV files
                 const files = fs.readdirSync(__dirname)
                     .filter(f => f.startsWith('winning_ads_') && f.endsWith('.csv'))
-                    // ترتيب تنازلي حسب تاريخ التعديل (الأحدث أولاً)
                     .sort((a, b) => {
-                        return fs.statSync(require('path').join(__dirname, b)).mtime.getTime() - 
+                        return fs.statSync(require('path').join(__dirname, b)).mtime.getTime() -
                                fs.statSync(require('path').join(__dirname, a)).mtime.getTime();
                     });
 
                 const results = [];
+                // Analyze top 10 recent result files to combine old and new data
                 if (files.length > 0) {
-                    const latestFiles = files.slice(0, 3); // قراءة آخر 3 ملفات لدمج النتائج (اختياري، هنا نستخدم الأحدث)
+                    const latestFiles = files.slice(0, 10);
                     
-                    // سنقرأ فقط الملف الأحدث لعرض نتائج آخر عملية
-                    const content = fs.readFileSync(require('path').join(__dirname, files[0]), 'utf8');
-                    const lines = content.split(/\r?\n/);
-                    
-                    // تخطي العنوان (السطر الأول)
-                    for (let i = 1; i < lines.length; i++) {
-                        const line = lines[i].trim();
-                        if (!line) continue;
-                        
-                        // تقسيم السطر مع مراعاة النصوص داخل علامات التنصيص
-                        const parts = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
-                        // تأكدنا من أن CSV الجديد يحتوي 8 أعمدة (بإضافة التصنيف)
-                        if (parts.length >= 7) {
-                            results.push({
-                                timestamp: parts[0].replace(/"/g, ''),
-                                product: parts[1].replace(/"/g, ''),
-                                category: parts[2].replace(/"/g, ''), // قراءة التصنيف
-                                likes: parts[3].replace(/"/g, ''),
-                                comments: parts[4].replace(/"/g, ''),
-                                ratio: parts[5].replace(/["%]/g, ''),
-                                url: parts[6].replace(/"/g, ''),
-                                status: parts[7] ? parts[7].replace(/"/g, '') : 'Unknown'
-                            });
-                        }
+                    for (const fileName of latestFiles) {
+                         try {
+                            const content = fs.readFileSync(require('path').join(__dirname, fileName), 'utf8');
+                            const lines = content.split(/\r?\n/);
+                            
+                            // Skip header row usually, but we need to check
+                            for (let i = 1; i < lines.length; i++) {
+                                const line = lines[i].trim();
+                                if (!line) continue;
+                                
+                                const parts = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
+                                if (parts.length >= 7) {
+                                    results.push({
+                                        timestamp: parts[0].replace(/"/g, ''),
+                                        product: parts[1].replace(/"/g, ''),
+                                        category: parts[2].replace(/"/g, ''),
+                                        likes: parts[3].replace(/"/g, ''),
+                                        comments: parts[4].replace(/"/g, ''),
+                                        ratio: parts[5].replace(/["%]/g, ''),
+                                        url: parts[6].replace(/"/g, ''),
+                                        status: parts[7] ? parts[7].replace(/"/g, '') : 'Unknown'
+                                    });
+                                }
+                            }
+                         } catch (err) { console.error('Error reading result file:', fileName, err); }
                     }
                 }
                 
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify(results));
                 return;
-                
+
             } catch (e) {
                 console.error(e);
                 res.writeHead(500, { 'Content-Type': 'application/json' });
