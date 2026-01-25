@@ -323,6 +323,69 @@ async function analyzeExternalCSV(filePath = 'ads_data.csv') {
 }
 
 // تشغيل خادم محلي يستقبل البيانات من متصفحك الشخصي
+
+// --- GITHUB BACKUP FUNCTION ---
+async function backupToGitHub(fileName, buffer) {
+    const token = process.env.GITHUB_TOKEN;
+    const owner = process.env.GITHUB_OWNER;
+    const repo = process.env.GITHUB_REPO;
+    
+    if (!token || !owner || !repo) {
+        console.log("Skipping GitHub backup: Missing GITHUB_TOKEN, GITHUB_OWNER, or GITHUB_REPO env vars.");
+        return;
+    }
+
+    try {
+        const path = `input_ads/${fileName}`;
+        const contentBase64 = buffer.toString('base64');
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+
+        // Check if file exists to get SHA (for update)
+        let sha = null;
+        try {
+            const checkRes = await fetch(url, {
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'User-Agent': 'Render-Scraper-Tool'
+                }
+            });
+            if (checkRes.ok) {
+                const data = await checkRes.json();
+                sha = data.sha;
+            }
+        } catch (e) {}
+
+        const body = {
+            message: `Backup uploaded file: ${fileName}`,
+            content: contentBase64,
+            branch: 'main' // or master, verify your branch name
+        };
+        if (sha) body.sha = sha;
+
+        const uploadRes = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                'User-Agent': 'Render-Scraper-Tool'
+            },
+            body: JSON.stringify(body)
+        });
+
+        if (uploadRes.ok) {
+            console.log(`✅ Successfully backed up ${fileName} to GitHub!`);
+        } else {
+            console.error(`GitHub Backup Failed: ${uploadRes.status} ${uploadRes.statusText}`);
+            const errTxt = await uploadRes.text();
+            console.error(errTxt);
+        }
+
+    } catch (error) {
+        console.error("GitHub Backup Error:", error.message);
+    }
+}
+// ------------------------------
+
 function startLocalServer() {
     console.log('\n🚀 جاري تشغيل خادم الاستقبال على المنفذ 3000...');
     
@@ -397,7 +460,16 @@ function startLocalServer() {
                     }
                 });
 
-                writeStream.on('finish', () => {
+                writeStream.on('finish', async () => {
+                    // Trigger Background Backup
+                    try {
+                        console.log('Starting GitHub backup...');
+                        const fileBuffer = fs.readFileSync(filePath);
+                        backupToGitHub(fileName, fileBuffer);
+                    } catch(e) { console.error('Backup trigger error:', e); }
+
+                    if (!res.headersSent) {
+    
                      if (!res.headersSent) {
                          res.writeHead(200, { 'Content-Type': 'text/plain' });
                          res.end('Upload Success');
