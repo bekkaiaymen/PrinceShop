@@ -97,6 +97,15 @@ async function startSystem() {
 // وضع تحليل سهل: البحث عن أي ملف CSV في مجلد input_ads وتحليله مباشرة
 async function analyzeInputFolder() {
     const inputDir = require('path').join(__dirname, 'input_ads');
+    // CLEANUP: Remove old winning_ads files to prevent massive duplication on re-runs
+    // We will regenerate them from the source files in input_ads
+    try {
+        const rootDir = __dirname;
+        const oldResults = fs.readdirSync(rootDir).filter(f => f.startsWith('winning_ads_') && f.endsWith('.csv'));
+        oldResults.forEach(f => fs.unlinkSync(require('path').join(rootDir, f)));
+        console.log('Cleaned up ' + oldResults.length + ' old result files.');
+    } catch (e) { console.error('Cleanup warning:', e.message); }
+    
 
     if (!fs.existsSync(inputDir)) {
         console.log('Creating input_ads folder...');
@@ -471,8 +480,28 @@ function startLocalServer() {
                     }
                 }
                 
+                
+                // --- DEDUPLICATION LOGIC ---
+                // Remove duplicates based on URL or Product Name
+                const uniqueResults = [];
+                const seenUrls = new Set();
+                
+                for (const ad of results) {
+                    // Create a unique key. Use URL if valid, otherwise Product Name.
+                    let key = ad.url;
+                    if (!key || key === 'No URL' || key.length < 5) {
+                        key = ad.product;
+                    }
+                    
+                    if (!seenUrls.has(key)) {
+                        seenUrls.add(key);
+                        uniqueResults.push(ad);
+                    }
+                }
+                // ---------------------------
+
                 res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify(results));
+                res.end(JSON.stringify(uniqueResults));
                 return;
 
             } catch (e) {
