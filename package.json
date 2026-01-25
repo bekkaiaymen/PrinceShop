@@ -5,7 +5,7 @@
   "type": "module",
   "main": "analyzer.js",
   "scripts": {
-    "start": "node analyzer-pro.js",
+    "start": "node scraper.js",
     "v3": "node analyzer-v3.js",
     "v2": "node analyzer-v2.js",
     "old": "node analyzer.js",

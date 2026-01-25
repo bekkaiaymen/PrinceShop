@@ -7,6 +7,16 @@ const http = require('http'); // إضافة مكتبة الخادم
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 const readline = require('readline');
 
+// --- Render Robustness Fixes ---
+console.log('ðŸ“¡ Inicializing Scraper Logic...');
+process.on('uncaughtException', (err) => {
+    console.error('CRITICAL ERROR (Uncaught Exception):', err);
+});
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('CRITICAL ERROR (Unhandled Rejection):', reason);
+});
+// ------------------------------
+
 // واجهة للقراءة من المستخدم
 const rl = readline.createInterface({
     input: process.stdin,
@@ -317,6 +327,13 @@ function startLocalServer() {
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+          // Health Check for Render
+          if (req.method === 'GET' && (req.url === '/health' || req.url === '/healthz')) {
+              res.writeHead(200);
+              res.end('OK');
+              return;
+          }
 
         if (req.method === 'OPTIONS') {
             res.writeHead(200);
