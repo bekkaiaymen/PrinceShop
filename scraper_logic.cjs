@@ -469,8 +469,6 @@ function startLocalServer() {
                     } catch(e) { console.error('Backup trigger error:', e); }
 
                     if (!res.headersSent) {
-    
-                     if (!res.headersSent) {
                          res.writeHead(200, { 'Content-Type': 'text/plain' });
                          res.end('Upload Success');
                      }
