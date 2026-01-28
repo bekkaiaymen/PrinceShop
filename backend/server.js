@@ -11,9 +11,15 @@ import authRoutes from './routes/auth.js';
 import affiliateRoutes from './routes/affiliate.js';
 import adminRoutes from './routes/admin.js';
 import { protect, adminOnly } from './middleware/auth.js';
+import adToolRoutes from './routes/adTool.js';
 import jwt from 'jsonwebtoken';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -102,6 +108,10 @@ function calculateCustomerPrice(wholesalePrice) {
 app.use('/api/auth', authRoutes);
 app.use('/api/affiliate', affiliateRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/ad-tool', adToolRoutes);
+
+// Static files for ad tool media
+app.use('/ad_media', express.static(path.join(__dirname, 'ad_media')));
 
 // إنشاء طلب جديد
 app.post('/api/orders', async (req, res) => {
