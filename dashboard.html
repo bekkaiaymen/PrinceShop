@@ -241,33 +241,30 @@
                 else if(cat.includes('bébé') || cat.includes('baby')) icon = 'fa-baby';
                 else if(cat.includes('jouet') || cat.includes('toy')) icon = 'fa-gamepad';
 
-                // بناء عنصر الميديا (فيديو أو صورة)
+                // بناء عنصر الميديا (فيديو أو صورة من بيانات MyAdFinder)
                 let mediaHTML = '';
-                if (ad.video_url) {
+                const videoUrl = ad.video_url || ad.videoUrl || ad.video || ad.Video;
+                const imageUrl = ad.image_url || ad.imageUrl || ad.image || ad.Image || ad.thumbnail;
+                
+                if (videoUrl) {
                     mediaHTML = `
-                        <video controls class="w-100" style="max-height: 400px; background: #000; border-radius: 10px 10px 0 0;">
-                            <source src="${ad.video_url}" type="video/mp4">
+                        <video controls class="w-100" style="max-height: 400px; background: #000;">
+                            <source src="${videoUrl}" type="video/mp4">
                             المتصفح لا يدعم الفيديو
                         </video>
                     `;
-                } else if (ad.image_url) {
+                } else if (imageUrl) {
                     mediaHTML = `
-                        <img src="${ad.image_url}" class="w-100" style="max-height: 400px; object-fit: cover; border-radius: 10px 10px 0 0;" alt="صورة الإعلان">
-                    `;
-                } else {
-                    // بدون ميديا، عرض أيقونة كبيرة
-                    mediaHTML = `
-                        <div class="d-flex justify-content-center align-items-center bg-light" style="height: 200px; border-radius: 10px 10px 0 0;">
-                            <i class="fas fa-image fa-5x text-muted"></i>
-                        </div>
+                        <img src="${imageUrl}" class="w-100" style="max-height: 400px; object-fit: cover;" alt="صورة الإعلان">
                     `;
                 }
+                // إذا لم يكن هناك ميديا، لا نعرض شيء
 
                 // معالجة اسم الصفحة
-                const pageName = ad.page_name || ad.product.substring(0, 30) + '...';
+                const pageName = ad.page_name || ad.pageName || ad.page || ad.advertiser || 'إعلان فيسبوك';
                 
                 // معالجة نص الإعلان الكامل
-                const adText = ad.ad_text || ad.product;
+                const adText = ad.ad_text || ad.adText || ad.text || ad.description || '';
 
                 // معالجة المشاركات
                 const shares = ad.shares || 0;
@@ -288,21 +285,18 @@
                             <span class="badge ${badgeColor} ratio-badge shadow-sm">${ad.ratio}%</span>
                         </div>
 
-                        <!-- الميديا (فيديو أو صورة) -->
-                        <div class="position-relative">
-                            ${mediaHTML}
-                        </div>
+                        <!-- الميديا (فيديو أو صورة) - يظهر فقط إذا كانت متوفرة -->
+                        ${mediaHTML ? `<div class="position-relative">${mediaHTML}</div>` : ''}
 
-                        <!-- نص الإعلان الكامل -->
+                        <!-- نص الإعلان أو اسم المنتج -->
                         <div class="card-body">
-                            <p class="card-text" dir="auto" style="white-space: pre-wrap; font-size: 14px; line-height: 1.6;">
-                                ${adText}
-                            </p>
+                            <h5 class="fw-bold text-primary mb-2">${ad.product}</h5>
+                            ${adText && adText !== ad.product ? `<p class="card-text text-muted" dir="auto" style="font-size: 14px; line-height: 1.6;">${adText}</p>` : ''}
                         </div>
 
                         <!-- إحصائيات التفاعل (لايكات، تعليقات، مشاركات) -->
                         <div class="card-footer bg-white border-top py-2 px-3">
-                            <div class="d-flex justify-content-around text-center">
+                            <div class="d-flex justify-content-around text-center mb-2">
                                 <div>
                                     <div class="text-primary"><i class="fas fa-thumbs-up"></i></div>
                                     <div class="fw-bold" style="font-size: 13px;">${parseInt(ad.likes).toLocaleString()}</div>
@@ -316,8 +310,8 @@
                                     <div class="fw-bold" style="font-size: 13px;">${parseInt(shares).toLocaleString()}</div>
                                 </div>
                             </div>
-                            <a href="${ad.url}" target="_blank" class="btn btn-sm btn-primary w-100 mt-2 rounded-pill">
-                                <i class="fab fa-facebook"></i> فتح في فيسبوك
+                            <a href="${ad.url}" target="_blank" class="btn btn-sm btn-primary w-100 rounded-pill">
+                                <i class="fab fa-facebook"></i> عرض الإعلان
                             </a>
                         </div>
                     </div>
