@@ -310,14 +310,67 @@
                                     <div class="fw-bold" style="font-size: 13px;">${parseInt(shares).toLocaleString()}</div>
                                 </div>
                             </div>
-                            <a href="${ad.url}" target="_blank" class="btn btn-sm btn-primary w-100 rounded-pill">
-                                <i class="fab fa-facebook"></i> عرض الإعلان
-                            </a>
+                            <button onclick="showFacebookPost('${ad.url.replace(/'/g, "\\'")}', '${ad.product.replace(/'/g, "\\'")}', event)" class="btn btn-sm btn-primary w-100 rounded-pill">
+                                <i class="fab fa-facebook"></i> عرض البوست الكامل
+                            </button>
                         </div>
                     </div>
                 `;
                 container.appendChild(card);
             });
+        }
+
+        function showFacebookPost(postUrl, productName, event) {
+            event.preventDefault();
+            
+            // إنشاء modal إذا لم يكن موجود
+            let modal = document.getElementById('fbPostModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'fbPostModal';
+                modal.className = 'modal fade';
+                modal.innerHTML = `
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title"><i class="fab fa-facebook"></i> <span id="modalProductName"></span></h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body p-0" style="min-height: 600px;">
+                                <div id="fbPostContainer" class="d-flex justify-content-center align-items-center" style="min-height: 600px;">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">جاري التحميل...</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <a href="" id="openInFbBtn" target="_blank" class="btn btn-success">
+                                    <i class="fas fa-external-link-alt"></i> فتح في فيسبوك
+                                </a>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+            
+            // تحديث المحتوى
+            document.getElementById('modalProductName').textContent = productName;
+            document.getElementById('openInFbBtn').href = postUrl;
+            
+            const container = document.getElementById('fbPostContainer');
+            container.innerHTML = `
+                <iframe src="https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(postUrl)}&show_text=true&width=500" 
+                        width="500" height="600" style="border:none;overflow:hidden" 
+                        scrolling="no" frameborder="0" allowfullscreen="true" 
+                        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+                </iframe>
+            `;
+            
+            // فتح المودال
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
         }
 
         // تحميل تلقائي عند الفتح
