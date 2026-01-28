@@ -1,0 +1,23 @@
+{
+  "name": "princeshop-ad-tool",
+  "version": "2.0.0",
+  "description": "PrinceShop Ad Analysis Tool - Infinite Extract & Warm",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["scrapper", "fb-ads", "automation"],
+  "author": "PrinceShop",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2",
+    "puppeteer": "^24.36.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "axios": "^1.6.0"
+  },
+   "engines": {
+    "node": ">=18"
+  }
+}

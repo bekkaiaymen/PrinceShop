@@ -1,0 +1,51 @@
+{
+   "action": {
+      "default_icon": {
+         "48": "assets/icon-48.png"
+      },
+      "default_popup": "popup.html",
+      "default_title": "MY AD FINDER"
+   },
+   "background": {
+      "service_worker": "background.js"
+   },
+   "content_scripts": [ {
+      "js": [ "content.js" ],
+      "matches": [ "*://*.facebook.com/*" ]
+   }, {
+      "all_frames": true,
+      "js": [ "interceptor.js" ],
+      "matches": [ "*://*.facebook.com/*" ],
+      "run_at": "document_start"
+   }, {
+      "all_frames": true,
+      "js": [ "maf-content.js" ],
+      "matches": [ "*://*.myadfinder.com/*" ],
+      "run_at": "document_start"
+   } ],
+   "description": "MY AD FINDER allows you to collect, save & hunt trending ads automatically from your facebook news feed.",
+   "host_permissions": [ "*://*.facebook.com/*" ],
+   "icons": {
+      "128": "assets/icon-128.png",
+      "16": "assets/icon-16.png",
+      "32": "assets/icon-32.png",
+      "48": "assets/icon-48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAinzjlCERn1O110k3+1/VG4ct0lS9BNnZmbrnAneiLhdFmTacN9wSPXN30BIJVKoscX17m0r4GV5KbePM1DnB04nkCVih6+tv7ntrSymBcX/63O9aGUpHeGjUwoLumAocSYDMumdxTtGkuBem7qT/wt8aCweGOS+4hFVMOpUxYpW6c9QNE+DwdeW9YAiR9HN3pmv8cdj5HKO6fpubeU9xnu5Jd4kVdW3M9FyrJRZdj3NPYTf3+cllbhVAAOTEa3JV6jmfgx2OF+bT/6lW977q8S6o9HOTPTYsE5G3QpPJHrwnKJb09fdexiZgDN0QChOfMr7C2DGFeSTGmGAsG8TMUQIDAQAB",
+   "manifest_version": 3,
+   "name": "MY AD FINDER",
+   "options_ui": {
+      "open_in_tab": true,
+      "page": "options.html"
+   },
+   "permissions": [ "storage", "tabs" ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "2.42.1",
+   "web_accessible_resources": [ {
+      "matches": [ "*://*/*" ],
+      "resources": [ "/assets/happy.png", "/assets/bleulogo.png", "/assets/sad.png", "/assets/freshchat.png" ]
+   }, {
+      "matches": [ "*://*.facebook.com/*" ],
+      "resources": [ "scripti.js" ]
+   } ]
+}

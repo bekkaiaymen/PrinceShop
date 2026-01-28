@@ -1,0 +1,15 @@
+2026/01/23-11:03:13.225 5990 Reusing MANIFEST C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\WebStorage\3\IndexedDB\indexeddb.leveldb/MANIFEST-000001
+2026/01/23-11:03:13.226 5990 Recovering log #209
+2026/01/23-11:03:13.232 5990 Reusing old log C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\WebStorage\3\IndexedDB\indexeddb.leveldb/000209.log 
+2026/01/23-11:10:37.515 1f08 Level-0 table #214: started
+2026/01/23-11:10:37.530 1f08 Level-0 table #214: 268276 bytes OK
+2026/01/23-11:10:37.535 1f08 Delete type=0 #209
+2026/01/23-11:10:37.538 1f08 Manual compaction at level-0 from (begin) .. (end); will stop at (end)
+2026/01/23-11:10:37.539 1f08 Manual compaction at level-1 from (begin) .. (end); will stop at '\x00\x07\x01\x1f\x04\x03\x01\x06\x00Q\x00U\x00E\x00U\x00E\x00D\x03\x00\x00\x00\x00\x00\x00L@\x03\x00\x90\xd3\xa6<\xbeyB\x00\x03\x00\x00\x00\x00\x00\xe0r@' @ 44544 : 1
+2026/01/23-11:10:37.540 1f08 Compacting 1@1 + 1@2 files
+2026/01/23-11:10:37.549 1f08 Generated table #215@1: 118 keys, 5293 bytes
+2026/01/23-11:10:37.549 1f08 Compacted 1@1 + 1@2 files => 5293 bytes
+2026/01/23-11:10:37.551 1f08 compacted to: files[ 0 0 1 0 0 0 0 ]
+2026/01/23-11:10:37.554 1f08 Delete type=2 #211
+2026/01/23-11:10:37.554 1f08 Delete type=2 #214
+2026/01/23-11:10:37.557 1f08 Manual compaction at level-1 from '\x00\x07\x01\x1f\x04\x03\x01\x06\x00Q\x00U\x00E\x00U\x00E\x00D\x03\x00\x00\x00\x00\x00\x00L@\x03\x00\x90\xd3\xa6<\xbeyB\x00\x03\x00\x00\x00\x00\x00\xe0r@' @ 44544 : 1 .. (end); will stop at (end)

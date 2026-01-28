@@ -1,0 +1,11 @@
+{
+   "desc": {
+      "message": "받아쓰기를 사용하여 50개 이상의 언어로 10,000개 이상의 사이트를 입력하세요. VoiceIn은 실시간으로 음성을 텍스트로 변환합니다."
+   },
+   "name": {
+      "message": "Voice In - 음성을 텍스트로 변환"
+   },
+   "shortName": {
+      "message": "Voice In"
+   }
+}

@@ -1,0 +1,6 @@
+2026/01/10-20:32:11.728 ae4 Creating DB C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_gg.indoneviler.xyz_0.indexeddb.leveldb since it was missing.
+2026/01/10-20:32:11.737 ae4 Reusing MANIFEST C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_gg.indoneviler.xyz_0.indexeddb.leveldb/MANIFEST-000001
+2026/01/10-20:32:20.814 3b0 Level-0 table #5: started
+2026/01/10-20:32:20.822 3b0 Level-0 table #5: 2826 bytes OK
+2026/01/10-20:32:20.827 3b0 Delete type=0 #3
+2026/01/10-20:32:20.829 3b0 Manual compaction at level-0 from (begin) .. (end); will stop at (end)

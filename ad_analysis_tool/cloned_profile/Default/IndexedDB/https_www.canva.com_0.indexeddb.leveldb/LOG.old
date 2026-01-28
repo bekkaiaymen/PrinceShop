@@ -1,0 +1,42 @@
+2026/01/08-20:59:29.418 5e2c Creating DB C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_www.canva.com_0.indexeddb.leveldb since it was missing.
+2026/01/08-20:59:29.425 5e2c Reusing MANIFEST C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_www.canva.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/01/08-20:59:29.865 4f08 Level-0 table #5: started
+2026/01/08-20:59:29.872 4f08 Level-0 table #5: 10375 bytes OK
+2026/01/08-20:59:29.875 4f08 Delete type=0 #3
+2026/01/08-20:59:29.876 5e2c Manual compaction at level-0 from '\x00\x02\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x03\x00\x00\x00' @ 0 : 0; will stop at (end)
+2026/01/08-21:03:34.085 5e2c Level-0 table #7: started
+2026/01/08-21:03:34.140 5e2c Level-0 table #7: 2531589 bytes OK
+2026/01/08-21:03:34.146 5e2c Delete type=0 #4
+2026/01/08-21:03:49.923 4f08 Compacting 1@1 + 1@2 files
+2026/01/08-21:03:49.996 4f08 Generated table #8@1: 362 keys, 44777 bytes
+2026/01/08-21:03:49.996 4f08 Compacted 1@1 + 1@2 files => 44777 bytes
+2026/01/08-21:03:50.045 4f08 compacted to: files[ 0 0 1 0 0 0 0 ]
+2026/01/08-21:03:50.046 4f08 Delete type=2 #5
+2026/01/08-21:03:50.046 4f08 Delete type=2 #7
+2026/01/08-21:08:57.144 2f60 Level-0 table #10: started
+2026/01/08-21:08:57.209 2f60 Level-0 table #10: 2529068 bytes OK
+2026/01/08-21:08:57.213 2f60 Delete type=0 #6
+2026/01/08-21:09:02.227 2f60 Compacting 1@1 + 1@2 files
+2026/01/08-21:09:02.271 2f60 Generated table #11@1: 344 keys, 22252 bytes
+2026/01/08-21:09:02.272 2f60 Compacted 1@1 + 1@2 files => 22252 bytes
+2026/01/08-21:09:02.275 2f60 compacted to: files[ 0 0 1 0 0 0 0 ]
+2026/01/08-21:09:02.277 2f60 Delete type=2 #8
+2026/01/08-21:09:02.277 2f60 Delete type=2 #10
+2026/01/08-21:13:05.313 2f60 Level-0 table #13: started
+2026/01/08-21:13:05.398 2f60 Level-0 table #13: 2532972 bytes OK
+2026/01/08-21:13:05.404 2f60 Delete type=0 #9
+2026/01/08-21:13:21.969 2f60 Compacting 1@1 + 1@2 files
+2026/01/08-21:13:22.012 2f60 Generated table #14@1: 337 keys, 23122 bytes
+2026/01/08-21:13:22.012 2f60 Compacted 1@1 + 1@2 files => 23122 bytes
+2026/01/08-21:13:22.016 2f60 compacted to: files[ 0 0 1 0 0 0 0 ]
+2026/01/08-21:19:59.462 2f60 Level-0 table #16: started
+2026/01/08-21:19:59.500 2f60 Level-0 table #16: 2488729 bytes OK
+2026/01/08-21:19:59.503 2f60 Delete type=2 #11
+2026/01/08-21:19:59.503 2f60 Delete type=0 #12
+2026/01/08-21:19:59.503 2f60 Delete type=2 #13
+2026/01/08-21:20:18.781 5e2c Compacting 1@1 + 1@2 files
+2026/01/08-21:20:18.820 5e2c Generated table #17@1: 336 keys, 17028 bytes
+2026/01/08-21:20:18.821 5e2c Compacted 1@1 + 1@2 files => 17028 bytes
+2026/01/08-21:20:18.823 5e2c compacted to: files[ 0 0 1 0 0 0 0 ]
+2026/01/08-21:20:18.825 5e2c Delete type=2 #14
+2026/01/08-21:20:18.825 5e2c Delete type=2 #16

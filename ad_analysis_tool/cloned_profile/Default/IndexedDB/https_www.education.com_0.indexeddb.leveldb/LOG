@@ -1,0 +1,6 @@
+2026/01/11-18:23:30.348 2c54 Reusing MANIFEST C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_www.education.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/01/11-18:23:30.350 2c54 Recovering log #3
+2026/01/11-18:23:30.371 2c54 Reusing old log C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_www.education.com_0.indexeddb.leveldb/000003.log 
+2026/01/11-18:24:11.307 2c54 Level-0 table #5: started
+2026/01/11-18:24:11.347 2c54 Level-0 table #5: 1338451 bytes OK
+2026/01/11-18:24:11.351 2c54 Delete type=0 #3

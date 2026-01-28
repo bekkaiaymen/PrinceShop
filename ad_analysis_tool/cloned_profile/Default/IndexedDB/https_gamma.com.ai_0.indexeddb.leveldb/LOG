@@ -1,0 +1,26 @@
+2025/11/02-20:39:07.407 5480 Creating DB C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_gamma.com.ai_0.indexeddb.leveldb since it was missing.
+2025/11/02-20:39:07.419 5480 Reusing MANIFEST C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_gamma.com.ai_0.indexeddb.leveldb/MANIFEST-000001
+2025/11/02-20:40:20.071 337c Level-0 table #5: started
+2025/11/02-20:40:20.106 337c Level-0 table #5: 1220393 bytes OK
+2025/11/02-20:40:20.111 337c Delete type=0 #3
+2025/11/02-20:41:32.802 337c Level-0 table #7: started
+2025/11/02-20:41:32.857 337c Level-0 table #7: 4158230 bytes OK
+2025/11/02-20:41:32.862 337c Delete type=0 #4
+2025/11/02-20:41:59.222 337c Compacting 1@1 + 1@2 files
+2025/11/02-20:41:59.240 337c Generated table #8@1: 71 keys, 597697 bytes
+2025/11/02-20:41:59.240 337c Compacted 1@1 + 1@2 files => 597697 bytes
+2025/11/02-20:41:59.242 337c compacted to: files[ 0 0 1 0 0 0 0 ]
+2025/11/02-20:42:21.127 337c Level-0 table #10: started
+2025/11/02-20:42:21.150 337c Level-0 table #10: 3571695 bytes OK
+2025/11/02-20:42:21.157 337c Delete type=2 #5
+2025/11/02-20:42:21.157 337c Delete type=0 #6
+2025/11/02-20:42:21.157 337c Delete type=2 #7
+2025/11/02-20:44:03.685 337c Compacting 1@1 + 1@2 files
+2025/11/02-20:44:03.701 337c Generated table #11@1: 71 keys, 644784 bytes
+2025/11/02-20:44:03.701 337c Compacted 1@1 + 1@2 files => 644784 bytes
+2025/11/02-20:44:03.705 337c compacted to: files[ 0 0 1 0 0 0 0 ]
+2025/11/02-20:44:03.706 337c Delete type=2 #8
+2025/11/02-20:44:03.707 337c Delete type=2 #10
+2025/11/02-20:44:10.783 337c Level-0 table #13: started
+2025/11/02-20:44:10.819 337c Level-0 table #13: 3460114 bytes OK
+2025/11/02-20:44:10.823 337c Delete type=0 #9

@@ -1,0 +1,6 @@
+2026/01/16-14:07:17.110 4de0 Creating DB C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_www.netlify.com_0.indexeddb.leveldb since it was missing.
+2026/01/16-14:07:17.120 4de0 Reusing MANIFEST C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_www.netlify.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/01/16-14:12:03.542 4de8 Level-0 table #5: started
+2026/01/16-14:12:03.547 4de8 Level-0 table #5: 827 bytes OK
+2026/01/16-14:12:03.552 4de8 Delete type=0 #3
+2026/01/16-14:12:03.554 4de8 Manual compaction at level-0 from (begin) .. (end); will stop at (end)

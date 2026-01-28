@@ -1,0 +1,7 @@
+2025/12/02-11:59:42.072 5f9c Reusing MANIFEST C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_imageresizer.com_0.indexeddb.leveldb/MANIFEST-000001
+2025/12/02-11:59:42.073 5f9c Recovering log #13
+2025/12/02-11:59:42.074 5f9c Reusing old log C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_imageresizer.com_0.indexeddb.leveldb/000013.log 
+2025/12/02-11:59:42.111 3b88 Level-0 table #19: started
+2025/12/02-11:59:42.115 3b88 Level-0 table #19: 1453 bytes OK
+2025/12/02-11:59:42.118 3b88 Delete type=0 #13
+2025/12/02-11:59:42.118 5f9c Manual compaction at level-0 from '\x00\x05\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x06\x00\x00\x00' @ 0 : 0; will stop at (end)

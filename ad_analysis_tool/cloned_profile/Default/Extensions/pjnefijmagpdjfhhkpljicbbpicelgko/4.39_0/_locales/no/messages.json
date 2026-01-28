@@ -1,0 +1,11 @@
+{
+   "desc": {
+      "message": "Bruk diktat til å skrive inn over 10 000 nettsteder på over 50 språk. VoiceIn transkriberer talen din til tekst i sanntid."
+   },
+   "name": {
+      "message": "Voice In - Tale-til-tekst Diktering"
+   },
+   "shortName": {
+      "message": "Voice In"
+   }
+}

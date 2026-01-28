@@ -1,0 +1,584 @@
+@media print {
+  * {
+    display: none !important;
+  }
+}
+
+div {
+  display: block;
+  border: none;
+  margin: 0;
+  padding: 0;
+  box-shadow: none;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+#voicein_voicebox_container {
+  position: fixed;
+  width: 50%;
+  top: 70px;
+  right: 25%;
+  text-align: center;
+  margin: 0 auto;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  text-align: center;
+  transition: display 1s ease-in-out;
+  -moz-transition: display 1s ease-in-out;
+  -webkit-transition: display 1s ease-in-out;
+  pointer-events:none;
+  z-index: 2147483647;
+}
+
+#voicein_voicebox {
+  display: inline-block;
+  font-size: 20px!important;
+  line-height: 1.3em!important;
+  font-family: Arial;
+  text-align: center!important;
+  padding: 5px 20px!important;
+  min-height: 1.25em!important;
+  background-color: rgba(210,210,210,0.8)!important;
+  color: #333 !important;
+  border: none;
+  border-radius: 10px;
+  transition: display 1s ease-in-out;
+  -moz-transition: display 1s ease-in-out;
+  -webkit-transition: display 1s ease-in-out;
+  box-sizing: content-box;
+}
+
+#voicein_spacebox_container textarea {
+  background: white;
+}
+
+#voicein_voicebox:empty {
+  visibility:hidden;
+  opacity:0;
+  transition: visibility 0s linear 0.5s, opacity 0.5s linear;
+  -webkit-transition: visibility 0s linear 0.5s, opacity 0.5s linear;
+}
+
+#voicein_voicebox_container:empty {
+  display: none;
+  transition: display 1s ease-in-out;
+  -moz-transition: display 1s ease-in-out;
+  -webkit-transition: display 1s ease-in-out;
+}
+
+#voicein_popup_container #voicein_popup>div {
+  margin-bottom: 5px;
+  margin-right: 5px;
+}
+
+#voicein_popup_container #voicein_popup>div:first-child {
+  margin-right: 0px;
+}
+
+#voicein_popup_container.voicein_tr {
+  top: 100px;
+  right: 0px;
+}
+
+#voicein_popup_container.voicein_tl {
+  top: 10px;
+  left: 20px;
+}
+
+#voicein_popup_container.voicein_br {
+  bottom: 10px;
+  right: 20px;
+}
+
+#voicein_popup_container.voicein_bl {
+  bottom: 10px;
+  left: 20px;
+}
+
+#voicein_popup_container.voicein_br #voicein_popup>div,
+#voicein_popup_container.voicein_tr #voicein_popup>div {
+  margin-left: auto;
+}
+
+#voicein_popup_container {
+  vertical-align: middle;
+  display: block;
+  position: fixed;
+  line-height: 23px;
+  background-color: transparent;
+  z-index: 2147483647;
+  margin: 0px auto;
+  padding: 0px;
+  border-width: initial;
+  border-color: initial;
+  border-image: initial;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-size: 12px;
+  text-decoration: none;
+  box-sizing: content-box;
+}
+
+#voicein_popup_container .voicein_menu_option {
+  text-align: center;
+  width: 120px;
+  height: 32px;
+  border: 1px solid #bbb;
+  margin-bottom: 5px;
+  background-color: white;
+}
+
+#voicein_popup_container .voicein_menu_option a {
+  text-decoration: none!important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#voicein_settings {
+  height: 34px;
+  width: fit-content;
+  max-width: 140px;
+  min-width: 110px;
+  margin: 0;
+  background-color: black;
+  color: white;
+  margin-bottom: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 1px 5px 1px 1px;
+  border-radius: 18px 0px 0px 18px;
+  border: 1px solid #000;
+  box-shadow: -2px 2px 0px rgb(0 0 0 / 10%);
+}
+
+#voicein_lang {
+  display: inline-block;
+  color: white;
+  font-weight: 500;
+  font-size: 14px;
+  padding-left: 6px;
+  padding-right: 5px;
+  max-width: 84px;
+  font-family: Helvetica;
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;  
+}
+
+#voicein_popup_container #voicein_upgrade {
+  color: black;
+  border: none;
+  background-color: #ffc107;
+  border-radius: 17px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+#voicein_popup_container #voicein_upgrade > a {
+  font-size: 14px;
+  color: #212529!important;
+}
+
+#voicein_popup_container #voicein_upgrade:hover {
+  color: #212529;
+  background-color: #e0a800;
+  border-color: #d39e00;
+}
+
+#voicein_help,
+#voicein_error {
+  width: 245px;
+  padding: 10px;
+  display: none;
+}
+
+#voicein_help {
+  color: #333;
+  border-radius: 8px;
+  border: 1px solid #eae9e4;
+  background-color: #FFF9DB;
+}
+
+#voicein_error {
+  color: #721c24;
+  background-color: #f8d7da;
+}
+
+#voicein_help_message,
+#voicein_error_message {
+  padding: 0;
+  margin: 0;
+  line-height: 18px;
+  font-size: 14px;
+}
+
+#voicein_error_message a,
+#voicein_help_message a {
+  color: #007bff;
+  text-decoration: none;
+  background-color: transparent;
+}
+
+#voicein_error_message a:hover,
+#voicein_help_message a:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+#voicein_help_message p, #voicein_help_message ul, #voicein_help_message h3, #voicein_help_message h4 {
+  margin: 5px 0;
+}
+
+#voicein_help_message h3 {
+  font-size: 20px;
+  line-height: 28px;
+  margin-top: 0;
+}
+
+#voicein_help_message .m-10 {
+  margin: 10px 0;
+}
+
+#voicein_help_message ul {
+  list-style: none;
+  padding-left: 2px;
+}
+
+.icon-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.icon-list li {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+
+.icon-list .icon {
+  flex-shrink: 0;
+  margin-right: 6px;
+  font-size: 1.2em;
+  line-height: 1.5;
+}
+
+.icon-list .text {
+  flex: 1;
+}
+
+#voicein_help.wide {
+  width: 320px;
+  background-color: #FFF9DB;
+}
+
+/* The Modal (background) */
+#voicein_modal .voicein_modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 2147483647; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* Modal Content/Box */
+#voicein_modal .voicein_modal_content {
+  display: block;
+  background-color: #fefefe;
+  margin: 2rem auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  color: #333;
+  width: 400px; /* Could be more or less, depending on screen size */
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-size: 1em;
+  line-height: 1.1em;
+}
+
+#voicein_modal .warn {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+#voicein_modal .voicein_modal_content p {
+  margin: 0;
+}
+
+/* The Close Button */
+#voicein_modal .voicein_modal_close {
+  color: #aaa;
+  float: right;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+#voicein_modal .voicein_modal_close:hover,
+#voicein_modal .voicein_modal_close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.voicein_ks {
+  padding: 5px 15px;
+  background: #626262;
+  display: inline-block;
+  color: #fff;
+  border-radius: 5px;
+  margin-left: 5px;
+  width: fit-content;
+}
+
+.voicein_ks_s {
+  display: inline-block;
+  width: max-content;
+}
+
+.voicein_modal_content h1 {
+  color: #333;
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 30px;
+  margin-top: 0px;
+  margin-bottom: 10px;
+}
+
+#voicein_pm_status {
+  font-size: 13px;
+  margin-top: 10px;
+  display: none;
+}
+
+.voicein_modal_section {
+  margin-bottom: 20px;
+}
+
+.voicein_modal_section h4 {
+  font-weight: 400;
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 18px;
+}
+
+.voicein_modal_section select {
+  width: max-content;
+  border: 1px solid rgb(130, 130, 130);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.voicein_modal_section label {
+  font-size: 16px;
+  color: #626262;
+  display: inline;
+}
+
+.voicein_modal_section a {
+  color: #0d6efd!important;
+  text-decoration: none;
+}
+
+.voicein_modal_section p {
+  font-size: 16px;
+  color: #626262
+}
+
+#voicein_spacebox_container {
+  display: none; background: black; border: 1px solid black;
+}
+
+#voicein_spacebox_container #voicein_spacebox {
+  outline: none;
+  margin: 0px!important;
+  height: 86px; width: 265px; display: block;
+  line-height: 16px;
+  font-family: Arial;
+  font-size: 14px;
+}
+
+input[type=checkbox] {
+  margin:0;
+  margin-right: 5px;
+  pointer-events: auto;
+  z-index:1000;
+  opacity: 1;
+  appearance: auto;
+}
+
+.voicein_close {
+  float: right;
+  display: inline-block;
+  margin: 0;
+  margin-top: -12px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+#voicein_ls {
+  text-align: inherit;
+  width: fit-content;
+}
+
+#voicein_ls > button {
+  padding: 1px 6px;
+  margin-right: 3px;
+  border: 1px solid rgb(118, 118, 118);
+}
+
+.plus-only {
+  font-size: 12px;
+}
+
+.plus-only a {
+    color: #007bff!important;
+}
+
+.fab-grabber-container {
+  margin: 1px 5px 1px 2px;
+  padding: 6px 2px 6px 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: move;
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+.fab-grabber-container .fab-grabber {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.fab-grabber-container .fab-grabber .horizontal-group {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.fab-grabber-container .fab-grabber .horizontal-group .movable-dot {
+  width: 2px;
+  height: 2px;
+  margin: 1px;
+  display: inline-block;
+  border-radius: 50%;
+  background-color: #fff;
+}
+
+.fab-container .fab-content > div {
+  display: flex;
+}
+
+.fab-grabber-container:hover {
+  background: #D2E1FF;
+}
+
+.fab-grabber-container:hover .fab-grabber .horizontal-group .movable-dot, .fab-grabber-container:hover:active .fab-grabber .horizontal-group .movable-dot {
+  background-color: #0000FF;
+}
+
+.vi-icon {
+  width: 20px;
+  height: 20px;
+  line-height: normal;
+  margin: 0px;
+  fill: rgb(243, 242, 241);
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: normal;
+  text-align: center;
+}
+.vi-icon {
+  display: inline-block;
+}
+
+.vi-icon svg>path {
+  fill: white;
+}
+
+#voicein_icon {
+  display: flex;
+  margin-left: 1px;
+  padding: 4px;
+  border-radius: 35px;
+  background-color: #00aa49;
+  position: relative;
+}
+
+#voicein_icon:hover {
+  background-color: #377e22;
+}
+
+.popover {
+  visibility: hidden;
+  width: 120px;
+  background-color: #323130;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%; /* Position the popover above the button */
+  left: 50%;
+  margin-left: -60px; /* Use half of the width value to center the popover */
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 12px;
+}
+
+.popover::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #42403f transparent transparent transparent;
+}
+
+#lang-container {
+  display: flex;
+  align-items: center;
+  height: 28px;
+  position: relative;
+}
+
+#voicein_icon:hover .popover, #lang-container:hover .popover {
+  visibility: visible;
+  opacity: 1;
+}
+
+#voicein_popup_container #audioscribe-btn {
+  color: black;
+  border: none;
+  background-color: rgba(0, 0, 0, 0);
+  border-radius: 17px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  background-image: linear-gradient(90.38deg, rgb(103, 57, 198) 0.23%, rgb(64, 64, 191) 32.73%, rgb(71, 61, 192) 50.37%, rgb(30, 61, 161) 98.27%);  
+}

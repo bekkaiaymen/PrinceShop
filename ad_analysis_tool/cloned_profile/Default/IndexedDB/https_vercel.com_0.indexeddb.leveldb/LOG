@@ -1,0 +1,12 @@
+2026/01/18-16:50:24.673 4b80 Reusing MANIFEST C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_vercel.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/01/18-16:50:24.674 4b80 Recovering log #15
+2026/01/18-16:50:24.694 4b80 Reusing old log C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_vercel.com_0.indexeddb.leveldb/000015.log 
+2026/01/18-16:50:25.211 cc0 Level-0 table #20: started
+2026/01/18-16:50:25.254 cc0 Level-0 table #20: 1690091 bytes OK
+2026/01/18-16:50:25.258 cc0 Delete type=0 #15
+2026/01/18-16:50:28.096 6e58 Compacting 1@1 + 1@2 files
+2026/01/18-16:50:28.117 6e58 Generated table #21@1: 570 keys, 52264 bytes
+2026/01/18-16:50:28.117 6e58 Compacted 1@1 + 1@2 files => 52264 bytes
+2026/01/18-16:50:28.119 6e58 compacted to: files[ 0 0 1 0 0 0 0 ]
+2026/01/18-16:50:28.120 6e58 Delete type=2 #17
+2026/01/18-16:50:28.120 6e58 Delete type=2 #20

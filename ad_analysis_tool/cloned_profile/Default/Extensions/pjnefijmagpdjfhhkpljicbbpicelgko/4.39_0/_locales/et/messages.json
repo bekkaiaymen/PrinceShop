@@ -1,0 +1,11 @@
+{
+   "desc": {
+      "message": "Kasutage dikteerimist, et tippida 10 000+ saidile 50+ keeles. VoiceIn transkribeerib teie kõne reaalajas tekstiks."
+   },
+   "name": {
+      "message": "Voice In - Kõne Tekstiks Dikteerimine"
+   },
+   "shortName": {
+      "message": "Voice In"
+   }
+}

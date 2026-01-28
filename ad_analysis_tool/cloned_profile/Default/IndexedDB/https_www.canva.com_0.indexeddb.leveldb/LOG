@@ -1,0 +1,15 @@
+2026/01/20-20:52:25.298 834 Reusing MANIFEST C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_www.canva.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/01/20-20:52:25.298 834 Recovering log #15
+2026/01/20-20:52:25.299 834 Reusing old log C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_www.canva.com_0.indexeddb.leveldb/000015.log 
+2026/01/20-21:32:14.938 834 Level-0 table #20: started
+2026/01/20-21:32:14.961 834 Level-0 table #20: 1561160 bytes OK
+2026/01/20-21:32:14.963 834 Delete type=0 #15
+2026/01/20-21:32:14.963 834 Manual compaction at level-0 from (begin) .. (end); will stop at (end)
+2026/01/20-21:32:14.963 834 Manual compaction at level-1 from (begin) .. (end); will stop at '\x00\x14\x00\x00\xc8\x0f\x00l\x00o\x00c\x00a\x00l\x00_\x00m\x00a\x00n\x00i\x00f\x00e\x00s\x00t\x00s' @ 54637 : 1
+2026/01/20-21:32:14.963 834 Compacting 1@1 + 1@2 files
+2026/01/20-21:32:14.974 834 Generated table #21@1: 373 keys, 7812 bytes
+2026/01/20-21:32:14.974 834 Compacted 1@1 + 1@2 files => 7812 bytes
+2026/01/20-21:32:14.975 834 compacted to: files[ 0 0 1 0 0 0 0 ]
+2026/01/20-21:32:14.976 834 Delete type=2 #17
+2026/01/20-21:32:14.976 834 Delete type=2 #20
+2026/01/20-21:32:14.977 834 Manual compaction at level-1 from '\x00\x14\x00\x00\xc8\x0f\x00l\x00o\x00c\x00a\x00l\x00_\x00m\x00a\x00n\x00i\x00f\x00e\x00s\x00t\x00s' @ 54637 : 1 .. (end); will stop at (end)

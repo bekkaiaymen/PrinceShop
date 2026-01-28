@@ -1,0 +1,57 @@
+2026/01/26-02:42:43.580 51a8 Reusing MANIFEST C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_drive.google.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/01/26-02:42:43.582 51a8 Recovering log #4216
+2026/01/26-02:42:43.586 51a8 Reusing old log C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_drive.google.com_0.indexeddb.leveldb/004216.log 
+2026/01/26-02:43:49.360 51b4 Level-0 table #4233: started
+2026/01/26-02:43:49.391 51b4 Level-0 table #4233: 1811393 bytes OK
+2026/01/26-02:43:49.393 51b4 Delete type=0 #4216
+2026/01/26-02:43:49.399 51b4 Compacting 1@0 + 0@1 files
+2026/01/26-02:43:49.439 51b4 Generated table #4234@0: 6335 keys, 1506673 bytes
+2026/01/26-02:43:49.445 51b4 Generated table #4235@0: 1559 keys, 82994 bytes
+2026/01/26-02:43:49.445 51b4 Compacted 1@0 + 0@1 files => 1589667 bytes
+2026/01/26-02:43:49.446 51b4 compacted to: files[ 0 2 15 0 0 0 0 ]
+2026/01/26-02:43:49.447 51b4 Delete type=2 #4233
+2026/01/26-02:43:49.453 51b4 Compacting 1@1 + 1@2 files
+2026/01/26-02:43:49.476 51b4 Generated table #4236@1: 9491 keys, 423025 bytes
+2026/01/26-02:43:49.476 51b4 Compacted 1@1 + 1@2 files => 423025 bytes
+2026/01/26-02:43:49.478 51b4 compacted to: files[ 0 1 15 0 0 0 0 ]
+2026/01/26-02:43:49.478 51b4 Delete type=2 #4230
+2026/01/26-02:43:49.478 51b4 Delete type=2 #4235
+2026/01/26-02:43:49.479 51e8 Compacting 1@1 + 10@2 files
+2026/01/26-02:43:49.537 51e8 Generated table #4237@1: 5671 keys, 2130881 bytes
+2026/01/26-02:43:49.577 51e8 Generated table #4238@1: 2143 keys, 2115438 bytes
+2026/01/26-02:43:49.581 51e8 Level-0 table #4241: started
+2026/01/26-02:43:49.611 51e8 Level-0 table #4241: 1690081 bytes OK
+2026/01/26-02:43:49.613 51e8 Delete type=0 #4232
+2026/01/26-02:43:49.655 51e8 Generated table #4239@1: 2116 keys, 2126876 bytes
+2026/01/26-02:43:49.693 51e8 Generated table #4242@1: 1956 keys, 2126274 bytes
+2026/01/26-02:43:49.734 51e8 Generated table #4243@1: 2126 keys, 2122618 bytes
+2026/01/26-02:43:49.768 51e8 Level-0 table #4246: started
+2026/01/26-02:43:49.795 51e8 Level-0 table #4246: 1881444 bytes OK
+2026/01/26-02:43:49.797 51e8 Delete type=0 #4240
+2026/01/26-02:43:49.810 51e8 Generated table #4244@1: 1758 keys, 2122153 bytes
+2026/01/26-02:43:49.846 51e8 Generated table #4247@1: 2228 keys, 2123320 bytes
+2026/01/26-02:43:49.936 51e8 Generated table #4248@1: 2367 keys, 2122103 bytes
+2026/01/26-02:43:50.028 51e8 Generated table #4249@1: 1913 keys, 2127774 bytes
+2026/01/26-02:43:50.096 51e8 Generated table #4250@1: 2283 keys, 2116591 bytes
+2026/01/26-02:43:50.134 51e8 Generated table #4251@1: 12392 keys, 1540765 bytes
+2026/01/26-02:43:50.134 51e8 Compacted 1@1 + 10@2 files => 22774793 bytes
+2026/01/26-02:43:50.135 51e8 compacted to: files[ 2 0 16 0 0 0 0 ]
+2026/01/26-02:43:50.136 51e8 Delete type=2 #4220
+2026/01/26-02:43:50.136 51e8 Delete type=2 #4221
+2026/01/26-02:43:50.136 51e8 Delete type=2 #4222
+2026/01/26-02:43:50.136 51e8 Delete type=2 #4223
+2026/01/26-02:43:50.136 51e8 Delete type=2 #4224
+2026/01/26-02:43:50.136 51e8 Delete type=2 #4225
+2026/01/26-02:43:50.137 51e8 Delete type=2 #4226
+2026/01/26-02:43:50.137 51e8 Delete type=2 #4227
+2026/01/26-02:43:50.137 51e8 Delete type=2 #4228
+2026/01/26-02:43:50.137 51e8 Delete type=2 #4229
+2026/01/26-02:43:50.137 51e8 Delete type=2 #4234
+2026/01/26-02:44:35.423 51b4 Compacting 2@0 + 0@1 files
+2026/01/26-02:44:35.463 51b4 Generated table #4252@0: 9779 keys, 2135346 bytes
+2026/01/26-02:44:35.477 51b4 Generated table #4253@0: 1278 keys, 1353953 bytes
+2026/01/26-02:44:35.482 51b4 Generated table #4254@0: 2764 keys, 55165 bytes
+2026/01/26-02:44:35.482 51b4 Compacted 2@0 + 0@1 files => 3544464 bytes
+2026/01/26-02:44:35.483 51b4 compacted to: files[ 0 3 16 0 0 0 0 ]
+2026/01/26-02:44:35.484 51b4 Delete type=2 #4241
+2026/01/26-02:44:35.484 51b4 Delete type=2 #4246

@@ -1,0 +1,47 @@
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta id="page-id" name="page-id" content="player">
+  <style>
+body {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    text-align: left;
+    background-color: #fff;
+}    
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #252525;
+    color: #d0d0d0;
+  }
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mt-2 {
+  margin-top: 1rem;
+}
+  </style>
+  <script type="module" crossorigin src="/player.js"></script>
+  <link rel="modulepreload" crossorigin href="/modulepreload-polyfill.js">
+  <link rel="modulepreload" crossorigin href="/tracking.js">
+</head>
+
+<body>
+  <div class="text-center">
+    <p class="mt-2">
+      <span>Voice In uses this tab for dictation. This tab will automatically close after 1 minute of no
+        activity.</span>
+      <!-- <span id="hidethistab-link" class="link" data-i18n="player_hidethistab_link"></span> -->
+    </p>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,11 @@
+{
+   "desc": {
+      "message": "Käytä sanelua kirjoittaaksesi yli 10 000 sivustoa yli 50 kielellä. VoiceIn litteroi puheesi tekstiksi reaaliajassa."
+   },
+   "name": {
+      "message": "Voice In - Puheesta tekstiksi sanelu"
+   },
+   "shortName": {
+      "message": "Voice In"
+   }
+}

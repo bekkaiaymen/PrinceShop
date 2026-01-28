@@ -1,0 +1,77 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/font-awesome5.min.css">
+  <style>
+body {
+  background: none;
+}
+
+:root {
+  background-color: transparent;
+}
+
+:root {
+  --toolbar-width: 200px;
+  --pane-width: 300px;
+  --pane-sm-width: 215px;
+  --toolbar-pane-width: calc(var(--toolbar-width) + var(--pane-width));
+  --toolbar-pane-sm-width: calc(var(--toolbar-width) + var(--pane-sm-width));
+  --toolbar-bg: #1a1a1a;
+  --pane-bg: #f8f8f8;
+  --note-bg: #ffffff;
+  --pane-active-bg: #f2f2f2;
+  --notetile-border: #ececec;
+  --default-color: #333;
+  --heading-color: #333;
+  --dimmed-color: #666;
+  --light-color: #aaa;
+  --btn-hover-color: #f2f2f2;
+}
+
+:root.darkMode {
+  --toolbar-bg: #191919;
+  --pane-bg: #19232e;
+  --pane-active-bg: #2b3b4e;
+  --note-bg: #222f3e;
+  --notetile-border: #2b3b4e;
+  --default-color: #ccc;
+  --heading-color: #e6e6e6;
+  --dimmed-color: #a6a6a6;
+  --light-color: #666;
+  --btn-hover-color: #262626;
+}
+
+a {
+  cursor: pointer;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-success {
+  color: white !important;
+}
+
+a:not([href]) {
+    color: inherit;
+    text-decoration: none;
+}
+  </style>
+  <script type="module" crossorigin src="/audioscribe.js"></script>
+  <link rel="modulepreload" crossorigin href="/modulepreload-polyfill.js">
+  <link rel="modulepreload" crossorigin href="/plugin-vue_export-helper.js">
+  <link rel="modulepreload" crossorigin href="/pinia.js">
+  <link rel="stylesheet" crossorigin href="/audioscribe.css">
+</head>
+<body>
+  <div>
+  </div>
+  <script src="/js/libs/jquery-3.6.1.min.js"></script>
+  <script src="/js/libs/bootstrap.bundle.min.js"></script>
+</body>
+</html>

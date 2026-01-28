@@ -1,0 +1,13 @@
+2025/12/02-16:28:05.154 4bd0 Reusing MANIFEST C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_imageresizer.com_0.indexeddb.leveldb/MANIFEST-000001
+2025/12/02-16:28:05.155 4bd0 Recovering log #18
+2025/12/02-16:28:05.156 4bd0 Reusing old log C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_imageresizer.com_0.indexeddb.leveldb/000018.log 
+2025/12/02-16:28:05.170 43b0 Level-0 table #22: started
+2025/12/02-16:28:05.173 43b0 Level-0 table #22: 1494 bytes OK
+2025/12/02-16:28:05.175 43b0 Delete type=0 #18
+2025/12/02-16:28:05.176 4bd0 Manual compaction at level-0 from '\x00\x06\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x07\x00\x00\x00' @ 0 : 0; will stop at '\x00\x06\x01\x02\x01\x03\x00k\x00e\x00y' @ 463 : 1
+2025/12/02-16:28:05.176 4bd0 Compacting 1@0 + 1@1 files
+2025/12/02-16:28:05.179 4bd0 Generated table #23@0: 30 keys, 648 bytes
+2025/12/02-16:28:05.179 4bd0 Compacted 1@0 + 1@1 files => 648 bytes
+2025/12/02-16:28:05.180 4bd0 compacted to: files[ 0 1 1 0 0 0 0 ]
+2025/12/02-16:28:05.181 4bd0 Delete type=2 #22
+2025/12/02-16:28:05.182 4bd0 Manual compaction at level-0 from '\x00\x06\x01\x02\x01\x03\x00k\x00e\x00y' @ 463 : 1 .. '\x00\x07\x00\x00\x00' @ 0 : 0; will stop at (end)

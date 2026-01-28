@@ -1,0 +1,11 @@
+{
+   "desc": {
+      "message": "Pomocí diktátu zadejte více než 10 000 webů ve více než 50 jazycích. VoiceIn přepisuje vaši řeč na text v reálném čase."
+   },
+   "name": {
+      "message": "Voice In - Převod řeči na text diktování"
+   },
+   "shortName": {
+      "message": "Voice In"
+   }
+}

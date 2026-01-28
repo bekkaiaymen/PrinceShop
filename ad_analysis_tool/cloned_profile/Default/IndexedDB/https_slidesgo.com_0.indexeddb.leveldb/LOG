@@ -1,0 +1,6 @@
+2025/11/02-20:49:52.942 5480 Creating DB C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_slidesgo.com_0.indexeddb.leveldb since it was missing.
+2025/11/02-20:49:52.960 5480 Reusing MANIFEST C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_slidesgo.com_0.indexeddb.leveldb/MANIFEST-000001
+2025/11/02-20:49:55.002 337c Level-0 table #5: started
+2025/11/02-20:49:55.008 337c Level-0 table #5: 3879 bytes OK
+2025/11/02-20:49:55.014 337c Delete type=0 #3
+2025/11/02-20:49:55.015 337c Manual compaction at level-0 from (begin) .. (end); will stop at (end)

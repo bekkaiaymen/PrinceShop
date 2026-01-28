@@ -1,0 +1,7 @@
+node_modules/
+profiles/
+ad_media/
+downloads/
+chrome_automation_profile/
+chrome_temp_profile/
+.env

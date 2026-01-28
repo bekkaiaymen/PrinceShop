@@ -1,0 +1,6 @@
+2025/12/18-12:16:28.205 4e2c Creating DB C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_www.ubuy.com.eg_0.indexeddb.leveldb since it was missing.
+2025/12/18-12:16:28.212 4e2c Reusing MANIFEST C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_www.ubuy.com.eg_0.indexeddb.leveldb/MANIFEST-000001
+2025/12/18-12:16:28.220 4f14 Level-0 table #5: started
+2025/12/18-12:16:28.225 4f14 Level-0 table #5: 672 bytes OK
+2025/12/18-12:16:28.227 4f14 Delete type=0 #3
+2025/12/18-12:16:28.228 5c14 Manual compaction at level-0 from '\x00\x01\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x02\x00\x00\x00' @ 0 : 0; will stop at (end)

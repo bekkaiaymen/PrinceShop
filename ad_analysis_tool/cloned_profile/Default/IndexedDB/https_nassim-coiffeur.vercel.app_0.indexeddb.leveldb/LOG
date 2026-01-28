@@ -1,0 +1,15 @@
+2026/01/25-21:27:48.341 51a8 Reusing MANIFEST C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_nassim-coiffeur.vercel.app_0.indexeddb.leveldb/MANIFEST-000001
+2026/01/25-21:27:48.342 51a8 Recovering log #63
+2026/01/25-21:27:48.343 51a8 Reusing old log C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_nassim-coiffeur.vercel.app_0.indexeddb.leveldb/000063.log 
+2026/01/25-21:32:39.708 51b4 Level-0 table #68: started
+2026/01/25-21:32:39.718 51b4 Level-0 table #68: 209 bytes OK
+2026/01/25-21:32:39.719 51b4 Delete type=0 #63
+2026/01/25-21:32:39.720 51b4 Manual compaction at level-0 from (begin) .. (end); will stop at (end)
+2026/01/25-21:32:39.720 51b4 Manual compaction at level-1 from (begin) .. (end); will stop at '\x00\x00\x00\x00\x06' @ 7925 : 1
+2026/01/25-21:32:39.721 51b4 Compacting 1@1 + 1@2 files
+2026/01/25-21:32:39.724 51b4 Generated table #69@1: 23 keys, 886 bytes
+2026/01/25-21:32:39.724 51b4 Compacted 1@1 + 1@2 files => 886 bytes
+2026/01/25-21:32:39.726 51b4 compacted to: files[ 0 0 1 0 0 0 0 ]
+2026/01/25-21:32:39.727 51b4 Delete type=2 #65
+2026/01/25-21:32:39.727 51b4 Delete type=2 #68
+2026/01/25-21:32:39.729 51b4 Manual compaction at level-1 from '\x00\x00\x00\x00\x06' @ 7925 : 1 .. (end); will stop at (end)

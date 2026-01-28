@@ -1,0 +1,9 @@
+2026/01/26-08:24:34.405 168c Reusing MANIFEST e:\affiliate marketing\ad_automation\cloned_profile\Default\Local Storage\leveldb/MANIFEST-000001
+2026/01/26-08:24:34.437 168c Recovering log #17914
+2026/01/26-08:24:34.457 168c Reusing old log e:\affiliate marketing\ad_automation\cloned_profile\Default\Local Storage\leveldb/017914.log 
+2026/01/26-08:34:38.896 6cb4 Level-0 table #17918: started
+2026/01/26-08:34:38.912 6cb4 Level-0 table #17918: 41838 bytes OK
+2026/01/26-08:34:38.922 6cb4 Delete type=0 #17914
+2026/01/26-08:43:37.457 6cb4 Level-0 table #17920: started
+2026/01/26-08:43:37.463 6cb4 Level-0 table #17920: 18440 bytes OK
+2026/01/26-08:43:37.466 6cb4 Delete type=0 #17917

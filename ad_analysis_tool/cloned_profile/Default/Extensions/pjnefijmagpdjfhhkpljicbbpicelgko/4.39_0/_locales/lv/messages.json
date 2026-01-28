@@ -1,0 +1,11 @@
+{
+   "desc": {
+      "message": "Izmantojiet diktātu, lai rakstītu vairāk nekā 10 000 vietņu vairāk nekā 50 valodās. VoiceIn pārraksta jūsu runu tekstā reāllaikā."
+   },
+   "name": {
+      "message": "Voice In - Runa uz tekstu diktēšana"
+   },
+   "shortName": {
+      "message": "Voice In"
+   }
+}

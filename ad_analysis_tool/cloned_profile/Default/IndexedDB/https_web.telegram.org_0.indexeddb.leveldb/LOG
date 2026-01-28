@@ -1,0 +1,9 @@
+2026/01/26-03:05:12.949 57e4 Reusing MANIFEST C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_web.telegram.org_0.indexeddb.leveldb/MANIFEST-000001
+2026/01/26-03:05:12.952 57e4 Recovering log #51
+2026/01/26-03:05:12.964 57e4 Reusing old log C:\Users\ADMIN\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_web.telegram.org_0.indexeddb.leveldb/000051.log 
+2026/01/26-03:09:05.764 1cc4 Compacting 1@1 + 1@2 files
+2026/01/26-03:09:05.799 1cc4 Generated table #54@1: 39 keys, 66703 bytes
+2026/01/26-03:09:05.799 1cc4 Compacted 1@1 + 1@2 files => 66703 bytes
+2026/01/26-03:09:05.801 1cc4 compacted to: files[ 0 0 1 0 0 0 0 ]
+2026/01/26-03:09:05.801 1cc4 Delete type=2 #49
+2026/01/26-03:09:05.801 1cc4 Delete type=2 #52
